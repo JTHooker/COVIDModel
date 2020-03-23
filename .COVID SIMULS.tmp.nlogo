@@ -176,10 +176,10 @@ to CountInfected
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-499
-113
-1044
-856
+501
+49
+1046
+792
 -1
 -1
 4.62
@@ -203,10 +203,10 @@ ticks
 30.0
 
 BUTTON
-396
-31
-460
-65
+346
+48
+410
+82
 NIL
 setup
 NIL
@@ -220,10 +220,10 @@ NIL
 1
 
 BUTTON
-365
-78
-429
-112
+315
+95
+379
+129
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
 T
@@ -271,21 +271,21 @@ NIL
 1
 
 SWITCH
-839
-126
-1034
-161
+840
+62
+1035
+97
 AvoidButton
 AvoidButton
-1
+0
 1
 -1000
 
 SLIDER
-1529
-230
-1669
-263
+1493
+553
+1633
+586
 ForwardDistance
 ForwardDistance
 0
@@ -297,10 +297,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1529
-265
-1671
-298
+1495
+602
+1637
+635
 BackwardDistance
 BackwardDistance
 0
@@ -342,10 +342,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1245
-988
-1523
-1147
+1153
+745
+1435
+904
 Susceptible, Infected and Recovered as a % of Population
 NIL
 NIL
@@ -377,21 +377,21 @@ NIL
 HORIZONTAL
 
 SWITCH
-838
-162
-1036
-197
+839
+98
+1037
+133
 Isolate
 Isolate
-1
+0
 1
 -1000
 
 PLOT
-1266
-630
-1466
-750
+1178
+398
+1378
+518
 Population
 NIL
 NIL
@@ -406,10 +406,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
 
 BUTTON
-430
-78
-494
-112
+380
+95
+444
+129
 Go Once
 go
 NIL
@@ -438,10 +438,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-505
-803
-562
-848
+506
+739
+563
+784
 Deaths
 Population - Count Simuls
 0
@@ -449,10 +449,10 @@ Population - Count Simuls
 11
 
 MONITOR
-1259
-762
-1334
-807
+1156
+918
+1231
+963
 Time Count
 ticks
 0
@@ -505,10 +505,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-840
-336
-1035
-371
+842
+272
+1037
+307
 Send_to_ICU
 Send_to_ICU
 1
@@ -524,17 +524,17 @@ Toilet_Rolls
 Toilet_Rolls
 0
 4
-0.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-1245
-815
-1514
-974
+1153
+575
+1433
+734
 Toilet Paper Reserves
 NIL
 NIL
@@ -564,10 +564,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1345
-753
-1404
-798
+1256
+520
+1315
+565
 # simuls
 count simuls
 0
@@ -575,10 +575,10 @@ count simuls
 11
 
 MONITOR
-1720
-354
-1938
-399
+1728
+346
+1946
+391
 NIL
 count patches with [ pcolor = white ]
 17
@@ -586,10 +586,10 @@ count patches with [ pcolor = white ]
 11
 
 MONITOR
-503
-655
-605
-700
+505
+590
+607
+635
 Total # Infected
 count simuls with [ color = red ]
 0
@@ -597,10 +597,10 @@ count simuls with [ color = red ]
 11
 
 PLOT
-499
-863
-1045
-1088
+501
+799
+1047
+1024
 # of infections
 NIL
 NIL
@@ -615,10 +615,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
 
 SLIDER
-839
-265
-1035
-300
+840
+200
+1036
+235
 ID_Rate
 ID_Rate
 0
@@ -630,10 +630,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1266
-476
-1466
-626
+1178
+243
+1378
+393
 Fear & Action
 NIL
 NIL
@@ -648,35 +648,35 @@ PENS
 "default" 1.0 0 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-123
-305
-273
-339
+122
+308
+272
+342
 Media_Exposure
 Media_Exposure
-0
+1
 100
-34.0
+53.0
 1
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-1510
-89
-1698
-158
-Media and knowledge link\n\nIf people are very ill, they won't move.\n\n
+1482
+148
+1671
+363
+Media and knowledge link\n\nIf people are very ill, they won't move.\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
 1
 
 MONITOR
-505
-703
-629
-748
+506
+639
+630
+684
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
@@ -684,10 +684,10 @@ mean [ timenow ] of simuls with [ color = red ]
 11
 
 SLIDER
-839
-300
-1035
-335
+840
+236
+1036
+271
 Superspreaders
 Superspreaders
 0
@@ -714,10 +714,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-505
-753
-623
-799
+506
+689
+624
+735
 % Total Infections
 numberInfected / Population * 100
 0
@@ -725,10 +725,10 @@ numberInfected / Population * 100
 11
 
 MONITOR
-1265
-276
-1464
-321
+1176
+43
+1375
+88
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -736,10 +736,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1265
-320
-1465
-470
+1176
+88
+1376
+238
 Case Fatality Rate %
 NIL
 NIL
@@ -754,30 +754,30 @@ PENS
 "default" 1.0 0 -5298144 true "" "plot (Population - Count Simuls) / numberInfected * 100"
 
 SLIDER
-838
-193
-1036
-228
+839
+129
+1037
+164
 Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-50.0
+100.0
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-838
-229
-1037
-264
+839
+165
+1038
+200
 Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-50.0
+100.0
 10
 1
 NIL
