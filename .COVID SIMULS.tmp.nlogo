@@ -342,10 +342,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1238
-996
-1516
-1155
+1245
+988
+1523
+1147
 Susceptible, Infected and Recovered as a % of Population
 NIL
 NIL
@@ -388,10 +388,10 @@ Isolate
 -1000
 
 PLOT
-1259
-639
-1459
-759
+1266
+630
+1466
+750
 Population
 NIL
 NIL
@@ -531,10 +531,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1238
-823
-1507
-982
+1245
+815
+1514
+974
 Toilet Paper Reserves
 NIL
 NIL
@@ -564,10 +564,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1338
-762
-1397
-807
+1345
+753
+1404
+798
 # simuls
 count simuls
 0
@@ -630,10 +630,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1259
-485
-1459
-635
+1266
+476
+1466
+626
 Fear & Action
 NIL
 NIL
@@ -725,10 +725,10 @@ numberInfected / Population * 100
 11
 
 MONITOR
-1258
-285
-1457
-330
+1265
+276
+1464
+321
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -736,10 +736,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1258
-329
-1458
-479
+1265
+320
+1465
+470
 Case Fatality Rate %
 NIL
 NIL
