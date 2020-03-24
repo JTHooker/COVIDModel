@@ -15,6 +15,9 @@ simuls-own [
   inICU
   fear
   sensitivity
+  R
+  income
+  expenditure
 ]
 
 patches-own [
@@ -42,18 +45,33 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 3 set shape "dot" set color 85 set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 fd random-float 1 ]
+      [ set size 3 set shape "dot" set color 85 set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 fd random-float 1 set R 0
+        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday]
     ]
-  ask one-of simuls [ set xcor 0 set ycor 0 set color red ]
+  ask n-of Initial simuls [ set xcor 0 set ycor 0 set color red ]
   reset-ticks
+
 end
 
 to resetlanding
   if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ]
 end
 
+to resetincome
+  if income < 10000 [
+    set income random-normal 50000 30000 ]
+end
+
+to calculateIncomeperday
+  set income income / 365
+end
+
+to calculateexpenditureperday
+  set expenditure income - random-normal 10 5
+end
+
 to go
-  ask simuls [ move avoid set shape "dot" recover settime karkit move avoid isolation reinfect createfear gatherreseources treat ] ;
+  ask simuls [ move avoid set shape "dot" recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -61,12 +79,17 @@ to go
   GlobalFear
   SuperSpread
   CountInfected
+  TriggerActionIsolation
+
+ ;; TriggerActionDistance
+ ;; TriggerActionICU
   tick
 end
 
 to move
   if color != red [ set heading heading + random 5 - random 5 fd pace avoidICUs ]
-  if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0 ]
+  if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+  if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Isolate = false [ set heading heading + random 90 - random 90 fd (pace * ( health / 100 )) ]
   if color = red and Send_to_ICU = false [ avoidICUs ]
 end
@@ -77,7 +100,7 @@ to isolation
 end
 
 to avoid
-  if avoidbutton = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
+  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
     ifelse any? other simuls-on patch-at-heading-and-distance heading forwarddistance [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
   [ set pace speed fd pace ] ]
 end
@@ -127,7 +150,7 @@ to deplete
 end
 
 to createfear
-  set fear fear + Fearfactor + random-normal -1 1
+  set fear fear + Fearfactor + random-normal -2 1
   if fear < 0 [ set fear 0 ]
  ; if fear > 100 [ set fear 100 ]
 end
@@ -174,15 +197,27 @@ end
 to CountInfected
   set numberinfected ( Population - count simuls ) + (count simuls with [ color != 85 ])
 end
+
+to TriggerActionIsolation
+  if PolicyTriggerOn = true [
+
+  ifelse mean [ fear ] of simuls > FearTrigger  [ set SpatialDistance true ] [ set SpatialDistance False ]
+  ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set isolate true ] [ set Isolate False ]
+  ]
+end
+
+to spend
+  set income income - expenditure
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 501
 49
-1046
-792
+939
+647
 -1
 -1
-4.62
+4.613
 1
 10
 1
@@ -274,18 +309,18 @@ SWITCH
 840
 62
 1035
-97
-AvoidButton
-AvoidButton
+95
+SpatialDistance
+SpatialDistance
 0
 1
 -1000
 
 SLIDER
-1493
-553
-1633
-586
+1480
+339
+1620
+372
 ForwardDistance
 ForwardDistance
 0
@@ -297,10 +332,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1495
-602
-1637
-635
+1480
+376
+1622
+409
 BackwardDistance
 BackwardDistance
 0
@@ -320,7 +355,7 @@ Population
 Population
 0
 20000
-5000.0
+2000.0
 1000
 1
 NIL
@@ -335,7 +370,7 @@ Speed
 Speed
 0
 1
-0.5
+0.11
 .01
 1
 NIL
@@ -365,12 +400,12 @@ SLIDER
 125
 233
 274
-267
+266
 Infectious_period
 Infectious_period
 0
 100
-15.0
+20.0
 5
 1
 NIL
@@ -380,7 +415,7 @@ SWITCH
 839
 98
 1037
-133
+131
 Isolate
 Isolate
 0
@@ -426,7 +461,7 @@ SLIDER
 121
 628
 319
-663
+661
 RestrictedMovement
 RestrictedMovement
 0
@@ -463,12 +498,12 @@ SLIDER
 121
 662
 319
-697
+695
 InfectionRate
 InfectionRate
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -478,7 +513,7 @@ SLIDER
 123
 269
 273
-303
+302
 ReInfectionRate
 ReInfectionRate
 0
@@ -493,7 +528,7 @@ SLIDER
 119
 348
 308
-383
+381
 Bed_Capacity
 Bed_Capacity
 0
@@ -508,7 +543,7 @@ SWITCH
 842
 272
 1037
-307
+305
 Send_to_ICU
 Send_to_ICU
 1
@@ -519,12 +554,12 @@ SLIDER
 122
 442
 311
-477
+475
 Toilet_Rolls
 Toilet_Rolls
 0
 4
-4.0
+0.0
 1
 1
 NIL
@@ -552,7 +587,7 @@ SLIDER
 119
 478
 315
-513
+511
 ProductionRate
 ProductionRate
 0
@@ -598,9 +633,9 @@ count simuls with [ color = red ]
 
 PLOT
 501
-799
+793
 1047
-1024
+1018
 # of infections
 NIL
 NIL
@@ -618,12 +653,12 @@ SLIDER
 840
 200
 1036
-235
+233
 ID_Rate
 ID_Rate
 0
 1
-1.0
+0.05
 .01
 1
 NIL
@@ -645,13 +680,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -2674135 true "" "plot mean [ fear ] of simuls"
+"default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
 122
 308
 272
-342
+341
 Media_Exposure
 Media_Exposure
 1
@@ -664,9 +699,9 @@ HORIZONTAL
 
 TEXTBOX
 1482
-148
+55
 1671
-363
+270
 Media and knowledge link\n\nIf people are very ill, they won't move.\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
@@ -687,7 +722,7 @@ SLIDER
 840
 236
 1036
-271
+269
 Superspreaders
 Superspreaders
 0
@@ -702,7 +737,7 @@ SLIDER
 122
 775
 322
-810
+808
 Seriousness_of_Infection
 Seriousness_of_Infection
 0
@@ -717,7 +752,7 @@ MONITOR
 506
 689
 624
-735
+734
 % Total Infections
 numberInfected / Population * 100
 0
@@ -757,7 +792,7 @@ SLIDER
 839
 129
 1037
-164
+162
 Proportion_People_Avoid
 Proportion_People_Avoid
 0
@@ -772,7 +807,7 @@ SLIDER
 839
 165
 1038
-200
+198
 Proportion_time_Avoid
 Proportion_time_Avoid
 0
@@ -787,12 +822,64 @@ SLIDER
 115
 393
 310
-428
+426
 Treatment_Benefit
 Treatment_Benefit
 0
 10
 2.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+152
+559
+326
+592
+FearTrigger
+FearTrigger
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1174
+520
+1233
+565
+R
+mean [ R ] of simuls with [ color != 85 ]
+2
+1
+11
+
+SWITCH
+1484
+419
+1628
+452
+PolicyTriggerOn
+PolicyTriggerOn
+1
+1
+-1000
+
+SLIDER
+124
+724
+326
+757
+Initial
+Initial
+0
+100
+20.0
 1
 1
 NIL
