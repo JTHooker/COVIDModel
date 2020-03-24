@@ -18,6 +18,7 @@ simuls-own [
   R
   income
   expenditure
+  reserves
 ]
 
 patches-own [
@@ -67,11 +68,11 @@ to calculateIncomeperday
 end
 
 to calculateexpenditureperday
-  set expenditure income - random-normal 10 5
+  set expenditure income * .99
 end
 
 to go
-  ask simuls [ move avoid set shape "dot" recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend ] ;
+  ask simuls [ move avoid set shape "dot" recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend reSpeed ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -102,7 +103,7 @@ end
 to avoid
   if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
     ifelse any? other simuls-on patch-at-heading-and-distance heading forwarddistance [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
-  [ set pace speed fd pace ] ]
+  [ set pace (speed / 2) fd pace ] ]
 end
 
 to finished
@@ -132,7 +133,7 @@ to allocatebed
 end
 
 to avoidICUs
-  if [ pcolor ] of patch-here = white and InICU = 0 [ move-to min-one-of patches with [ pcolor = black ]  [ distance myself ] set heading heading - 180   ]
+  if [ pcolor ] of patch-here = white and InICU = 0 [ move-to min-one-of patches with [ pcolor = black ]  [ distance myself ] set heading heading - random 90 + random 90 ]
 end
 
 to moveaway
@@ -207,7 +208,12 @@ to TriggerActionIsolation
 end
 
 to spend
-  set income income - expenditure
+  set expenditure expenditure + (expenditure * (.025 / 365 ) )
+  set reserves (income + income - expenditure )
+end
+
+to reSpeed
+  set pace speed
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -312,15 +318,15 @@ SWITCH
 95
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
 SLIDER
-1480
-339
-1620
-372
+2232
+413
+2372
+446
 ForwardDistance
 ForwardDistance
 0
@@ -332,10 +338,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1480
-376
-1622
-409
+2232
+451
+2374
+484
 BackwardDistance
 BackwardDistance
 0
@@ -370,17 +376,17 @@ Speed
 Speed
 0
 1
-0.11
+0.44
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1153
-745
-1435
-904
+1906
+819
+2188
+978
 Susceptible, Infected and Recovered as a % of Population
 NIL
 NIL
@@ -405,7 +411,7 @@ Infectious_period
 Infectious_period
 0
 100
-20.0
+15.0
 5
 1
 NIL
@@ -423,10 +429,10 @@ Isolate
 -1000
 
 PLOT
-1178
-398
-1378
-518
+1931
+472
+2131
+592
 Population
 NIL
 NIL
@@ -484,10 +490,10 @@ Population - Count Simuls
 11
 
 MONITOR
-1156
-918
-1231
-963
+1909
+992
+1984
+1037
 Time Count
 ticks
 0
@@ -566,10 +572,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1153
-575
-1433
-734
+1906
+649
+2186
+808
 Toilet Paper Reserves
 NIL
 NIL
@@ -599,10 +605,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1256
-520
-1315
-565
+2009
+593
+2068
+638
 # simuls
 count simuls
 0
@@ -610,10 +616,10 @@ count simuls
 11
 
 MONITOR
-1728
-346
-1946
-391
+2480
+420
+2698
+465
 NIL
 count patches with [ pcolor = white ]
 17
@@ -632,10 +638,10 @@ count simuls with [ color = red ]
 11
 
 PLOT
-501
-793
-1047
-1018
+705
+533
+1041
+788
 # of infections
 NIL
 NIL
@@ -665,10 +671,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1178
-243
-1378
-393
+1931
+318
+2131
+468
 Fear & Action
 NIL
 NIL
@@ -698,10 +704,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1482
-55
-1671
-270
+2235
+129
+2424
+344
 Media and knowledge link\n\nIf people are very ill, they won't move.\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
@@ -760,10 +766,10 @@ numberInfected / Population * 100
 11
 
 MONITOR
-1176
-43
-1375
-88
+1925
+99
+2124
+144
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -771,10 +777,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1176
-88
-1376
-238
+1929
+162
+2129
+312
 Case Fatality Rate %
 NIL
 NIL
@@ -797,7 +803,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+50.0
 10
 1
 NIL
@@ -812,7 +818,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-100.0
+50.0
 10
 1
 NIL
@@ -849,10 +855,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1174
-520
-1233
-565
+1926
+593
+1985
+638
 R
 mean [ R ] of simuls with [ color != 85 ]
 2
@@ -860,10 +866,10 @@ mean [ R ] of simuls with [ color != 85 ]
 11
 
 SWITCH
-1484
-419
-1628
-452
+2236
+493
+2380
+526
 PolicyTriggerOn
 PolicyTriggerOn
 1
@@ -884,6 +890,35 @@ Initial
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1092
+300
+1217
+346
+Financial Researves
+mean [ reserves ] of simuls
+1
+1
+11
+
+PLOT
+1125
+425
+1497
+621
+Financial Reserves
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ income ] of simuls"
 
 @#$#@#$#@
 ## WHAT IS IT?
