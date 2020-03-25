@@ -53,7 +53,7 @@ to setup
       [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ count simuls-here = 0 and pcolor = black  ]]
     ]
-  ask n-of (Current * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
+  ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
   reset-ticks
 
 end
@@ -355,7 +355,7 @@ Population
 Population
 0
 10000
-2500.0
+5000.0
 500
 1
 NIL
@@ -476,7 +476,7 @@ MONITOR
 506
 760
 595
-818
+817
 Deaths
 Count simuls with [ color = green ] * (25000000 / population )
 0
@@ -602,9 +602,9 @@ MONITOR
 1103
 239
 1241
-297
+296
 # simuls
-count simuls * (25000000 / population)
+count simuls * (Total_Population / population)
 0
 1
 14
@@ -647,7 +647,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (25000 / Population )"
+"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 SLIDER
 869
@@ -956,7 +956,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-55.0
+80.0
 5
 1
 NIL
@@ -978,8 +978,19 @@ INPUTBOX
 130
 492
 191
-Current
+Current_Cases
 10000.0
+1
+0
+Number
+
+INPUTBOX
+339
+223
+495
+284
+Total_Population
+2.5E7
 1
 0
 Number

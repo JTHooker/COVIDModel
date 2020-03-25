@@ -342,7 +342,7 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -355,7 +355,7 @@ Population
 Population
 0
 10000
-2500.0
+5000.0
 500
 1
 NIL
@@ -418,7 +418,7 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -476,7 +476,7 @@ MONITOR
 506
 760
 595
-818
+817
 Deaths
 Count simuls with [ color = green ] * (25000000 / population )
 0
@@ -602,9 +602,9 @@ MONITOR
 1103
 239
 1241
-297
+296
 # simuls
-count simuls * (25000000 / population)
+count simuls * (Total_Population / population)
 0
 1
 14
@@ -647,7 +647,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (25000 / Population )"
+"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 SLIDER
 869
@@ -980,6 +980,17 @@ INPUTBOX
 191
 Current_Cases
 10000.0
+1
+0
+Number
+
+INPUTBOX
+339
+223
+495
+284
+Total_Population
+2.5E7
 1
 0
 Number
