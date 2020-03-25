@@ -97,7 +97,7 @@ to go
 end
 
 to move
-  if color != red [ fd pace set heading heading + random 5 - random 5 avoidICUs ]
+  if color != red [ fd pace avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 [ set heading heading + random 90 - random 90 fd pace ]
@@ -111,8 +111,8 @@ to isolation
 end
 
 to avoid
-  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and ticks > 3 [
-    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
+  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
+    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 fd pace set heading heading + random 45 - random 45  ]
   [ set pace (speed / 2) fd pace ] ]
 end
 
@@ -380,7 +380,7 @@ Speed
 Speed
 0
 1
-0.51
+0.5
 .01
 1
 NIL
@@ -488,7 +488,7 @@ MONITOR
 595
 817
 Deaths
-Count simuls with [ color = green ] * (Total_Population / population )
+Count simuls with [ color = black ] * (Total_Population / population )
 0
 1
 14
@@ -807,7 +807,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+100.0
 5
 1
 NIL
@@ -822,7 +822,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-90.0
+100.0
 5
 1
 NIL
@@ -859,10 +859,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1175
-540
-1234
-585
+1110
+533
+1169
+578
 R
 mean [ R ] of simuls with [ color = red and timenow > 12 ]
 3
@@ -1025,7 +1025,7 @@ MONITOR
 347
 1266
 392
-CLose contacts pper day
+Close contacts per day
 mean [ contacts] of simuls / ticks
 2
 1
@@ -1042,12 +1042,12 @@ NIL
 0.0
 10.0
 0.0
-10.0
+1.0
 true
 false
 "" ""
 PENS
-"Contacts" 1.0 0 -16777216 true "" "plot mean [ contacts ] of simuls with [ color != black  ] "
+"Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 @#$#@#$#@
 ## WHAT IS IT?
