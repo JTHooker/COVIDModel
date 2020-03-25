@@ -77,7 +77,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend reSpeed ] ;
+  ask simuls [ move avoid recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend  ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -85,9 +85,9 @@ to go
   GlobalFear
   SuperSpread
   CountInfected
-  TriggerActionIsolation
   CruiseShip
   CalculateDailyGrowth
+  TriggerActionIsolation
 
  ;; TriggerActionDistance
  ;; TriggerActionICU
@@ -214,8 +214,10 @@ end
 to TriggerActionIsolation
   if PolicyTriggerOn = true [
 
-  ifelse mean [ fear ] of simuls > FearTrigger  [ set SpatialDistance true ] [ set SpatialDistance False ]
-  ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set Case_Isolation true ] [ set Case_Isolation False ]
+ ;; ifelse mean [ fear ] of simuls > FearTrigger  [ set SpatialDistance true ] [ set SpatialDistance False ]
+ ;; ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set Case_Isolation true ] [ set Case_Isolation False ]
+
+    ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true ] [ set SpatialDistance False set Case_Isolation False ]
   ]
 end
 
@@ -225,13 +227,14 @@ to spend
 end
 
 to reSpeed
-  set pace speed
+  if color != red [ set pace speed ]
 end
 
 to Cruiseship
   if mouse-down? [
-    create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 3 set shape "dot" set color red set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-      set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday ] ]
+    create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 3 set shape "dot" set color red set health (random 100) set timenow 0 set pace Speed set InICU 0
+      set fear 0 set sensitivity random-float 1 set R 0 set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday ]
+  ]
 end
 
 to CalculateDailyGrowth
@@ -239,6 +242,7 @@ to CalculateDailyGrowth
   set TodayInfections ( count simuls with [ color = red ] )
   if YesterdayInfections != 0 [set InfectionChange ( TodayInfections / YesterdayInfections ) ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 498
@@ -268,10 +272,10 @@ ticks
 30.0
 
 BUTTON
-156
-146
-220
-180
+174
+64
+238
+98
 NIL
 setup
 NIL
@@ -285,10 +289,10 @@ NIL
 1
 
 BUTTON
-125
-193
-189
-227
+142
+112
+206
+146
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
 T
@@ -302,10 +306,10 @@ NIL
 1
 
 BUTTON
-121
-366
-239
-400
+144
+237
+262
+271
 Trace_Patterns
 ask one-of turtles with [ color = red ] [ pen-down ] 
 NIL
@@ -319,10 +323,10 @@ NIL
 1
 
 BUTTON
-121
-412
-239
-446
+144
+284
+262
+318
 UnTrace
 ask turtles [ pen-up ]
 NIL
@@ -342,15 +346,15 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
 SLIDER
-112
-289
-252
-322
+134
+159
+274
+192
 Population
 Population
 0
@@ -362,25 +366,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-112
-323
-253
-356
+134
+194
+275
+227
 Speed
 Speed
 0
 1
-1.0
+0.5
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-501
-862
-1096
-1125
+1535
+159
+2130
+422
 Susceptible, Infected and Recovered - 000's
 Days from March 10th
 Numbers of people
@@ -397,10 +401,10 @@ PENS
 "Susceptible" 1.0 0 -1184463 true "" "plot count simuls with [ color = yellow ] * (25000 / count Simuls)"
 
 SLIDER
-113
-461
-262
-494
+134
+332
+283
+365
 Infectious_period
 Infectious_period
 0
@@ -418,7 +422,7 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -441,10 +445,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
 
 BUTTON
-189
-193
-253
-227
+209
+112
+273
+146
 Go Once
 go
 NIL
@@ -458,15 +462,15 @@ NIL
 1
 
 SLIDER
-109
-855
-307
-888
+132
+724
+330
+757
 RestrictedMovement
 RestrictedMovement
 0
 1
-0.1
+0.0
 .01
 1
 NIL
@@ -478,7 +482,7 @@ MONITOR
 595
 817
 Deaths
-Count simuls with [ color = green ] * (25000000 / population )
+Count simuls with [ color = green ] * (Total_Population / population )
 0
 1
 14
@@ -495,10 +499,10 @@ ticks
 11
 
 SLIDER
-109
-889
-307
-922
+132
+759
+330
+792
 InfectionRate
 InfectionRate
 0
@@ -510,10 +514,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-112
-496
-262
-529
+134
+367
+284
+400
 ReInfectionRate
 ReInfectionRate
 0
@@ -525,10 +529,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-108
-575
-297
-608
+129
+444
+318
+477
 Bed_Capacity
 Bed_Capacity
 0
@@ -546,15 +550,15 @@ SWITCH
 303
 Send_to_ICU
 Send_to_ICU
-1
+0
 1
 -1000
 
 SLIDER
-110
-669
-299
-702
+132
+539
+321
+572
 Toilet_Rolls
 Toilet_Rolls
 0
@@ -584,10 +588,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "plot mean [ volume ] of resources"
 
 SLIDER
-108
-705
-304
-738
+129
+574
+325
+607
 ProductionRate
 ProductionRate
 0
@@ -658,7 +662,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.5
+0.43
 .01
 1
 NIL
@@ -683,10 +687,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-110
-535
-260
-568
+132
+404
+282
+437
 Media_Exposure
 Media_Exposure
 1
@@ -698,10 +702,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1599
-188
-1788
-403
+1584
+452
+1773
+667
 Media and knowledge link\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
@@ -734,10 +738,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-110
-1002
-310
-1035
+132
+874
+332
+907
 Seriousness_of_Infection
 Seriousness_of_Infection
 0
@@ -797,7 +801,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-80.0
+90.0
 5
 1
 NIL
@@ -812,17 +816,17 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-80.0
+90.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-103
-620
-298
-653
+124
+489
+319
+522
 Treatment_Benefit
 Treatment_Benefit
 0
@@ -834,10 +838,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-140
-786
-314
-819
+162
+657
+336
+690
 FearTrigger
 FearTrigger
 0
@@ -860,21 +864,21 @@ mean [ R ] of simuls with [ color = red and timenow > 12 ]
 11
 
 SWITCH
-1600
-552
-1744
-585
+325
+325
+469
+358
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
 SLIDER
-112
-951
-314
-984
+134
+822
+336
+855
 Initial
 Initial
 0
@@ -956,7 +960,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-80.0
+0.0
 5
 1
 NIL
@@ -974,10 +978,10 @@ infectionchange
 11
 
 INPUTBOX
-336
-130
-492
-191
+322
+149
+478
+210
 Current_Cases
 10000.0
 1
@@ -985,15 +989,30 @@ Current_Cases
 Number
 
 INPUTBOX
-339
-223
-495
-284
+322
+215
+478
+276
 Total_Population
 2.5E7
 1
 0
 Number
+
+SLIDER
+310
+285
+484
+318
+Triggerday
+Triggerday
+0
+100
+6.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
