@@ -22,6 +22,7 @@ simuls-own [
   income
   expenditure
   reserves
+  agerange
 ]
 
 patches-own [
@@ -49,10 +50,10 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 fd random-float 1 set R 0
-        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday]
+      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ count simuls-here = 0 and pcolor = black  ]]
     ]
-  ask n-of Initial simuls [ set xcor 0 set ycor 0 set color red ]
+  ask n-of (Current * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
   reset-ticks
 
 end
@@ -63,7 +64,7 @@ end
 
 to resetincome
   if income < 10000 [
-    set income random-normal 50000 30000 ]
+    set income random 100000 ]
 end
 
 to calculateIncomeperday
@@ -74,8 +75,9 @@ to calculateexpenditureperday
   set expenditure income * .99
 end
 
+
 to go
-  ask simuls [ move avoid set shape "dot" recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend reSpeed ] ;
+  ask simuls [ move avoid recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend reSpeed ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -93,11 +95,12 @@ to go
 end
 
 to move
-  if color != red [ set heading heading + random 5 - random 5 fd pace avoidICUs ]
+  if color != red [ fd pace set heading heading + random 5 - random 5 avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
-  if color = red and Case_Isolation = false [ set heading heading + random 90 - random 90 fd (pace * ( health / 100 )) ]
+  if color = red and Case_Isolation = false and Proportion_Isolating < random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_ICU = false [ avoidICUs ]
+  if color = black [set pace 0 fd pace ]
 end
 
 to isolation
@@ -107,7 +110,7 @@ end
 
 to avoid
   if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
-    ifelse any? other simuls-on patch-at-heading-and-distance heading forwarddistance [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
+    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
   [ set pace (speed / 2) fd pace ] ]
 end
 
@@ -121,11 +124,11 @@ to settime
 end
 
 to karkit
-  if health < 0 [ set color black die ]
+  if health < 0 [ set color green ]
 end
 
 to recover
-  if timenow > random-normal Infectious_Period ( Infectious_Period / 5) [
+  if timenow > random-normal Infectious_Period  ( Infectious_Period / 5) and color != green  [
     set color yellow set timenow 0 set health random 100 set inICU 0  ]
 end
 
@@ -192,8 +195,12 @@ to treat
 end
 
 to superSpread
-  if count simuls with [ color = red ] > 0 and Case_Isolation = false  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = true and Proportion_Isolating < random 100  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+
 end
+
+;; change pace with health
 
 to PossiblyDie
   if InICU = 0 and Seriousness_of_infection / Infectious_Period > random 100 [ set health health - Seriousness_of_Infection ]
@@ -234,10 +241,10 @@ to CalculateDailyGrowth
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-497
-43
-1092
-856
+498
+45
+1093
+858
 -1
 -1
 7.25
@@ -261,10 +268,10 @@ ticks
 30.0
 
 BUTTON
-346
-48
-410
-82
+156
+146
+220
+180
 NIL
 setup
 NIL
@@ -278,10 +285,10 @@ NIL
 1
 
 BUTTON
-315
-95
-379
-129
+125
+193
+189
+227
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
 T
@@ -295,10 +302,10 @@ NIL
 1
 
 BUTTON
-132
-139
-250
-173
+121
+366
+239
+400
 Trace_Patterns
 ask one-of turtles with [ color = red ] [ pen-down ] 
 NIL
@@ -312,10 +319,10 @@ NIL
 1
 
 BUTTON
-132
-185
-250
-219
+121
+412
+239
+446
 UnTrace
 ask turtles [ pen-up ]
 NIL
@@ -329,51 +336,21 @@ NIL
 1
 
 SWITCH
-840
-62
-1035
-95
+869
+61
+1064
+94
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
 SLIDER
-1596
-472
-1736
-505
-ForwardDistance
-ForwardDistance
-0
-20
-1.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1596
-509
-1738
-542
-BackwardDistance
-BackwardDistance
-0
-20
-1.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-123
-62
-263
-95
+112
+289
+252
+322
 Population
 Population
 0
@@ -385,28 +362,28 @@ NIL
 HORIZONTAL
 
 SLIDER
-123
-96
-264
-129
+112
+323
+253
+356
 Speed
 Speed
 0
 1
-0.5
+1.0
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1270
-878
-1552
-1037
-Susceptible, Infected and Recovered as a % of Population
-NIL
-NIL
+501
+862
+1096
+1125
+Susceptible, Infected and Recovered - 000's
+Days from March 10th
+Numbers of people
 0.0
 10.0
 0.0
@@ -415,15 +392,15 @@ true
 false
 "" ""
 PENS
-"Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] / count simuls * 100"
-"Recovered Proportion" 1.0 0 -14070903 true "" "plot count simuls with [ color = 85 ] / count simuls * 100"
-"Susceptible" 1.0 0 -1184463 true "" "plot count simuls with [ color = yellow ] / count simuls * 100"
+"Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (25000 / count Simuls) "
+"Recovered Proportion" 1.0 0 -14070903 true "" "plot count simuls with [ color = 85 ] * (25000 / count Simuls)"
+"Susceptible" 1.0 0 -1184463 true "" "plot count simuls with [ color = yellow ] * (25000 / count Simuls)"
 
 SLIDER
-125
-233
-274
-266
+113
+461
+262
+494
 Infectious_period
 Infectious_period
 0
@@ -435,10 +412,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-839
-98
-1037
-131
+869
+96
+1067
+129
 Case_Isolation
 Case_Isolation
 1
@@ -464,10 +441,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
 
 BUTTON
-380
-95
-444
-129
+189
+193
+253
+227
 Go Once
 go
 NIL
@@ -481,10 +458,10 @@ NIL
 1
 
 SLIDER
-121
-628
-319
-661
+109
+855
+307
+888
 RestrictedMovement
 RestrictedMovement
 0
@@ -498,10 +475,10 @@ HORIZONTAL
 MONITOR
 506
 760
-569
-817
+595
+818
 Deaths
-Population - Count Simuls
+Count simuls with [ color = green ] * (25000000 / population )
 0
 1
 14
@@ -518,25 +495,25 @@ ticks
 11
 
 SLIDER
-121
-662
-319
-695
+109
+889
+307
+922
 InfectionRate
 InfectionRate
 0
 100
-100.0
+50.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-123
-269
-273
-302
+112
+496
+262
+529
 ReInfectionRate
 ReInfectionRate
 0
@@ -548,14 +525,14 @@ NIL
 HORIZONTAL
 
 SLIDER
-119
-348
-308
-381
+108
+575
+297
+608
 Bed_Capacity
 Bed_Capacity
 0
-100
+20
 15.0
 1
 1
@@ -563,21 +540,21 @@ NIL
 HORIZONTAL
 
 SWITCH
-842
-272
-1037
-305
+869
+270
+1069
+303
 Send_to_ICU
 Send_to_ICU
-0
+1
 1
 -1000
 
 SLIDER
-122
-442
-311
-475
+110
+669
+299
+702
 Toilet_Rolls
 Toilet_Rolls
 0
@@ -607,10 +584,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "plot mean [ volume ] of resources"
 
 SLIDER
-119
-478
-315
-511
+108
+705
+304
+738
 ProductionRate
 ProductionRate
 0
@@ -623,14 +600,14 @@ HORIZONTAL
 
 MONITOR
 1103
-232
-1162
-277
+239
+1241
+297
 # simuls
-count simuls
+count simuls * (25000000 / population)
 0
 1
-11
+14
 
 MONITOR
 1843
@@ -649,17 +626,17 @@ MONITOR
 631
 647
 Total # Infected
-count simuls with [ color = red ]
+count simuls with [ color = red ] * (25000000 / population)
 0
 1
 14
 
 PLOT
-502
-856
-1091
-1112
-# of infections
+1236
+889
+1558
+1051
+# of infections '000s
 NIL
 NIL
 0.0
@@ -670,18 +647,18 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
+"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (25000 / Population )"
 
 SLIDER
-840
-200
-1039
-233
+869
+198
+1068
+231
 ID_Rate
 ID_Rate
 0
 1
-0.1
+0.5
 .01
 1
 NIL
@@ -706,10 +683,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-122
-308
-272
-341
+110
+535
+260
+568
 Media_Exposure
 Media_Exposure
 1
@@ -725,7 +702,7 @@ TEXTBOX
 188
 1788
 403
-Media and knowledge link\n\nIf people are very ill, they won't move.\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
+Media and knowledge link\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
 1
@@ -742,10 +719,10 @@ mean [ timenow ] of simuls with [ color = red ]
 14
 
 SLIDER
-840
-236
-1036
-269
+869
+235
+1065
+268
 Superspreaders
 Superspreaders
 0
@@ -757,10 +734,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-122
-775
-322
-808
+110
+1002
+310
+1035
 Seriousness_of_Infection
 Seriousness_of_Infection
 0
@@ -812,55 +789,55 @@ PENS
 "default" 1.0 0 -5298144 true "" "plot (Population - Count Simuls) / numberInfected * 100"
 
 SLIDER
-839
-129
-1037
-162
+869
+128
+1067
+161
 Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-70.0
-10
+80.0
+5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-839
-165
-1038
-198
+869
+163
+1068
+196
 Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-70.0
-10
+80.0
+5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-115
-393
-310
-426
+103
+620
+298
+653
 Treatment_Benefit
 Treatment_Benefit
 0
 10
-2.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-152
-559
-326
-592
+140
+786
+314
+819
 FearTrigger
 FearTrigger
 0
@@ -877,8 +854,8 @@ MONITOR
 1349
 697
 R
-mean [ R ] of simuls with [ color = red and timenow = 15 ]
-2
+mean [ R ] of simuls with [ color = red and timenow > 12 ]
+3
 1
 11
 
@@ -894,10 +871,10 @@ PolicyTriggerOn
 -1000
 
 SLIDER
-124
-724
-326
-757
+112
+951
+314
+984
 Initial
 Initial
 0
@@ -920,11 +897,11 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1589
-693
-1961
-889
-Financial Reserves
+1593
+689
+1962
+888
+Age range of deceased
 NIL
 NIL
 0.0
@@ -932,10 +909,10 @@ NIL
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "histogram [ income ] of simuls"
+"default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = green ] "
 
 SLIDER
 1573
@@ -952,34 +929,60 @@ Track_and_Trace_Resources
 NIL
 HORIZONTAL
 
-MONITOR
-506
-538
-662
-588
-Daily Infection Change
-InfectionChange
-3
-1
-12
-
 PLOT
 1592
 898
 1965
 1048
-Infection Growth Rate
+Infection Proportional Growth Rate
 Time
 Growth rate
 0.0
 300.0
 0.0
 2.0
-false
+true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot InfectionChange - 1 "
+"default" 1.0 0 -16777216 true "" "plot (InfectionChange - 1 ) * 100"
+
+SLIDER
+870
+308
+1069
+341
+Proportion_Isolating
+Proportion_Isolating
+0
+100
+55.0
+5
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1773
+943
+1905
+988
+Infection Growth %
+infectionchange
+2
+1
+11
+
+INPUTBOX
+336
+130
+492
+191
+Current
+10000.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
