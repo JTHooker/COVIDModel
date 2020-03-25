@@ -23,6 +23,7 @@ simuls-own [
   expenditure
   reserves
   agerange
+  contacts
 ]
 
 patches-own [
@@ -51,7 +52,7 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ count simuls-here = 0 and pcolor = black  ]]
+        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [  pcolor = black  ] spend ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
   reset-ticks
@@ -77,7 +78,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime karkit move avoid isolation reinfect createfear gatherreseources treat Spend  ] ;
+  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Spend Countcontacts ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -88,6 +89,7 @@ to go
   CruiseShip
   CalculateDailyGrowth
   TriggerActionIsolation
+
 
  ;; TriggerActionDistance
  ;; TriggerActionICU
@@ -109,7 +111,7 @@ to isolation
 end
 
 to avoid
-  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
+  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and ticks > 3 [
     ifelse any? other simuls-on patch-ahead 1 [ set pace 0 fd pace set heading heading + random 180 - random 180  ]
   [ set pace (speed / 2) fd pace ] ]
 end
@@ -124,11 +126,11 @@ to settime
 end
 
 to karkit
-  if health < 0 [ set color green ]
+  if health < 0 [ set color black ]
 end
 
 to recover
-  if timenow > random-normal Infectious_Period  ( Infectious_Period / 5) and color != green  [
+  if timenow > random-normal Infectious_Period  ( Infectious_Period / 5) and color != black  [
     set color yellow set timenow 0 set health random 100 set inICU 0  ]
 end
 
@@ -243,6 +245,10 @@ to CalculateDailyGrowth
   if YesterdayInfections != 0 [set InfectionChange ( TodayInfections / YesterdayInfections ) ]
 end
 
+to countcontacts
+  if any? other simuls-here with [ color != black ] [
+    set contacts ( contacts + 1 ) ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 498
@@ -346,7 +352,7 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -374,7 +380,7 @@ Speed
 Speed
 0
 1
-0.5
+0.51
 .01
 1
 NIL
@@ -422,15 +428,15 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
 PLOT
-1295
-530
-1495
-650
+1292
+425
+1492
+545
 Population
 NIL
 NIL
@@ -550,7 +556,7 @@ SWITCH
 303
 Send_to_ICU
 Send_to_ICU
-0
+1
 1
 -1000
 
@@ -570,10 +576,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1270
-708
-1550
-867
+1267
+604
+1547
+763
 Toilet Paper Reserves
 NIL
 NIL
@@ -636,10 +642,10 @@ count simuls with [ color = red ] * (25000000 / population)
 14
 
 PLOT
-1236
-889
-1558
-1051
+1233
+785
+1555
+947
 # of infections '000s
 NIL
 NIL
@@ -662,17 +668,17 @@ ID_Rate
 ID_Rate
 0
 1
-0.43
+1.0
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1295
-376
-1495
-526
+1292
+272
+1492
+422
 Fear & Action
 NIL
 NIL
@@ -764,10 +770,10 @@ numberInfected / Population * 100
 14
 
 MONITOR
-1289
-158
-1488
-203
+1287
+54
+1486
+99
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -775,10 +781,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1293
-220
-1493
-370
+1290
+115
+1490
+265
 Case Fatality Rate %
 NIL
 NIL
@@ -853,10 +859,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1290
-652
-1349
-697
+1175
+540
+1234
+585
 R
 mean [ R ] of simuls with [ color = red and timenow > 12 ]
 3
@@ -870,7 +876,7 @@ SWITCH
 358
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -901,22 +907,22 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1593
-689
-1962
-888
+1805
+554
+2174
+753
 Age range of deceased
 NIL
 NIL
 0.0
-10.0
+100.0
 0.0
-10.0
+50.0
 true
 true
 "" ""
 PENS
-"default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = green ] "
+"default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 SLIDER
 1573
@@ -934,10 +940,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1592
-898
-1965
-1048
+1587
+797
+1960
+947
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -967,10 +973,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1773
-943
-1905
-988
+1768
+842
+1900
+887
 Infection Growth %
 infectionchange
 2
@@ -1008,11 +1014,40 @@ Triggerday
 Triggerday
 0
 100
-6.0
+10.0
 1
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1112
+347
+1266
+392
+CLose contacts pper day
+mean [ contacts] of simuls / ticks
+2
+1
+11
+
+PLOT
+1095
+408
+1295
+528
+Close contacts per day
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Contacts" 1.0 0 -16777216 true "" "plot mean [ contacts ] of simuls with [ color != black  ] "
 
 @#$#@#$#@
 ## WHAT IS IT?
