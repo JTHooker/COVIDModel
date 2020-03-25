@@ -2,6 +2,9 @@ globals [
 
   FearFactor
   NumberInfected
+  InfectionChange
+  TodayInfections
+  YesterdayInfections
   ]
 
 breed [ simuls simul ]
@@ -46,7 +49,7 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 3 set shape "dot" set color 85 set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 fd random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 fd random-float 1 set R 0
         set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday]
     ]
   ask n-of Initial simuls [ set xcor 0 set ycor 0 set color red ]
@@ -81,6 +84,8 @@ to go
   SuperSpread
   CountInfected
   TriggerActionIsolation
+  CruiseShip
+  CalculateDailyGrowth
 
  ;; TriggerActionDistance
  ;; TriggerActionICU
@@ -91,12 +96,12 @@ to move
   if color != red [ set heading heading + random 5 - random 5 fd pace avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
-  if color = red and Isolate = false [ set heading heading + random 90 - random 90 fd (pace * ( health / 100 )) ]
+  if color = red and Case_Isolation = false [ set heading heading + random 90 - random 90 fd (pace * ( health / 100 )) ]
   if color = red and Send_to_ICU = false [ avoidICUs ]
 end
 
 to isolation
-  if Isolate = true and color = red [
+  if Case_Isolation = true and color = red [
     set pace RestrictedMovement fd pace ]
 end
 
@@ -187,7 +192,7 @@ to treat
 end
 
 to superSpread
-  if count simuls with [ color = red ] > 0 and isolate = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = false  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
 end
 
 to PossiblyDie
@@ -203,7 +208,7 @@ to TriggerActionIsolation
   if PolicyTriggerOn = true [
 
   ifelse mean [ fear ] of simuls > FearTrigger  [ set SpatialDistance true ] [ set SpatialDistance False ]
-  ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set isolate true ] [ set Isolate False ]
+  ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set Case_Isolation true ] [ set Case_Isolation False ]
   ]
 end
 
@@ -215,15 +220,27 @@ end
 to reSpeed
   set pace speed
 end
+
+to Cruiseship
+  if mouse-down? [
+    create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 3 set shape "dot" set color red set health (random 100) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+      set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday ] ]
+end
+
+to CalculateDailyGrowth
+  set YesterdayInfections TodayInfections
+  set TodayInfections ( count simuls with [ color = red ] )
+  if YesterdayInfections != 0 [set InfectionChange ( TodayInfections / YesterdayInfections ) ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-501
-49
-1046
-794
+497
+43
+1092
+856
 -1
 -1
-4.613
+7.25
 1
 10
 1
@@ -323,10 +340,10 @@ SpatialDistance
 -1000
 
 SLIDER
-2232
-413
-2372
-446
+1596
+472
+1736
+505
 ForwardDistance
 ForwardDistance
 0
@@ -338,10 +355,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-2232
-451
-2374
-484
+1596
+509
+1738
+542
 BackwardDistance
 BackwardDistance
 0
@@ -360,9 +377,9 @@ SLIDER
 Population
 Population
 0
-20000
-2000.0
-1000
+10000
+2500.0
+500
 1
 NIL
 HORIZONTAL
@@ -376,17 +393,17 @@ Speed
 Speed
 0
 1
-0.44
+0.5
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1906
-819
-2188
-978
+1270
+878
+1552
+1037
 Susceptible, Infected and Recovered as a % of Population
 NIL
 NIL
@@ -422,17 +439,17 @@ SWITCH
 98
 1037
 131
-Isolate
-Isolate
+Case_Isolation
+Case_Isolation
 1
 1
 -1000
 
 PLOT
-1931
-472
-2131
-592
+1295
+530
+1495
+650
 Population
 NIL
 NIL
@@ -480,20 +497,20 @@ HORIZONTAL
 
 MONITOR
 506
-739
-563
-784
+760
+569
+817
 Deaths
 Population - Count Simuls
 0
 1
-11
+14
 
 MONITOR
-1909
-992
-1984
-1037
+1273
+1050
+1348
+1095
 Time Count
 ticks
 0
@@ -552,7 +569,7 @@ SWITCH
 305
 Send_to_ICU
 Send_to_ICU
-1
+0
 1
 -1000
 
@@ -572,10 +589,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1906
-649
-2186
-808
+1270
+708
+1550
+867
 Toilet Paper Reserves
 NIL
 NIL
@@ -605,10 +622,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-2009
-593
-2068
-638
+1103
+232
+1162
+277
 # simuls
 count simuls
 0
@@ -616,10 +633,10 @@ count simuls
 11
 
 MONITOR
-2480
-420
-2698
-465
+1843
+478
+2061
+523
 NIL
 count patches with [ pcolor = white ]
 17
@@ -629,19 +646,19 @@ count patches with [ pcolor = white ]
 MONITOR
 505
 590
-607
-635
+631
+647
 Total # Infected
 count simuls with [ color = red ]
 0
 1
-11
+14
 
 PLOT
-705
-533
-1041
-788
+502
+856
+1091
+1112
 # of infections
 NIL
 NIL
@@ -658,23 +675,23 @@ PENS
 SLIDER
 840
 200
-1036
+1039
 233
 ID_Rate
 ID_Rate
 0
 1
-0.05
+0.1
 .01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1931
-318
-2131
-468
+1295
+376
+1495
+526
 Fear & Action
 NIL
 NIL
@@ -704,25 +721,25 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-2235
-129
-2424
-344
+1599
+188
+1788
+403
 Media and knowledge link\n\nIf people are very ill, they won't move.\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
 11
 0.0
 1
 
 MONITOR
-506
-639
-630
-684
+505
+646
+655
+703
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
 1
-11
+14
 
 SLIDER
 840
@@ -756,20 +773,20 @@ HORIZONTAL
 
 MONITOR
 506
-689
-624
-734
+703
+647
+760
 % Total Infections
 numberInfected / Population * 100
 0
 1
-11
+14
 
 MONITOR
-1925
-99
-2124
-144
+1289
+158
+1488
+203
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -777,10 +794,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1929
-162
-2129
-312
+1293
+220
+1493
+370
 Case Fatality Rate %
 NIL
 NIL
@@ -803,7 +820,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-50.0
+70.0
 10
 1
 NIL
@@ -818,7 +835,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-50.0
+70.0
 10
 1
 NIL
@@ -855,21 +872,21 @@ NIL
 HORIZONTAL
 
 MONITOR
-1926
-593
-1985
-638
+1290
+652
+1349
+697
 R
-mean [ R ] of simuls with [ color != 85 ]
+mean [ R ] of simuls with [ color = red and timenow = 15 ]
 2
 1
 11
 
 SWITCH
-2236
-493
-2380
-526
+1600
+552
+1744
+585
 PolicyTriggerOn
 PolicyTriggerOn
 1
@@ -885,28 +902,28 @@ Initial
 Initial
 0
 100
-20.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1092
-300
-1217
-346
-Financial Researves
+1100
+169
+1239
+226
+Financial Reserves
 mean [ reserves ] of simuls
 1
 1
-11
+14
 
 PLOT
-1125
-425
-1497
-621
+1589
+693
+1961
+889
 Financial Reserves
 NIL
 NIL
@@ -919,6 +936,50 @@ false
 "" ""
 PENS
 "default" 1.0 1 -16777216 true "" "histogram [ income ] of simuls"
+
+SLIDER
+1573
+92
+1783
+125
+Track_and_Trace_Resources
+Track_and_Trace_Resources
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+506
+538
+662
+588
+Daily Infection Change
+InfectionChange
+3
+1
+12
+
+PLOT
+1592
+898
+1965
+1048
+Infection Growth Rate
+Time
+Growth rate
+0.0
+300.0
+0.0
+2.0
+false
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot InfectionChange - 1 "
 
 @#$#@#$#@
 ## WHAT IS IT?
