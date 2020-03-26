@@ -51,10 +51,11 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) resethealth set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [  pcolor = black  ] spend ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
+  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
   reset-ticks
 
 end
@@ -66,6 +67,11 @@ end
 to resetincome
   if income < 10000 [
     set income random 100000 ]
+end
+
+to resethealth
+  if health < 0 [
+    set health (100 - agerange) + random-normal 0 5 ]
 end
 
 to calculateIncomeperday
@@ -97,7 +103,7 @@ to go
 end
 
 to move
-  if color != red [ fd pace avoidICUs ]
+  if color != red [ respeed fd pace avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 [ set heading heading + random 90 - random 90 fd pace ]
@@ -112,8 +118,8 @@ end
 
 to avoid
   if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
-    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 fd pace set heading heading + random 45 - random 45  ]
-  [ set pace (speed / 2) fd pace ] ]
+    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 if any? neighbors with [ count simuls-here = 0 ] [ move-to one-of neighbors with [ count simuls-here = 0  ] ]  set heading heading + random 45 - random 45  ]
+  [ respeed  ] ]
 end
 
 to finished
@@ -131,7 +137,7 @@ end
 
 to recover
   if timenow > random-normal Infectious_Period  ( Infectious_Period / 5) and color != black  [
-    set color yellow set timenow 0 set health random 100 set inICU 0  ]
+    set color yellow set timenow 0 set health (100 - agerange )  set inICU 0  ]
 end
 
 to reinfect
@@ -197,8 +203,8 @@ to treat
 end
 
 to superSpread
-  if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
-  if count simuls with [ color = red ] > 0 and Case_Isolation = true and Proportion_Isolating < random 100  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of 1 simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = true and Proportion_Isolating < random 100  [  if Superspreaders > random 100 [ ask n-of 1 simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
 
 end
 
@@ -229,7 +235,7 @@ to spend
 end
 
 to reSpeed
-  if color != red [ set pace speed ]
+  if pace <= speed [ set pace pace + .1 ]
 end
 
 to Cruiseship
@@ -352,7 +358,7 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -414,9 +420,9 @@ SLIDER
 Infectious_period
 Infectious_period
 0
-100
+20
 15.0
-5
+1
 1
 NIL
 HORIZONTAL
@@ -431,24 +437,6 @@ Case_Isolation
 1
 1
 -1000
-
-PLOT
-1292
-425
-1492
-545
-Population
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count simuls"
 
 BUTTON
 209
@@ -513,7 +501,7 @@ InfectionRate
 InfectionRate
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -576,10 +564,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1267
-604
-1547
-763
+1278
+592
+1558
+751
 Toilet Paper Reserves
 NIL
 NIL
@@ -668,7 +656,7 @@ ID_Rate
 ID_Rate
 0
 1
-1.0
+0.1
 .01
 1
 NIL
@@ -807,7 +795,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+70.0
 5
 1
 NIL
@@ -822,7 +810,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-100.0
+70.0
 5
 1
 NIL
@@ -844,10 +832,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-162
-657
-336
-690
+133
+610
+325
+644
 FearTrigger
 FearTrigger
 0
@@ -859,12 +847,12 @@ NIL
 HORIZONTAL
 
 MONITOR
-1110
-533
-1169
-578
+1114
+547
+1173
+592
 R
-mean [ R ] of simuls with [ color = red and timenow > 12 ]
+mean [ R ] of simuls with [ color = red and timenow > Infectious_Period / 1.8 ]
 3
 1
 11
@@ -989,7 +977,7 @@ INPUTBOX
 478
 210
 Current_Cases
-10000.0
+2000.0
 1
 0
 Number
@@ -1014,7 +1002,7 @@ Triggerday
 Triggerday
 0
 100
-10.0
+5.0
 1
 1
 NIL
@@ -1048,6 +1036,42 @@ false
 "" ""
 PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
+
+PLOT
+1580
+624
+1780
+774
+R value
+Time
+R
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"R" 1.0 0 -16777216 true "" "plot mean [ R ] of simuls with [ color = red and timenow > 12 ]"
+
+PLOT
+1304
+428
+1504
+548
+Population
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count simuls"
 
 @#$#@#$#@
 ## WHAT IS IT?
