@@ -5,7 +5,7 @@ globals [
   InfectionChange
   TodayInfections
   YesterdayInfections
-  ]
+    ]
 
 breed [ simuls simul ]
 breed [ resources resource ]
@@ -14,7 +14,6 @@ breed [ medresources medresource ] ;; people living in the city
 simuls-own [
   timenow
   health
-  pace
   inICU
   fear
   sensitivity
@@ -24,6 +23,7 @@ simuls-own [
   reserves
   agerange
   contacts
+  IncubationPd
 ]
 
 patches-own [
@@ -43,7 +43,7 @@ to setup
     ;;reset-ticks
 
     clear-all
-  ask patches [ set pcolor black ]
+  ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity moveaway set xcor 20 set ycor -40 ]
   ask medresources [ ask patches in-radius Capacity [ set pcolor white ] ]
@@ -51,7 +51,7 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) resethealth set timenow 0 set pace Speed set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [  pcolor = black  ] spend ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
@@ -88,38 +88,38 @@ to go
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
+  CruiseShip
   GlobalTreat
   GlobalFear
   SuperSpread
   CountInfected
-  CruiseShip
   CalculateDailyGrowth
   TriggerActionIsolation
-
+  tick
 
  ;; TriggerActionDistance
  ;; TriggerActionICU
-  tick
+
 end
 
 to move
-  if color != red [ respeed fd pace avoidICUs ]
+  if color != red and color != black [ move-to one-of neighbors avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
-  if color = red and Case_Isolation = false and Proportion_Isolating < random 100 [ set heading heading + random 90 - random 90 fd pace ]
-  if color = red and Send_to_ICU = false [ avoidICUs ]
-  if color = black [set pace 0 fd pace ]
+  if color = red and Case_Isolation = false and Proportion_Isolating < random 100  [ move-to one-of neighbors ]
+  if color = red and Send_to_Hospital = false [ avoidICUs ]
+  if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
 to isolation
-  if Case_Isolation = true and color = red [
-    set pace RestrictedMovement fd pace ]
+  if Case_Isolation = true and color = red and Proportion_Isolating > random 100 and timenow > IncubationPD [
+    move-to patch-here ]
 end
 
 to avoid
-  if SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 [
-    ifelse any? other simuls-on patch-ahead 1 [ set pace 0 if any? neighbors witmove-to one-of neighbors with [ count simuls-here = 0  ]  set heading heading + random 45 - random 45  ]
-  [ respeed  ] ]
+  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and color != red and color != black
+  [ if any? other simuls-here [ if any? neighbors with [ count simuls-here = 0 ] [ move-to one-of neighbors with [ count simuls-here = 0  ] ] ]]
+  [ move-to patch-here ]
 end
 
 to finished
@@ -130,6 +130,8 @@ end
 to settime
   if color = red [ set timenow timenow + 1 PossiblyDie ]
 end
+
+
 
 to karkit
   if health < 0 [ set color black ]
@@ -177,7 +179,7 @@ to GlobalFear
 end
 
 to gatherreseources
-  if (fear * sensitivity) > random 100 and count resources > 0 and InICU = 0  [ face min-one-of resources with [ volume >= 0 ] [ distance myself ]  fd pace ]
+  if (fear * sensitivity) > random 100 and count resources > 0 and InICU = 0  [ face min-one-of resources with [ volume >= 0 ] [ distance myself ]  ]
   if any? resources-here with [ volume >= 0 ] and fear > 0 [ set fear mean [ fearfactor ] of neighbors move-to one-of patches with [ pcolor = black ] ]
 end
 
@@ -191,9 +193,8 @@ set heading heading + 5
 end
 
 to GlobalTreat
-  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_ICU = true and any? simuls with [ color = red and inICU = 0 ]
+  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_Hospital = true and any? simuls with [ color = red and inICU = 0 ]
     [ ask n-of ( count simuls with [ color = red and inICU = 0 ] * ID_Rate ) simuls with [ color = red and inICU = 0 ] [ move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
-
 end
 
 to treat
@@ -202,11 +203,7 @@ to treat
      if inICU = 1 [ move-to one-of patches with [ pcolor = white]  ]
 end
 
-to superSpread
-  if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of 1 simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
-  if count simuls with [ color = red ] > 0 and Case_Isolation = true and Proportion_Isolating < random 100  [  if Superspreaders > random 100 [ ask n-of 1 simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
 
-end
 
 ;; change pace with health
 
@@ -221,10 +218,6 @@ end
 
 to TriggerActionIsolation
   if PolicyTriggerOn = true [
-
- ;; ifelse mean [ fear ] of simuls > FearTrigger  [ set SpatialDistance true ] [ set SpatialDistance False ]
- ;; ifelse mean [ fear ] of simuls > FearTrigger / 2 [ set Case_Isolation true ] [ set Case_Isolation False ]
-
     ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true ] [ set SpatialDistance False set Case_Isolation False ]
   ]
 end
@@ -234,15 +227,12 @@ to spend
   set reserves (income + income - expenditure )
 end
 
-to reSpeed
-  if pace <= speed [ set pace pace + .1 ]
-end
-
 to Cruiseship
   if mouse-down? [
-    create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 3 set shape "dot" set color red set health (random 100) set timenow 0 set pace Speed set InICU 0
-      set fear 0 set sensitivity random-float 1 set R 0 set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday ]
-  ]
+    create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
+      set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+        set income random-normal 50000 3000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
+  ]]
 end
 
 to CalculateDailyGrowth
@@ -255,6 +245,7 @@ to countcontacts
   if any? other simuls-here with [ color != black ] [
     set contacts ( contacts + 1 ) ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 498
@@ -323,7 +314,7 @@ BUTTON
 262
 271
 Trace_Patterns
-ask one-of turtles with [ color = red ] [ pen-down ] 
+ask n-of 10 simuls with [ color = red ] [ pen-down ] 
 NIL
 1
 T
@@ -358,7 +349,7 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -386,7 +377,7 @@ Speed
 Speed
 0
 1
-0.15
+0.5
 .01
 1
 NIL
@@ -434,7 +425,7 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -501,7 +492,7 @@ InfectionRate
 InfectionRate
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -542,9 +533,9 @@ SWITCH
 270
 1069
 303
-Send_to_ICU
-Send_to_ICU
-0
+Send_to_Hospital
+Send_to_Hospital
+1
 1
 -1000
 
@@ -864,7 +855,7 @@ SWITCH
 358
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1072,6 +1063,21 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
+
+SLIDER
+324
+370
+467
+404
+Incubation_Period
+Incubation_Period
+0
+10
+5.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
