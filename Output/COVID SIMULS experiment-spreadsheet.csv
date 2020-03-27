@@ -1,0 +1,60 @@
+"BehaviorSpace results (NetLogo 6.1.0)"
+"COVID SIMULS.nlogo"
+"experiment"
+"03/27/2020 14:29:41:079 +1100"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-40","40","-55","55"
+"[run number]","7","7","7","7","7","7","7","7","7","7","7","7","7","7","7","7","7"
+"Illness_period","15",,,,,,,,,,,,,,,,
+"SpatialDistance","false",,,,,,,,,,,,,,,,
+"Proportion_Isolating","100",,,,,,,,,,,,,,,,
+"Total_Population","25000000",,,,,,,,,,,,,,,,
+"Toilet_Rolls","0",,,,,,,,,,,,,,,,
+"Current_Cases","2630",,,,,,,,,,,,,,,,
+"Media_Exposure","50",,,,,,,,,,,,,,,,
+"Bed_Capacity","15",,,,,,,,,,,,,,,,
+"ReInfectionRate","0",,,,,,,,,,,,,,,,
+"RestrictedMovement","0",,,,,,,,,,,,,,,,
+"Superspreaders","100",,,,,,,,,,,,,,,,
+"Severity_of_illness","15",,,,,,,,,,,,,,,,
+"Send_to_Hospital","false",,,,,,,,,,,,,,,,
+"ProductionRate","5",,,,,,,,,,,,,,,,
+"Incubation_Period","5",,,,,,,,,,,,,,,,
+"Case_Isolation","false",,,,,,,,,,,,,,,,
+"Initial","1",,,,,,,,,,,,,,,,
+"ID_Rate","0.1",,,,,,,,,,,,,,,,
+"PolicyTriggerOn","true",,,,,,,,,,,,,,,,
+"Proportion_People_Avoid","5",,,,,,,,,,,,,,,,
+"Population","5000",,,,,,,,,,,,,,,,
+"Treatment_Benefit","4",,,,,,,,,,,,,,,,
+"FearTrigger","50",,,,,,,,,,,,,,,,
+"Speed","1",,,,,,,,,,,,,,,,
+"Triggerday","0",,,,,,,,,,,,,,,,
+"Proportion_time_Avoid","80",,,,,,,,,,,,,,,,
+"InfectionRate","35",,,,,,,,,,,,,,,,
+"[reporter]","count simuls with [ color = red ]","count simuls with [ color = blue ]","count simuls with [color = black ]","count simuls with [ color = yellow ]","count simuls with [ color = black and agerange = 5 ]","count simuls with [ color = black and agerange = 15 ]","count simuls with [ color = black and agerange = 25 ]","count simuls with [ color = black and agerange = 35 ]","count simuls with [ color = black and agerange = 45 ]","count simuls with [ color = black and agerange = 55 ]","count simuls with [ color = black and agerange = 65 ]","count simuls with [ color = black and agerange = 75 ]","count simuls with [ color = black and agerange = 85 ]","count simuls with [ color = black and agerange = 95 ]","mean [ R ] of simuls with [ timenow = Illness_period ]","mean [ contacts ] of simuls / ticks","mean [ timenow ] of simuls with [ color = red ]"
+"[final]","0","0","0","1","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.42016470588235294","<RuntimePrimitiveException>"
+"[min]","0","0","0","0","0","0","0","0","0","0","0","0","0","0","5","4.0E-4","0"
+"[max]","1","0","0","1","0","0","0","0","0","0","0","0","0","0","5","0.42016470588235294","16"
+"[mean]","0.9444444444444444","0","0","0.05555555555555555","0","0","0","0","0","0","0","0","0","0",,,
+"[steps]","17","17","17","17","17","17","17","17","17","17","17","17","17","17","17","17","17"
+
+"[all run data]","count simuls with [ color = red ]","count simuls with [ color = blue ]","count simuls with [color = black ]","count simuls with [ color = yellow ]","count simuls with [ color = black and agerange = 5 ]","count simuls with [ color = black and agerange = 15 ]","count simuls with [ color = black and agerange = 25 ]","count simuls with [ color = black and agerange = 35 ]","count simuls with [ color = black and agerange = 45 ]","count simuls with [ color = black and agerange = 55 ]","count simuls with [ color = black and agerange = 65 ]","count simuls with [ color = black and agerange = 75 ]","count simuls with [ color = black and agerange = 85 ]","count simuls with [ color = black and agerange = 95 ]","mean [ R ] of simuls with [ timenow = Illness_period ]","mean [ contacts ] of simuls / ticks","mean [ timenow ] of simuls with [ color = red ]"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","<RuntimePrimitiveException>","0"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","4.0E-4","1"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.2333","2"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.30633333333333335","3"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.34135","4"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.3608","5"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.37506666666666666","6"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.38485714285714284","7"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.392325","8"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.3981555555555556","9"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.40378","10"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.4070727272727273","11"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.41018333333333334","12"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.4127692307692307","13"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.4153142857142857","14"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","5","0.4168","15"
+,"1","0","0","0","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.4185375","16"
+,"0","0","0","1","0","0","0","0","0","0","0","0","0","0","<RuntimePrimitiveException>","0.42016470588235294","<RuntimePrimitiveException>"

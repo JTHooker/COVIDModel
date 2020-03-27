@@ -196,7 +196,7 @@ end
 
 to superSpread
   if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
-;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
+;;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
 
 end
 
@@ -273,7 +273,7 @@ end
 
 to TriggerActionIsolation
   if PolicyTriggerOn = true [
-    ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true ] [ set SpatialDistance False set Case_Isolation False ]
+    ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true set Send_to_Hospital true ] [ set SpatialDistance False set Case_Isolation False ]
   ]
 end
 
@@ -443,7 +443,7 @@ Speed
 Speed
 0
 1
-0.5
+1.0
 .1
 1
 NIL
@@ -491,7 +491,7 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -601,7 +601,7 @@ SWITCH
 303
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -849,7 +849,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-5.0
+70.0
 5
 1
 NIL
@@ -903,7 +903,7 @@ SWITCH
 358
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1026,7 +1026,7 @@ Triggerday
 Triggerday
 0
 100
-5.0
+0.0
 1
 1
 NIL
@@ -1569,6 +1569,120 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="6" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="350"/>
+    <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
+    <metric>count simuls with [ color = red ]</metric>
+    <metric>count simuls with [ color = blue ]</metric>
+    <metric>count simuls with [color = black ]</metric>
+    <metric>count simuls with [ color = yellow ]</metric>
+    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
+    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
+    <metric>mean [ R ] of simuls with [ timenow = Illness_period ]</metric>
+    <metric>mean [ contacts ] of simuls / ticks</metric>
+    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
+    <enumeratedValueSet variable="Illness_period">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SpatialDistance">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_Isolating">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Total_Population">
+      <value value="25000000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Toilet_Rolls">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Current_Cases">
+      <value value="2630"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Media_Exposure">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Bed_Capacity">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ReInfectionRate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RestrictedMovement">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Superspreaders">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity_of_illness">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Send_to_Hospital">
+      <value value="false"/>
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ProductionRate">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Incubation_Period">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Case_Isolation">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Initial">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ID_Rate">
+      <value value="0.1"/>
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="PolicyTriggerOn">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Population">
+      <value value="5000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Treatment_Benefit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FearTrigger">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Speed">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Triggerday">
+      <value value="0"/>
+      <value value="7"/>
+      <value value="14"/>
+      <value value="28"/>
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_time_Avoid">
+      <value value="70"/>
+      <value value="80"/>
+      <value value="90"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="InfectionRate">
+      <value value="35"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
