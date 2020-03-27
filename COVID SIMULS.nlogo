@@ -5,7 +5,18 @@ globals [
   InfectionChange
   TodayInfections
   YesterdayInfections
-    ]
+  five
+  fifteen
+  twentyfive
+  thirtyfive
+  fortyfive
+  fiftyfive
+  sixtyfive
+  seventyfive
+  eightyfive
+  ninetyfive
+]
+
 
 breed [ simuls simul ]
 breed [ resources resource ]
@@ -24,6 +35,9 @@ simuls-own [
   agerange
   contacts
   IncubationPd
+  DailyRisk
+  RiskofDeath
+  Pace
 ]
 
 patches-own [
@@ -45,23 +59,68 @@ to setup
     clear-all
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
-  ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity moveaway set xcor 20 set ycor -40 ]
+  ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -40 ]
   ask medresources [ ask patches in-radius Capacity [ set pcolor white ] ]
   ask n-of Toilet_Rolls patches [ sprout-resources 1 ]
-  ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  moveaway resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
+  ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ] set health ( 100 - Agerange ) resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [  pcolor = black  ] spend ]
+      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] spend resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
   if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
-  reset-ticks
 
+  set five int ( Population * .126 ) ;; insert age range proportions here
+  set fifteen int ( Population * .121 )
+  set twentyfive int ( Population * .145 )
+  set thirtyfive int ( Population * .145 )
+  set fortyfive int ( Population * .129 )
+  set fiftyfive int ( Population * .121 )
+  set sixtyfive int ( Population * .103 )
+  set seventyfive int ( Population * .071 )
+  set eightyfive int ( Population * .032 )
+  set ninetyfive int ( Population * .008 )
+
+  matchages
+
+  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk ]
+
+  reset-ticks
+end
+
+to matchages
+  ask n-of int five simuls [ set agerange 5 ]
+  ask n-of int fifteen simuls with [ agerange != 5 ] [ set agerange 15 ]
+  ask n-of int twentyfive simuls with [ agerange > 15 ] [ set agerange 25 ]
+  ask n-of int thirtyfive simuls with [ agerange > 25 ] [ set agerange 35 ]
+  ask n-of int fortyfive simuls with [ agerange > 35 ] [ set agerange 45 ]
+  ask n-of int fiftyfive simuls with [ agerange > 45 ] [ set agerange 55 ]
+  ask n-of int sixtyfive simuls with [ agerange > 55 ] [ set agerange 65 ]
+  ask n-of int seventyfive simuls with [ agerange > 65 ] [ set agerange 75 ]
+  ask n-of int eightyfive simuls with [ agerange > 75 ] [ set agerange 85 ]
+  ;;ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ]
+end
+
+to setdeathrisk
+  if agerange = 5 [ set riskofDeath 0 ]
+  if agerange = 15 [ set riskofDeath .02 ]
+  if agerange = 25 [ set riskofDeath .02 ]
+  if agerange = 35 [ set riskofDeath .02 ]
+  if agerange = 45 [ set riskofDeath .04 ]
+  if agerange = 55 [ set riskofDeath .013 ]
+  if agerange = 65 [ set riskofDeath .036 ]
+  if agerange = 75 [ set riskofDeath .08 ]
+  if agerange = 85 [ set riskofDeath .148 ]
+  if agerange = 95 [ set riskofDeath .148 ]
 end
 
 to resetlanding
   if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ]
+end
+
+to resetlandingSimul
+  if any? other simuls-here [ move-to one-of patches with [ count simuls-here = 0 and pcolor = black ]]
 end
 
 to resetincome
@@ -82,9 +141,12 @@ to calculateexpenditureperday
   set expenditure income * .99
 end
 
+to calculatedailyrisk
+  set dailyrisk ( riskofDeath / Illness_period )
+end
 
 to go
-  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Spend Countcontacts ] ;
+  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Spend Countcontacts respeed ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -95,6 +157,7 @@ to go
   CountInfected
   CalculateDailyGrowth
   TriggerActionIsolation
+  ask patches [ checkutilisation ]
   tick
 
  ;; TriggerActionDistance
@@ -103,23 +166,23 @@ to go
 end
 
 to move
-  if color != red and color != black [ move-to one-of neighbors avoidICUs ]
+  if color != red and color != black [ set heading heading + random 90 - random 90 fd pace avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
-  if color = red and Case_Isolation = false and Proportion_Isolating < random 100  [ move-to one-of neighbors ]
+  if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
 to isolation
   if Case_Isolation = true and color = red and Proportion_Isolating > random 100 and timenow > IncubationPD [
-    move-to patch-here ]
+    move-to patch-here set pace 0 ]
 end
 
 to avoid
-  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and color != red and color != black
-  [ if any? other simuls-here [ if any? neighbors with [ count simuls-here = 0 ] [ move-to one-of neighbors with [ count simuls-here = 0  ] ] ]]
-  [ move-to patch-here ]
+  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100
+  [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
+  [ fd pace ]
 end
 
 to finished
@@ -133,17 +196,13 @@ end
 
 to superSpread
   if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
-  if count simuls with [ color = red ] > 0 and Case_Isolation = true and Proportion_Isolating < random 100  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
 
-end
-
-to karkit
-  if health < 0 [ set color black ]
 end
 
 to recover
-  if timenow > random-normal Infectious_Period  ( Infectious_Period / 5) and color != black  [
-    set color yellow set timenow 0 set health (100 - agerange )  set inICU 0  ]
+  if timenow > Illness_Period and color != black  [
+    set color yellow set timenow 0 set health (100 - agerange ) set inICU 0  ]
 end
 
 to reinfect
@@ -155,11 +214,7 @@ to allocatebed
 end
 
 to avoidICUs
-  if [ pcolor ] of patch-here = white and InICU = 0 [ move-to min-one-of patches with [ pcolor = black ]  [ distance myself ] set heading heading - random 90 + random 90 ]
-end
-
-to moveaway
-  if any? other turtles-here [ move-to one-of patches ]
+  if [ pcolor ] of patch-here = white and InICU = 0 [ move-to min-one-of patches with [ pcolor = black ]  [ distance myself ]  ]
 end
 
 to replenish
@@ -198,22 +253,18 @@ end
 
 to GlobalTreat
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_Hospital = true and any? simuls with [ color = red and inICU = 0 ]
-    [ ask n-of ( count simuls with [ color = red and inICU = 0 ] * ID_Rate ) simuls with [ color = red and inICU = 0 ] [ move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
+    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * ID_Rate ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [ move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
 
 to treat
 ;  if Send_to_ICU = true and inICU = 0 and [ pcolor ] of patch-here = black and color = red
 ;    [ move-to one-of patches with [ pcolor = white ] set inICU 1 ]
-     if inICU = 1 [ move-to one-of patches with [ pcolor = white]  ]
+     if inICU = 1 and color = red [ move-to one-of patches with [ pcolor = white]  ]
 end
 
-
-
-;; change pace with health
-
 to PossiblyDie
-  if InICU = 0 and Seriousness_of_infection / Infectious_Period > random 100 [ set health health - Seriousness_of_Infection ]
-  if InICU = 1 and Seriousness_of_infection / Infectious_Period > random 100 [ set health health - Seriousness_of_Infection / Treatment_Benefit ]
+  if InICU = 0 and Severity_of_illness / Illness_Period > random 100 [ set health health - Severity_of_Illness ]
+  if InICU = 1 and Severity_of_illness / Illness_Period > random 100 [ set health health - Severity_of_Illness / Treatment_Benefit ]
 end
 
 to CountInfected
@@ -250,6 +301,17 @@ to countcontacts
     set contacts ( contacts + 1 ) ]
 end
 
+to karkit
+  if color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 ]
+end
+
+to respeed
+  set pace speed
+end
+
+to checkutilisation
+  ifelse any? simuls-here [ set utilisation 1 ] [ set utilisation 0 ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 498
@@ -381,8 +443,8 @@ Speed
 Speed
 0
 1
-0.5
-.01
+0.4
+.1
 1
 NIL
 HORIZONTAL
@@ -412,11 +474,11 @@ SLIDER
 332
 283
 365
-Infectious_period
-Infectious_period
+Illness_period
+Illness_period
 0
 20
-15.0
+10.0
 1
 1
 NIL
@@ -429,7 +491,7 @@ SWITCH
 129
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -651,7 +713,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.1
+0.05
 .01
 1
 NIL
@@ -684,7 +746,7 @@ Media_Exposure
 Media_Exposure
 1
 100
-53.0
+50.0
 1
 1
 NIL
@@ -731,8 +793,8 @@ SLIDER
 874
 332
 907
-Seriousness_of_Infection
-Seriousness_of_Infection
+Severity_of_illness
+Severity_of_illness
 0
 100
 15.0
@@ -790,7 +852,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-70.0
+40.0
 5
 1
 NIL
@@ -805,7 +867,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-70.0
+40.0
 5
 1
 NIL
@@ -830,7 +892,7 @@ SLIDER
 133
 610
 325
-644
+643
 FearTrigger
 FearTrigger
 0
@@ -847,7 +909,7 @@ MONITOR
 1173
 592
 R
-mean [ R ] of simuls with [ color = red and timenow > Infectious_Period / 1.8 ]
+mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
 3
 1
 11
@@ -890,10 +952,10 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1805
-554
-2174
-753
+1802
+575
+2242
+775
 Age range of deceased
 NIL
 NIL
@@ -906,21 +968,6 @@ true
 "" ""
 PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
-
-SLIDER
-1573
-92
-1783
-125
-Track_and_Trace_Resources
-Track_and_Trace_Resources
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
 
 PLOT
 1587
@@ -938,7 +985,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot (InfectionChange - 1 ) * 100"
+"default" 1.0 0 -16777216 true "" "if ticks > 1 [ plot (InfectionChange - 1 ) * 10 ]"
 
 SLIDER
 870
@@ -949,7 +996,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-0.0
+100.0
 5
 1
 NIL
@@ -1072,7 +1119,7 @@ SLIDER
 324
 370
 467
-404
+403
 Incubation_Period
 Incubation_Period
 0
@@ -1082,6 +1129,41 @@ Incubation_Period
 1
 NIL
 HORIZONTAL
+
+PLOT
+1972
+798
+2246
+948
+Age ranges
+NIL
+NIL
+0.0
+100.0
+0.0
+0.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
+
+BUTTON
+377
+101
+473
+134
+Match Ages
+Matchages
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
