@@ -166,7 +166,7 @@ to go
 end
 
 to move
-  if color != red and color != black [ set heading heading + random 90 - random 90 fd pace avoidICUs ]
+  if color != red and color != black and spatialDistance = false [ set heading heading + random 90 - random 90 fd pace avoidICUs ]
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
@@ -182,7 +182,7 @@ end
 to avoid
   ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100
   [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
-  [ fd pace ]
+  [ set heading heading + random 90 - random 90 fd pace avoidICUs move-to patch-here ]
 end
 
 to finished
@@ -196,7 +196,7 @@ end
 
 to superSpread
   if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
-  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
+;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
 
 end
 
@@ -415,7 +415,7 @@ SWITCH
 94
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -443,7 +443,7 @@ Speed
 Speed
 0
 1
-0.4
+0.5
 .1
 1
 NIL
@@ -478,7 +478,7 @@ Illness_period
 Illness_period
 0
 20
-10.0
+15.0
 1
 1
 NIL
@@ -539,10 +539,10 @@ Count simuls with [ color = black ] * (Total_Population / population )
 14
 
 MONITOR
-1273
-1050
-1348
-1095
+1100
+50
+1175
+95
 Time Count
 ticks
 0
@@ -558,7 +558,7 @@ InfectionRate
 InfectionRate
 0
 100
-50.0
+35.0
 1
 1
 NIL
@@ -601,7 +601,7 @@ SWITCH
 303
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -621,10 +621,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1278
-592
-1558
-751
+1279
+593
+1559
+752
 Toilet Paper Reserves
 NIL
 NIL
@@ -654,10 +654,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1103
-239
-1241
-296
+1100
+232
+1238
+289
 # simuls
 count simuls * (Total_Population / population)
 0
@@ -681,28 +681,10 @@ MONITOR
 631
 647
 Total # Infected
-count simuls with [ color = red ] * (25000000 / population)
+count simuls with [ color = red ] * (Total_Population / population)
 0
 1
 14
-
-PLOT
-1233
-785
-1555
-947
-# of infections '000s
-NIL
-NIL
-0.0
-10.0
-0.0
-200.0
-true
-false
-"" ""
-PENS
-"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 SLIDER
 869
@@ -713,7 +695,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.05
+0.1
 .01
 1
 NIL
@@ -852,7 +834,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+5.0
 5
 1
 NIL
@@ -867,7 +849,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-100.0
+5.0
 5
 1
 NIL
@@ -969,21 +951,6 @@ true
 PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
-SLIDER
-1573
-92
-1783
-125
-Track_and_Trace_Resources
-Track_and_Trace_Resources
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
 PLOT
 1587
 797
@@ -1034,7 +1001,7 @@ INPUTBOX
 478
 210
 Current_Cases
-2000.0
+2630.0
 1
 0
 Number
@@ -1066,10 +1033,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1112
-347
-1266
-392
+1096
+366
+1251
+412
 Close contacts per day
 mean [ contacts] of simuls / ticks
 2
@@ -1077,10 +1044,10 @@ mean [ contacts] of simuls / ticks
 11
 
 PLOT
-1095
-408
-1295
-528
+1096
+409
+1296
+530
 Close contacts per day
 NIL
 NIL
@@ -1095,17 +1062,17 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-1580
-624
-1780
-774
+499
+862
+1097
+1012
 R value
 Time
 R
 0.0
 10.0
 0.0
-10.0
+3.0
 true
 false
 "" ""
@@ -1113,10 +1080,10 @@ PENS
 "R" 1.0 0 -16777216 true "" "plot mean [ R ] of simuls with [ color = red and timenow > 12 ]"
 
 PLOT
-1304
-428
-1504
-548
+1305
+429
+1505
+550
 Population
 NIL
 NIL
@@ -1179,6 +1146,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+1103
+762
+1549
+1020
+# of infections '000s
+NIL
+NIL
+0.0
+10.0
+0.0
+200.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 @#$#@#$#@
 ## WHAT IS IT?
