@@ -61,7 +61,7 @@ to setup
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -40 ]
   ask medresources [ ask patches in-radius Capacity [ set pcolor white ] ]
-  ask n-of Toilet_Rolls patches [ sprout-resources 1 ]
+  ask n-of Available_Resources patches [ sprout-resources 1 ]
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
@@ -610,8 +610,8 @@ SLIDER
 539
 321
 572
-Toilet_Rolls
-Toilet_Rolls
+Available_Resources
+Available_Resources
 0
 4
 0.0
@@ -695,7 +695,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.1
+0.2
 .01
 1
 NIL
@@ -720,10 +720,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-132
-404
-282
-437
+512
+1040
+662
+1073
 Media_Exposure
 Media_Exposure
 1
@@ -834,7 +834,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-5.0
+90.0
 5
 1
 NIL
@@ -934,10 +934,10 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1802
-575
-2242
-775
+1786
+203
+2521
+662
 Age range of deceased
 NIL
 NIL
@@ -1026,7 +1026,7 @@ Triggerday
 Triggerday
 0
 100
-0.0
+150.0
 1
 1
 NIL
@@ -1036,7 +1036,7 @@ MONITOR
 1096
 366
 1251
-412
+411
 Close contacts per day
 mean [ contacts] of simuls / ticks
 2
@@ -1113,10 +1113,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1972
-798
-2246
-948
+1846
+692
+2465
+914
 Age ranges
 NIL
 NIL
@@ -1570,10 +1570,9 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="6" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="350"/>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = blue ]</metric>
@@ -1614,7 +1613,7 @@ NetLogo 6.1.0
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Bed_Capacity">
-      <value value="15"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ReInfectionRate">
       <value value="0"/>
@@ -1630,7 +1629,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Send_to_Hospital">
       <value value="false"/>
-      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ProductionRate">
       <value value="5"/>
@@ -1646,13 +1644,15 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="ID_Rate">
       <value value="0.1"/>
-      <value value="0.5"/>
+      <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="PolicyTriggerOn">
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="5"/>
+      <value value="70"/>
+      <value value="80"/>
+      <value value="90"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="5000"/>
