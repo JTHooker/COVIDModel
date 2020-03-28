@@ -519,10 +519,10 @@ NIL
 1
 
 SLIDER
-1959
-560
-2157
-593
+1955
+562
+2153
+595
 RestrictedMovement
 RestrictedMovement
 0
@@ -642,7 +642,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -5298144 true "" "plot mean [ volume ] of resources"
+"default" 1.0 1 -5298144 true "" "if count resources > 0 [ plot mean [ volume ] of resources ]"
 
 SLIDER
 1951
@@ -726,10 +726,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-1951
-676
-2155
-710
+1960
+679
+2164
+713
 Media_Exposure
 Media_Exposure
 1
@@ -819,7 +819,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -5298144 true "" "plot (Population - Count Simuls) / numberInfected * 100"
+"default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
 
 SLIDER
 625
@@ -1058,10 +1058,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-255
-892
-853
-1042
+254
+889
+852
+1039
 R value
 Time
 R
@@ -1109,10 +1109,10 @@ NIL
 HORIZONTAL
 
 PLOT
-2024
-104
-2516
-328
+1994
+90
+2286
+235
 Age ranges
 NIL
 NIL
@@ -1236,10 +1236,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1861
-796
-2383
-1058
+1860
+797
+2382
+1051
 Financial_Reserves
 NIL
 NIL

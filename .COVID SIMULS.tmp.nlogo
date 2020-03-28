@@ -642,7 +642,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -5298144 true "" "plot mean [ volume ] of resources"
+"default" 1.0 1 -5298144 true "" "if count resources > 0 [ plot mean [ volume ] of resources ]"
 
 SLIDER
 1951
@@ -819,7 +819,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -5298144 true "" "plot (Population - Count Simuls) / numberInfected * 100"
+"default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
 
 SLIDER
 625
@@ -1236,10 +1236,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1861
-796
-2383
-1058
+1860
+797
+2382
+1051
 Financial_Reserves
 NIL
 NIL
