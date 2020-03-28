@@ -479,7 +479,7 @@ Illness_period
 Illness_period
 0
 20
-16.0
+10.0
 1
 1
 NIL
@@ -559,7 +559,7 @@ InfectionRate
 InfectionRate
 0
 100
-50.0
+75.0
 1
 1
 NIL
@@ -581,10 +581,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-609
-809
-798
+629
 842
+833
+876
 Bed_Capacity
 Bed_Capacity
 0
@@ -765,7 +765,7 @@ Superspreaders
 Superspreaders
 0
 100
-100.0
+20.0
 1
 1
 NIL
@@ -1182,7 +1182,7 @@ PLOT
 795
 1852
 1054
-New Infections Per Day
+New Infections Per Day '000's
 NIL
 NIL
 0.0
@@ -1204,7 +1204,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-10.0
+1.0
 1
 1
 NIL
