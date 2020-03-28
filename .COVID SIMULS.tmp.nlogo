@@ -166,7 +166,7 @@ to go
 end
 
 to move
-  if color != red and color != black and spatialDistance = false [ set heading heading + random 90 - random 90 fd pace avoidICUs ]
+  if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
@@ -180,9 +180,9 @@ to isolation
 end
 
 to avoid
-  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100
+  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and AgeRange < Age_Isolation
   [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
-  [ set heading heading + random 90 - random 90 fd pace avoidICUs move-to patch-here ]
+  [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]
 end
 
 to finished
@@ -590,7 +590,7 @@ Bed_Capacity
 0
 20
 2.0
-1
+15
 1
 NIL
 HORIZONTAL
@@ -765,7 +765,7 @@ Superspreaders
 Superspreaders
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -835,7 +835,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-70.0
+100.0
 5
 1
 NIL
@@ -850,7 +850,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-70.0
+100.0
 5
 1
 NIL
@@ -1205,6 +1205,36 @@ Diffusion_Adjustment
 0
 10
 1.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+627
+562
+826
+596
+Age_Isolation
+Age_Isolation
+0
+100
+70.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+629
+599
+827
+634
+Contact_Radius
+Contact_Radius
+0
+180
+90.0
 1
 1
 NIL
