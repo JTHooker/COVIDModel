@@ -531,8 +531,8 @@ HORIZONTAL
 MONITOR
 506
 760
-595
-817
+655
+819
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -679,8 +679,8 @@ count patches with [ pcolor = white ]
 MONITOR
 505
 590
-631
-647
+655
+649
 Total # Infected
 count simuls with [ color = red ] * (Total_Population / population)
 0
@@ -789,8 +789,8 @@ HORIZONTAL
 MONITOR
 506
 703
-647
-760
+655
+762
 % Total Infections
 numberInfected / Population * 100
 0
@@ -953,10 +953,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1587
-797
-2557
-1221
+2077
+670
+2584
+960
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -986,10 +986,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1768
-842
-1900
-887
+2437
+699
+2569
+744
 Infection Growth %
 infectionchange
 2
@@ -1153,7 +1153,7 @@ PLOT
 762
 1549
 1020
-# of infections '000s
+Total Active Infections '000s
 NIL
 NIL
 0.0
@@ -1165,18 +1165,35 @@ false
 "" ""
 PENS
 "Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
-"New Cases" 1.0 0 -14070903 true "" "plot count simuls with [ color = red and timenow = 5 ] * (Total_Population / 1000 / Population )"
 
 MONITOR
 507
 545
-604
+656
 590
-New Infections
+New Infections Today
 count simuls with [ color = red and timenow = 10 ] * ( Total_Population / 100 / count Simuls )
 0
 1
 11
+
+PLOT
+1550
+764
+1992
+1023
+New Infections Per Day
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Confirmed Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )"
 
 @#$#@#$#@
 ## WHAT IS IT?
