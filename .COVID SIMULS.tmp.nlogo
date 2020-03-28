@@ -416,8 +416,8 @@ NIL
 SWITCH
 625
 90
-820
-123
+825
+125
 SpatialDistance
 SpatialDistance
 1
@@ -934,7 +934,7 @@ PLOT
 419
 1903
 634
-Age range of deceased
+Number of deceased across age ranges
 NIL
 NIL
 0.0

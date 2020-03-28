@@ -934,7 +934,7 @@ PLOT
 419
 1903
 634
-Age range of deceased
+Number of deceased across age ranges
 NIL
 NIL
 0.0
