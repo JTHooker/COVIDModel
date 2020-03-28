@@ -531,8 +531,8 @@ HORIZONTAL
 MONITOR
 506
 760
-655
-819
+595
+817
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -679,8 +679,8 @@ count patches with [ pcolor = white ]
 MONITOR
 505
 590
-655
-649
+631
+647
 Total # Infected
 count simuls with [ color = red ] * (Total_Population / population)
 0
@@ -789,8 +789,8 @@ HORIZONTAL
 MONITOR
 506
 703
-655
-762
+647
+760
 % Total Infections
 numberInfected / Population * 100
 0
@@ -1170,9 +1170,9 @@ PENS
 MONITOR
 507
 545
-656
+604
 590
-New Infections Today
+New Infections
 count simuls with [ color = red and timenow = 10 ] * ( Total_Population / 100 / count Simuls )
 0
 1
