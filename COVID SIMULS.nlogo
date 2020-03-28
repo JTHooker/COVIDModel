@@ -180,7 +180,7 @@ to isolation
 end
 
 to avoid
-  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and AgeRange < Age_Isolation
+  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and AgeRange > Age_Isolation
   [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
   [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]
 end
@@ -195,7 +195,8 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
+    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 ;;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
 
 end
@@ -415,7 +416,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -462,7 +463,7 @@ Numbers of people
 0.0
 100.0
 true
-false
+true
 "" ""
 PENS
 "Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 100 / count Simuls) "
@@ -479,7 +480,7 @@ Illness_period
 Illness_period
 0
 20
-10.0
+15.0
 1
 1
 NIL
@@ -492,7 +493,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -937,7 +938,7 @@ NIL
 0.0
 50.0
 true
-true
+false
 "" ""
 PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
@@ -1194,7 +1195,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-1.0
+5.0
 1
 1
 NIL
@@ -1209,7 +1210,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-70.0
+71.0
 1
 1
 NIL

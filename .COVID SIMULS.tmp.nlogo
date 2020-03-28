@@ -180,7 +180,7 @@ to isolation
 end
 
 to avoid
-  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and AgeRange < Age_Isolation
+  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_time_Avoid > random 100 and AgeRange > Age_Isolation
   [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
   [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]
 end
@@ -195,7 +195,8 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]]]]
+  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
+    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 ;;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
 
 end
@@ -415,7 +416,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -462,7 +463,7 @@ Numbers of people
 0.0
 100.0
 true
-false
+true
 "" ""
 PENS
 "Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 100 / count Simuls) "
@@ -479,7 +480,7 @@ Illness_period
 Illness_period
 0
 20
-10.0
+15.0
 1
 1
 NIL
@@ -492,7 +493,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -514,10 +515,10 @@ NIL
 1
 
 SLIDER
-2527
-539
-2725
-572
+1959
+560
+2157
+593
 RestrictedMovement
 RestrictedMovement
 0
@@ -640,10 +641,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "plot mean [ volume ] of resources"
 
 SLIDER
-2519
-465
-2715
-498
+1951
+488
+2147
+521
 ProductionRate
 ProductionRate
 0
@@ -666,10 +667,10 @@ count simuls * (Total_Population / population)
 14
 
 MONITOR
-1704
-510
-1922
-555
+1386
+372
+1604
+417
 NIL
 count patches with [ pcolor = white ]
 17
@@ -721,10 +722,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-2519
-654
-2723
-688
+1951
+676
+2155
+710
 Media_Exposure
 Media_Exposure
 1
@@ -734,16 +735,6 @@ Media_Exposure
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-1445
-485
-1634
-700
-Media and knowledge link\n\nToilet roll panic should also act independently of the virus panic\n\nI might have to isolate, so I need resources to get me through.\n\nOther people will probably try to get those resources because they will want to isolate, too, so I will panic-buy\n
-11
-0.0
-1
 
 MONITOR
 260
@@ -772,10 +763,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-2524
-617
-2724
-650
+1956
+639
+2156
+672
 Severity_of_illness
 Severity_of_illness
 0
@@ -857,10 +848,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-2519
-422
-2714
-455
+1951
+445
+2146
+478
 Treatment_Benefit
 Treatment_Benefit
 0
@@ -872,10 +863,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-2522
-500
-2714
-533
+1955
+522
+2147
+555
 FearTrigger
 FearTrigger
 0
@@ -909,10 +900,10 @@ PolicyTriggerOn
 -1000
 
 SLIDER
-2522
-580
-2724
-613
+1955
+602
+2157
+635
 Initial
 Initial
 0
@@ -935,10 +926,10 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1942
-482
-2462
-697
+1383
+419
+1903
+634
 Age range of deceased
 NIL
 NIL
@@ -947,16 +938,16 @@ NIL
 0.0
 50.0
 true
-true
+false
 "" ""
 PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1937
-702
-2444
-992
+1385
+639
+1893
+789
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -986,10 +977,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-2297
-730
-2429
-775
+1740
+666
+1872
+711
 Infection Growth %
 infectionchange
 2
@@ -1132,10 +1123,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
 BUTTON
-2567
-382
-2663
-415
+1999
+405
+2095
+438
 Match Ages
 Matchages
 NIL
@@ -1204,7 +1195,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-1.0
+5.0
 1
 1
 NIL
@@ -1219,7 +1210,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-70.0
+71.0
 1
 1
 NIL
