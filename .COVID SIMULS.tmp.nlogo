@@ -138,7 +138,7 @@ to calculateIncomeperday
 end
 
 to calculateexpenditureperday
-  set expenditure income * .99
+  set expenditure income * random-normal 0.1 5
 end
 
 to calculatedailyrisk
@@ -146,7 +146,7 @@ to calculatedailyrisk
 end
 
 to go
-  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Spend Countcontacts respeed ] ;
+  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   finished
@@ -279,8 +279,7 @@ to TriggerActionIsolation
 end
 
 to spend
-  set expenditure expenditure + (expenditure * (.025 / 365 ) )
-  set reserves (income + income - expenditure )
+    set reserves (income * random-normal 90 30 ) ;; average of 3 months with tails
 end
 
 to Cruiseship
@@ -312,6 +311,11 @@ end
 
 to checkutilisation
   ifelse any? simuls-here [ set utilisation 1 ] [ set utilisation 0 ]
+end
+
+to earn
+  set expenditure expenditure + (expenditure * (.025 / 365 ) )
+    if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 [ set reserves reserves +  (contacts / ticks * income ) - expenditure ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -416,7 +420,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -493,7 +497,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -1210,7 +1214,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-71.0
+19.0
 1
 1
 NIL
@@ -1230,6 +1234,24 @@ Contact_Radius
 1
 NIL
 HORIZONTAL
+
+PLOT
+1861
+796
+2383
+1058
+Financial_Reserves
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Financial_Reserves" 1.0 0 -16777216 true "" "plot sum [ reserves] of simuls with [ color != black ]"
 
 @#$#@#$#@
 ## WHAT IS IT?
