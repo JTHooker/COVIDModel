@@ -448,7 +448,7 @@ SWITCH
 125
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -525,7 +525,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -858,7 +858,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-75.0
+65.0
 5
 1
 NIL
@@ -873,7 +873,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-70.0
+65.0
 5
 1
 NIL
@@ -1285,6 +1285,17 @@ Cruise
 1
 1
 -1000
+
+MONITOR
+960
+332
+1079
+382
+Stimulus
+Sum [ value ] of packages * -1 * (Total_Population / Population )
+0
+1
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
