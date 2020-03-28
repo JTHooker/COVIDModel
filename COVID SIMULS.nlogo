@@ -21,6 +21,7 @@ globals [
 breed [ simuls simul ]
 breed [ resources resource ]
 breed [ medresources medresource ] ;; people living in the city
+breed [ packages package ]
 
 simuls-own [
   timenow
@@ -39,6 +40,11 @@ simuls-own [
   RiskofDeath
   Pace
 ]
+
+Packages-own [
+  value
+]
+
 
 patches-own [
   utilisation
@@ -66,7 +72,7 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-normal 50000 30000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] spend resetlandingSimul set riskofdeath .01 ]
+        set income random-normal 50000 15000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
   if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
@@ -84,7 +90,7 @@ to setup
 
   matchages
 
-  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk ]
+  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend ]
 
   reset-ticks
 end
@@ -125,7 +131,7 @@ end
 
 to resetincome
   if income < 10000 [
-    set income random 100000 ]
+    set income random-normal 50000 15000 ]
 end
 
 to resethealth
@@ -138,7 +144,7 @@ to calculateIncomeperday
 end
 
 to calculateexpenditureperday
-  set expenditure income * random-normal 0.1 5
+  set expenditure income * random-normal .99 .05
 end
 
 to calculatedailyrisk
@@ -146,9 +152,10 @@ to calculatedailyrisk
 end
 
 to go
-  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn ] ;
+  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
+  ask packages [ absorbshock ]
   finished
   CruiseShip
   GlobalTreat
@@ -157,6 +164,8 @@ to go
   CountInfected
   CalculateDailyGrowth
   TriggerActionIsolation
+  DeployStimulus
+
   ask patches [ checkutilisation ]
   tick
 
@@ -279,11 +288,11 @@ to TriggerActionIsolation
 end
 
 to spend
-    set reserves (income * random-normal 90 30 ) ;; average of 3 months with tails
+    set reserves (income * random-normal 21 10 ) ;; average of 3 months with tails
 end
 
 to Cruiseship
-  if mouse-down? [
+  if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
       set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-normal 50000 3000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
@@ -314,9 +323,28 @@ to checkutilisation
 end
 
 to earn
-  set expenditure expenditure + (expenditure * (.025 / 365 ) )
-    if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 [ set reserves reserves +  (contacts / ticks * income ) - expenditure ]
+  if agerange > 18 and agerange < 70 [ set expenditure expenditure + (expenditure * (.025 / 365 ) ) ]
+  if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income * 2 ]
+  if agerange > 18 and agerange < 70 and not any? other simuls-here with [ reserves > 0 ] and color != black [ set reserves ( reserves - expenditure )]
 end
+
+to financialstress
+  if reserves <= 0 and agerange > 18 and agerange < 70 [ set shape "star" ]
+  if reserves > 0 [ set shape "dot" ]
+end
+
+to DeployStimulus
+  if mouse-down? and stimulus = true [ create-packages 1 [ setxy mouse-xcor mouse-ycor set shape "box" set value 0 set color orange set size 5 ] ]
+end
+
+to absorbshock
+  if any? simuls in-radius 1 with [ shape = "star" ] [ set value value - sum [ reserves ] of simuls in-radius 1 with [ shape = "star" ] ]
+end
+
+to AccessPackage
+  if any? Packages in-radius 1 and reserves < 0 [ set reserves 100 ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 254
@@ -447,8 +475,8 @@ SLIDER
 Speed
 Speed
 0
-1
-1.0
+5
+5.0
 .1
 1
 NIL
@@ -519,10 +547,10 @@ NIL
 1
 
 SLIDER
-1955
-562
-2153
-595
+1922
+629
+2109
+663
 RestrictedMovement
 RestrictedMovement
 0
@@ -645,10 +673,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "if count resources > 0 [ plot mean [ volume ] of resources ]"
 
 SLIDER
-1951
-488
-2147
-521
+1920
+554
+2109
+588
 ProductionRate
 ProductionRate
 0
@@ -726,10 +754,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-1960
-679
-2164
-713
+1924
+747
+2111
+781
 Media_Exposure
 Media_Exposure
 1
@@ -767,10 +795,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1956
-639
-2156
-672
+1924
+707
+2109
+741
 Severity_of_illness
 Severity_of_illness
 0
@@ -830,7 +858,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+75.0
 5
 1
 NIL
@@ -845,17 +873,17 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-100.0
+70.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1951
-445
-2146
-478
+1920
+515
+2110
+549
 Treatment_Benefit
 Treatment_Benefit
 0
@@ -867,10 +895,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1955
-522
-2147
-555
+1922
+589
+2109
+623
 FearTrigger
 FearTrigger
 0
@@ -904,10 +932,10 @@ PolicyTriggerOn
 -1000
 
 SLIDER
-1955
-602
-2157
-635
+1922
+669
+2107
+703
 Initial
 Initial
 0
@@ -948,10 +976,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1385
-639
-1893
-789
+1384
+640
+1904
+790
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -1126,23 +1154,6 @@ false
 PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
-BUTTON
-1999
-405
-2095
-438
-Match Ages
-Matchages
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 PLOT
 964
 795
@@ -1229,7 +1240,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+47.0
 1
 1
 NIL
@@ -1251,7 +1262,29 @@ true
 false
 "" ""
 PENS
-"Financial_Reserves" 1.0 0 -16777216 true "" "plot sum [ reserves] of simuls with [ color != black ]"
+"Financial_Reserves" 1.0 1 -16777216 true "" "plot sum [ reserves] of simuls with [ color != black ]"
+
+SWITCH
+90
+670
+194
+704
+Stimulus
+Stimulus
+0
+1
+-1000
+
+SWITCH
+90
+712
+194
+746
+Cruise
+Cruise
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
