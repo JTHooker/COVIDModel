@@ -177,7 +177,7 @@ to go
 end
 
 to move
-  if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
+  if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
   if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
@@ -208,7 +208,9 @@ end
 to superSpread
   if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
-;;  if count simuls with [ color = red ] > 0 and Case_Isolation = true  [  if Superspreaders > random 100 [ ask one-of simuls with [ color = red ] [fd 0 ]]]
+
+  if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
+    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 
 end
 
@@ -326,7 +328,7 @@ end
 
 to earn
   if agerange > 18 and agerange < 70 [ set expenditure expenditure + (expenditure * (.025 / 365 ) ) ]
-  if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income * 2 ]
+  if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income * 1.8 ]
   if agerange > 18 and agerange < 70 and not any? other simuls-here with [ reserves > 0 ] and color != black [ set reserves ( reserves - expenditure )]
 end
 
@@ -346,7 +348,6 @@ end
 to AccessPackage
   if any? Packages in-radius 1 and reserves < 0 [ set reserves 100 ]
 end
-
 
 to setInitialReserves
   if ticks = 1  [ set InitialReserves sum [ reserves ] of simuls ]
@@ -419,7 +420,7 @@ BUTTON
 207
 349
 Trace_Patterns
-ask n-of 10 simuls with [ color = red ] [ pen-down ] 
+ask n-of 50 simuls with [ color != black ] [ pen-down ] 
 NIL
 1
 T
@@ -454,7 +455,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -531,7 +532,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -568,10 +569,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-262
-789
-411
-846
+259
+790
+414
+848
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -598,7 +599,7 @@ InfectionRate
 InfectionRate
 0
 100
-75.0
+35.0
 1
 1
 NIL
@@ -735,7 +736,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.1
+0.2
 .01
 1
 NIL
@@ -788,7 +789,7 @@ mean [ timenow ] of simuls with [ color = red ]
 SLIDER
 627
 489
-823
+827
 522
 Superspreaders
 Superspreaders
@@ -816,10 +817,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-262
-732
-411
-789
+260
+733
+413
+791
 % Total Infections
 numberInfected / Population * 100
 0
@@ -864,7 +865,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-80.0
+85.0
 5
 1
 NIL
@@ -879,7 +880,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-80.0
+85.0
 5
 1
 NIL
@@ -1031,7 +1032,7 @@ INPUTBOX
 228
 470
 Current_Cases
-3968.0
+4000.0
 1
 0
 Number
@@ -1107,7 +1108,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "plot mean [ R ] of simuls with [ color = red and timenow > 12 ]"
+"R" 1.0 0 -16777216 true "" "plot mean [ R ] of simuls with [ color = red and timenow > 13 ]"
 
 PLOT
 1093
@@ -1216,7 +1217,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-5.0
+1.0
 1
 1
 NIL
@@ -1231,21 +1232,21 @@ Age_Isolation
 Age_Isolation
 0
 100
-19.0
+70.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-629
-599
-827
-632
+628
+600
+830
+633
 Contact_Radius
 Contact_Radius
 0
-180
+90
 90.0
 1
 1
@@ -1277,7 +1278,7 @@ SWITCH
 703
 Stimulus
 Stimulus
-0
+1
 1
 -1000
 
@@ -1288,7 +1289,7 @@ SWITCH
 745
 Cruise
 Cruise
-1
+0
 1
 -1000
 
@@ -1736,7 +1737,7 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="6" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -1758,6 +1759,7 @@ NetLogo 6.1.0
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )</metric>
+    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -1770,7 +1772,7 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="Total_Population">
       <value value="25000000"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Toilet_Rolls">
+    <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
