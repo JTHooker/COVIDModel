@@ -1,4 +1,4 @@
-# COVIDModel
+# COVID Model in the Australian Context
 
 This is an Agent-Based Model being built to assist with modeling the spread, health and economic impact of COVID 19 in Australia and policy-settings during its expansion and contraction phase that could limit its damage.
 
