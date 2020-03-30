@@ -181,7 +181,7 @@ end
 
 to move
   if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+  if any? other simuls-here with [ color = red and timenow => random-normal 4 1 ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -464,7 +464,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -541,7 +541,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -581,7 +581,7 @@ MONITOR
 262
 824
 417
-882
+881
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -651,7 +651,7 @@ SWITCH
 297
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -829,7 +829,7 @@ MONITOR
 262
 762
 415
-820
+819
 % Total Infections
 numberInfected / Population * 100
 0
@@ -1041,7 +1041,7 @@ INPUTBOX
 228
 470
 Current_Cases
-2630.0
+4300.0
 1
 0
 Number
@@ -1192,7 +1192,7 @@ MONITOR
 259
 574
 412
-624
+623
 New Infections Today
 count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count Simuls )
 0
