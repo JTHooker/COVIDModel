@@ -295,7 +295,7 @@ to TriggerActionIsolation
 end
 
 to spend
-    set reserves (income * random-normal Cash_Reserves (Cash_Reserves / 5) ) / 365 ;; average of 3 weeks with tails
+    set reserves (income * random-normal Days_of_Cash_Reserves (Days_of_Cash_Reserves / 5) ) / 365 ;; average of 3 weeks with tails
 end
 
 to Cruiseship
@@ -1344,8 +1344,8 @@ INPUTBOX
 126
 1045
 187
-Cash_Reserves
-0.0
+Days_of_Cash_Reserves
+30.0
 1
 0
 Number
