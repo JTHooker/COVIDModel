@@ -16,6 +16,7 @@ globals [
   eightyfive
   ninetyfive
   InitialReserves
+  AverageContacts
 ]
 
 
@@ -91,7 +92,7 @@ to setup
 
   matchages
 
-  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend ]
+  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
 
   reset-ticks
 end
@@ -131,7 +132,7 @@ to resetlandingSimul
 end
 
 to resetincome
-  if income < 10000 [
+  if agerange >= 18 and agerange < 70 and income < 10000 [
     set income random-normal 50000 15000 ]
 end
 
@@ -141,11 +142,12 @@ to resethealth
 end
 
 to calculateIncomeperday
-  set income income / 365
+  if agerange >= 18 and agerange < 70 [
+    set income income + (income * (.025 / 365 ))]
 end
 
 to calculateexpenditureperday
-  set expenditure income * random-normal .99 .05
+  set expenditure income * random-normal 1 .05
 end
 
 to calculatedailyrisk
@@ -153,7 +155,7 @@ to calculatedailyrisk
 end
 
 to go
-  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage ] ;
+  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock ]
@@ -167,6 +169,7 @@ to go
   TriggerActionIsolation
   DeployStimulus
   setInitialReserves
+  CalculateAverageContacts
 
   ask patches [ checkutilisation ]
   tick
@@ -292,7 +295,7 @@ to TriggerActionIsolation
 end
 
 to spend
-    set reserves (income * random-normal 21 10 ) ;; average of 3 months with tails
+    set reserves (income * random-normal  10 ) / 365 ;; average of 3 weeks with tails
 end
 
 to Cruiseship
@@ -328,8 +331,8 @@ end
 
 to earn
   if agerange > 18 and agerange < 70 [ set expenditure expenditure + (expenditure * (.025 / 365 ) ) ]
-  if ticks > 0 and color != red and color != black and agerange > 18 and agerange < 70 and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income * 1.8 ]
-  if agerange > 18 and agerange < 70 and not any? other simuls-here with [ reserves > 0 ] and color != black [ set reserves ( reserves - expenditure )]
+  if ticks > 0 and AverageContacts > 0 and color != red and color != black and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income / 365  ]
+  if agerange >= 18 and agerange < 70 and not any? other simuls-here with [ reserves > 0 ] and color != black [ set reserves ( reserves - expenditure / 365 )]
 end
 
 to financialstress
@@ -351,6 +354,10 @@ end
 
 to setInitialReserves
   if ticks = 1  [ set InitialReserves sum [ reserves ] of simuls ]
+end
+
+to CalculateAverageContacts
+  if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ agerange >= 18 and agerange < 70 ] / ticks ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -455,7 +462,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -483,7 +490,7 @@ Speed
 Speed
 0
 5
-1.0
+5.0
 .1
 1
 NIL
@@ -532,7 +539,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -554,10 +561,10 @@ NIL
 1
 
 SLIDER
-1851
-615
-2038
-648
+1975
+495
+2162
+528
 RestrictedMovement
 RestrictedMovement
 0
@@ -642,7 +649,7 @@ SWITCH
 297
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -664,8 +671,8 @@ HORIZONTAL
 PLOT
 883
 629
-1138
-766
+1298
+767
 Resource Availability
 NIL
 NIL
@@ -680,10 +687,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "if count resources > 0 [ plot mean [ volume ] of resources ]"
 
 SLIDER
-1848
-539
-2037
-572
+1972
+419
+2161
+452
 ProductionRate
 ProductionRate
 0
@@ -706,10 +713,10 @@ count simuls * (Total_Population / population)
 14
 
 MONITOR
-1315
-358
-1533
-403
+1322
+352
+1540
+397
 NIL
 count patches with [ pcolor = white ]
 17
@@ -761,10 +768,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-1852
-732
-2039
-765
+1976
+612
+2163
+645
 Media_Exposure
 Media_Exposure
 1
@@ -802,10 +809,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1852
-692
-2037
-725
+1976
+572
+2161
+605
 Severity_of_illness
 Severity_of_illness
 0
@@ -865,7 +872,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+100.0
 5
 1
 NIL
@@ -880,17 +887,17 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-85.0
+100.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1848
-501
-2038
-534
+1972
+380
+2162
+413
 Treatment_Benefit
 Treatment_Benefit
 0
@@ -902,10 +909,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1851
-575
-2038
-608
+1975
+455
+2162
+488
 FearTrigger
 FearTrigger
 0
@@ -917,10 +924,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-903
-565
-962
-610
+883
+580
+942
+625
 R
 mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
 3
@@ -939,10 +946,10 @@ PolicyTriggerOn
 -1000
 
 SLIDER
-1851
-655
-2036
-688
+1975
+535
+2160
+568
 Initial
 Initial
 0
@@ -965,10 +972,10 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1312
-405
-1832
-620
+1325
+406
+1845
+621
 Number of deceased across age ranges
 NIL
 NIL
@@ -983,10 +990,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1312
-625
-1832
-775
+1325
+626
+1845
+776
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -1069,16 +1076,16 @@ MONITOR
 1040
 430
 Close contacts per day
-mean [ contacts] of simuls / ticks
+AverageContacts
 2
 1
 11
 
 PLOT
-885
-428
-1085
-549
+880
+451
+1080
+572
 Close contacts per day
 NIL
 NIL
@@ -1093,10 +1100,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-254
-889
-852
-1039
+1925
+226
+2218
+376
 R value
 Time
 R
@@ -1162,10 +1169,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
 PLOT
-883
-780
-1329
-1038
+875
+782
+1321
+1040
 Total Active Infections '000s
 NIL
 NIL
@@ -1191,10 +1198,10 @@ count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count 
 11
 
 PLOT
-1338
-780
-1781
-1039
+255
+889
+851
+1042
 New Infections Per Day '000's
 NIL
 NIL
@@ -1247,17 +1254,17 @@ Contact_Radius
 Contact_Radius
 0
 90
-90.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-1788
-782
-2311
-1041
+1326
+780
+1849
+1039
 Productivity
 NIL
 NIL
@@ -1269,7 +1276,7 @@ true
 false
 "" ""
 PENS
-"Financial_Reserves" 1.0 1 -16777216 true "" "plot sum [ reserves] of simuls with [ color != black ]"
+"Financial_Reserves" 1.0 1 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
 
 SWITCH
 90
@@ -1278,7 +1285,7 @@ SWITCH
 703
 Stimulus
 Stimulus
-1
+0
 1
 -1000
 
@@ -1289,7 +1296,7 @@ SWITCH
 745
 Cruise
 Cruise
-0
+1
 1
 -1000
 
@@ -1305,10 +1312,10 @@ Sum [ value ] of packages * -1 * (Total_Population / Population )
 12
 
 MONITOR
-2093
-679
-2242
-736
+1366
+968
+1515
+1025
 Growth
 sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 2
@@ -1331,6 +1338,17 @@ NIL
 NIL
 NIL
 1
+
+INPUTBOX
+889
+126
+1045
+187
+Cash_Reserves
+0.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
