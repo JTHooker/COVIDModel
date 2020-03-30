@@ -181,7 +181,7 @@ end
 
 to move
   if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+  if any? other simuls-here with [ color = red ] and color = 85 and infectionRate > random 100 and timenow = random-normal 4 1 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -351,7 +351,7 @@ to absorbshock
 end
 
 to AccessPackage
-  if any? Packages in-radius 1 and reserves < 0 [ set reserves 100 ]
+  if any? Packages in-radius 10 and reserves < 0 [ set reserves 100 ]
 end
 
 to setInitialReserves
@@ -578,10 +578,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-259
-790
-414
-848
+262
+824
+417
+882
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -638,8 +638,8 @@ Bed_Capacity
 Bed_Capacity
 0
 20
-0.0
-15
+2.0
+1
 1
 NIL
 HORIZONTAL
@@ -727,9 +727,9 @@ count patches with [ pcolor = white ]
 
 MONITOR
 260
-619
+632
 410
-676
+689
 Total # Infected
 count simuls with [ color = red ] * (Total_Population / population)
 0
@@ -786,9 +786,9 @@ HORIZONTAL
 
 MONITOR
 260
-675
+695
 410
-732
+752
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
@@ -826,10 +826,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-260
-733
-413
-791
+262
+762
+415
+820
 % Total Infections
 numberInfected / Population * 100
 0
@@ -874,7 +874,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+90.0
 5
 1
 NIL
@@ -889,7 +889,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-100.0
+80.0
 5
 1
 NIL
@@ -943,7 +943,7 @@ SWITCH
 617
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1018,7 +1018,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-40.0
+100.0
 5
 1
 NIL
@@ -1041,7 +1041,7 @@ INPUTBOX
 228
 470
 Current_Cases
-4111.0
+2630.0
 1
 0
 Number
@@ -1189,15 +1189,15 @@ PENS
 "Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 MONITOR
-262
+259
 574
-411
-619
+412
+624
 New Infections Today
 count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count Simuls )
 0
 1
-11
+12
 
 PLOT
 255
@@ -1256,7 +1256,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
