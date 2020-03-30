@@ -295,7 +295,7 @@ to TriggerActionIsolation
 end
 
 to spend
-    set reserves (income * random-normal Cash_Reserves (Cash_Reserves / 5) ) / 365 ;; average of 3 weeks with tails
+  ifelse agerange < 18 [ set reserves reserves ] [ set reserves (income * random-normal Days_of_Cash_Reserves (Days_of_Cash_Reserves / 5) ) / 365 ];; average of 3 weeks with tails
 end
 
 to Cruiseship
@@ -330,8 +330,10 @@ to checkutilisation
 end
 
 to earn
-  if agerange > 18 and agerange < 70 [ set expenditure expenditure + (expenditure * (.025 / 365 ) ) ]
-  if ticks > 0 and AverageContacts > 0 and color != red and color != black and any? other simuls-here with [ reserves > 0 ] [ set reserves reserves + income / 365  ]
+  if agerange < 18 [ set reserves reserves ]
+  if agerange > 70 [ set reserves reserves ]
+  if agerange >= 18 and agerange < 70 [ set expenditure expenditure + (expenditure * (.025 / 365 ) ) ]
+  if ticks > 0 and AverageContacts > 0 and color != red and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [ set reserves reserves + (income  / 365 ) * 1 / AverageContacts ]
   if agerange >= 18 and agerange < 70 and not any? other simuls-here with [ reserves > 0 ] and color != black [ set reserves ( reserves - expenditure / 365 )]
 end
 
@@ -462,7 +464,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -490,7 +492,7 @@ Speed
 Speed
 0
 5
-5.0
+1.0
 .1
 1
 NIL
@@ -539,7 +541,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -636,7 +638,7 @@ Bed_Capacity
 Bed_Capacity
 0
 20
-2.0
+0.0
 15
 1
 NIL
@@ -649,7 +651,7 @@ SWITCH
 297
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -1016,7 +1018,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-100.0
+40.0
 5
 1
 NIL
@@ -1039,7 +1041,7 @@ INPUTBOX
 228
 470
 Current_Cases
-4000.0
+4111.0
 1
 0
 Number
@@ -1239,7 +1241,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-70.0
+99.0
 1
 1
 NIL
@@ -1248,13 +1250,13 @@ HORIZONTAL
 SLIDER
 628
 600
-830
+825
 633
 Contact_Radius
 Contact_Radius
 0
-90
-0.0
+180
+90.0
 1
 1
 NIL
@@ -1345,7 +1347,7 @@ INPUTBOX
 1045
 187
 Days_of_Cash_Reserves
-30000.0
+60.0
 1
 0
 Number
