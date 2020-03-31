@@ -1,3 +1,7 @@
+extensions [ dist ]
+
+
+
 globals [
 
   FearFactor
@@ -74,11 +78,11 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-normal 50000 15000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
+        set income random- 50000 15000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
 
-  ;if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
+  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
   set fifteen int ( Population * .121 )
@@ -476,9 +480,9 @@ SLIDER
 270
 Population
 Population
-0
+1000
 10000
-0.0
+5000.0
 500
 1
 NIL
@@ -1227,7 +1231,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-0.0
+2.0
 1
 1
 NIL
@@ -1352,6 +1356,24 @@ Days_of_Cash_Reserves
 1
 0
 Number
+
+PLOT
+1874
+782
+2500
+1038
+Cash Reserves
+NIL
+NIL
+0.0
+20000.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "histogram [ reserves ] of simuls with [ agerange > 18 and agerange < 70 ] "
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1874,6 +1896,10 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="Age_Isolation">
       <value value="70"/>
       <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Contact_Radius">
+      <value value="25"/>
+      <value value="90"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
