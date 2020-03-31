@@ -77,6 +77,7 @@ to setup
         set income random-normal 50000 15000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
+
   if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
@@ -475,7 +476,7 @@ SLIDER
 270
 Population
 Population
-0
+1000
 10000
 5000.0
 500
@@ -889,7 +890,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-80.0
+90.0
 5
 1
 NIL
@@ -1041,7 +1042,7 @@ INPUTBOX
 228
 470
 Current_Cases
-4300.0
+4514.0
 1
 0
 Number
@@ -1226,7 +1227,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-1.0
+0.0
 1
 1
 NIL
@@ -1241,7 +1242,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-99.0
+70.0
 1
 1
 NIL
@@ -1256,7 +1257,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
@@ -1757,7 +1758,7 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="6" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -1796,7 +1797,7 @@ NetLogo 6.1.0
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
-      <value value="2630"/>
+      <value value="4300"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
@@ -1869,6 +1870,10 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="35"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="70"/>
+      <value value="100"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

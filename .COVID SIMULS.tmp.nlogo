@@ -77,7 +77,8 @@ to setup
         set income random-normal 50000 15000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
-  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
+
+  ;if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
   set fifteen int ( Population * .121 )
@@ -181,7 +182,7 @@ end
 
 to move
   if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red and timenow => random-normal 4 1 ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -477,7 +478,7 @@ Population
 Population
 0
 10000
-5000.0
+0.0
 500
 1
 NIL
@@ -889,7 +890,7 @@ Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-80.0
+90.0
 5
 1
 NIL
@@ -1041,7 +1042,7 @@ INPUTBOX
 228
 470
 Current_Cases
-4300.0
+4514.0
 1
 0
 Number
@@ -1226,7 +1227,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-1.0
+0.0
 1
 1
 NIL
@@ -1241,7 +1242,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-99.0
+70.0
 1
 1
 NIL
@@ -1256,7 +1257,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
@@ -1757,7 +1758,7 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="6" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -1796,7 +1797,7 @@ NetLogo 6.1.0
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
-      <value value="2630"/>
+      <value value="4300"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
@@ -1869,6 +1870,10 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="35"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="70"/>
+      <value value="100"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
