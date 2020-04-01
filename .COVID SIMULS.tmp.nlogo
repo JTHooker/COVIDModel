@@ -79,9 +79,9 @@ to setup
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
-  ask n-of (Current_Cases * (population / 25000000)) simuls [ set xcor 0 set ycor 0 set color red ]
+  ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
-  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red ]]
+  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
   set fifteen int ( Population * .121 )
@@ -334,10 +334,12 @@ to checkutilisation
 end
 
 to earn
+  if ticks > 1 [
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
   ifelse ticks > 0 and AverageFinancialContacts > 0 and color != red and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts) ) ]
    [ set reserves reserves - ( expenditure / 365) * .5 ]
+  ]
 end
 
 to financialstress
@@ -368,13 +370,13 @@ to CalculateAverageContacts
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-254
-74
-849
-887
+236
+63
+858
+889
 -1
 -1
-7.25
+4.7025
 1
 10
 1
@@ -384,10 +386,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--40
-40
--55
-55
+-45
+45
+-60
+60
 0
 0
 1
@@ -469,7 +471,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -481,7 +483,7 @@ SLIDER
 Population
 Population
 1000
-10000
+25000
 5000.0
 500
 1
@@ -546,7 +548,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -750,7 +752,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.2
+0.1
 .01
 1
 NIL
@@ -948,7 +950,7 @@ SWITCH
 617
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1046,7 +1048,7 @@ INPUTBOX
 228
 470
 Current_Cases
-4300.0
+5000.0
 1
 0
 Number
@@ -1205,10 +1207,10 @@ count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count 
 12
 
 PLOT
-255
-889
-851
-1042
+248
+890
+844
+1043
 New Infections Per Day '000's
 NIL
 NIL
@@ -1231,7 +1233,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-2.0
+0.0
 1
 1
 NIL
@@ -1255,7 +1257,7 @@ HORIZONTAL
 SLIDER
 628
 600
-825
+827
 633
 Contact_Radius
 Contact_Radius
@@ -1393,6 +1395,17 @@ MONITOR
 622
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
+0
+1
+11
+
+MONITOR
+66
+813
+205
+858
+Count red simuls (raw)
+count simuls with [ color = red ]
 0
 1
 11
@@ -1923,7 +1936,7 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Focused Policy" repetitions="30" runMetricsEveryStep="true">
+  <experiment name="Focused Policy" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -1962,7 +1975,7 @@ NetLogo 6.1.0
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
-      <value value="4300"/>
+      <value value="5000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
@@ -1983,7 +1996,6 @@ NetLogo 6.1.0
       <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Send_to_Hospital">
-      <value value="false"/>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ProductionRate">
@@ -1999,9 +2011,7 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ID_Rate">
-      <value value="0.1"/>
       <value value="0.15"/>
-      <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="PolicyTriggerOn">
       <value value="true"/>
@@ -2022,7 +2032,7 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="0"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
       <value value="75"/>
@@ -2037,12 +2047,12 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy" repetitions="30" runMetricsEveryStep="true">
+  <experiment name="Containment Policy" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = blue ]</metric>
+    <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
     <metric>count simuls with [ color = yellow ]</metric>
     <metric>count simuls with [ color = black and agerange = 5 ]</metric>
@@ -2076,7 +2086,7 @@ NetLogo 6.1.0
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
-      <value value="4300"/>
+      <value value="5000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
@@ -2097,7 +2107,6 @@ NetLogo 6.1.0
       <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Send_to_Hospital">
-      <value value="false"/>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ProductionRate">
@@ -2114,8 +2123,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="ID_Rate">
       <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="PolicyTriggerOn">
       <value value="true"/>
