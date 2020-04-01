@@ -185,7 +185,11 @@ end
 
 to move
   if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [ set color red set timenow Incubation_Period - ticks  ]
+
+
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -471,7 +475,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
@@ -548,7 +552,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -658,7 +662,7 @@ SWITCH
 297
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -752,7 +756,7 @@ ID_Rate
 ID_Rate
 0
 1
-0.15
+0.1
 .01
 1
 NIL
@@ -950,7 +954,7 @@ SWITCH
 617
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1073,7 +1077,7 @@ Triggerday
 Triggerday
 0
 100
-10.0
+7.0
 1
 1
 NIL
@@ -1153,7 +1157,7 @@ Incubation_Period
 Incubation_Period
 0
 10
-4.0
+5.0
 1
 1
 NIL
@@ -1941,7 +1945,7 @@ NetLogo 6.1.0
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = blue ]</metric>
+    <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
     <metric>count simuls with [ color = yellow ]</metric>
     <metric>count simuls with [ color = black and agerange = 5 ]</metric>
@@ -2047,12 +2051,12 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy" repetitions="30" runMetricsEveryStep="true">
+  <experiment name="Containment Policy" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = blue ]</metric>
+    <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
     <metric>count simuls with [ color = yellow ]</metric>
     <metric>count simuls with [ color = black and agerange = 5 ]</metric>
@@ -2086,7 +2090,7 @@ NetLogo 6.1.0
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Current_Cases">
-      <value value="4300"/>
+      <value value="5000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
@@ -2107,7 +2111,6 @@ NetLogo 6.1.0
       <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Send_to_Hospital">
-      <value value="false"/>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ProductionRate">
@@ -2124,8 +2127,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="ID_Rate">
       <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="PolicyTriggerOn">
       <value value="true"/>

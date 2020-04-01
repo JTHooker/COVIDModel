@@ -185,7 +185,11 @@ end
 
 to move
   if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 [ set color red set timenow 0  ]
+
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [ set color red set timenow sIncubation_Period - 1  ]
+
+
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [ set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -471,7 +475,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -548,7 +552,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -1941,7 +1945,7 @@ NetLogo 6.1.0
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = blue ]</metric>
+    <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
     <metric>count simuls with [ color = yellow ]</metric>
     <metric>count simuls with [ color = black and agerange = 5 ]</metric>

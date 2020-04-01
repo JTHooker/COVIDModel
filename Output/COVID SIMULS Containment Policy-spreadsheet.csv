@@ -1,0 +1,44 @@
+"BehaviorSpace results (NetLogo 6.1.0)"
+"COVID SIMULS.nlogo"
+"Containment Policy"
+"04/02/2020 10:41:46:059 +1100"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-45","45","-60","60"
+"[run number]"
+"Illness_period",
+"SpatialDistance",
+"Proportion_Isolating",
+"Total_Population",
+"Available_Resources",
+"Current_Cases",
+"Media_Exposure",
+"Bed_Capacity",
+"ReInfectionRate",
+"RestrictedMovement",
+"Superspreaders",
+"Severity_of_illness",
+"Send_to_Hospital",
+"ProductionRate",
+"Incubation_Period",
+"Case_Isolation",
+"Initial",
+"ID_Rate",
+"PolicyTriggerOn",
+"Proportion_People_Avoid",
+"Population",
+"Treatment_Benefit",
+"FearTrigger",
+"Speed",
+"Triggerday",
+"Proportion_time_Avoid",
+"InfectionRate",
+"Age_Isolation",
+"Contact_Radius",
+"[reporter]"
+"[final]",
+"[min]",
+"[max]",
+"[mean]",
+"[steps]",
+
+"[all run data]"
