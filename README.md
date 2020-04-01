@@ -11,3 +11,5 @@ The model will be updated regularly as it is constructed.
 We apologise in advance for the lack of commenting in the code. Hopefully you can read Netlogo. We'll update as we go. We're in a rush at present.
 
 If you have any specific questions or would like to contribute / comment, please contact jason.thompson@unimelb.edu.au .
+
+IMPORTANT! Users must download and import the Netlogo DIST extension for the model to run. This is related to the economic exchange between agents.
