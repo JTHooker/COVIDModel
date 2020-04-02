@@ -20,6 +20,7 @@ globals [
   InitialReserves
   AverageContacts
   AverageFinancialContacts
+  ScalePhase
 ]
 
 
@@ -111,15 +112,15 @@ to matchages
   ask n-of int sixtyfive simuls with [ agerange > 55 ] [ set agerange 65 ]
   ask n-of int seventyfive simuls with [ agerange > 65 ] [ set agerange 75 ]
   ask n-of int eightyfive simuls with [ agerange > 75 ] [ set agerange 85 ]
-  ;;ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ]
+ ;; ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ]
 end
 
 to setdeathrisk
   if agerange = 5 [ set riskofDeath 0 ]
-  if agerange = 15 [ set riskofDeath .02 ]
-  if agerange = 25 [ set riskofDeath .02 ]
-  if agerange = 35 [ set riskofDeath .02 ]
-  if agerange = 45 [ set riskofDeath .04 ]
+  if agerange = 15 [ set riskofDeath .002 ]
+  if agerange = 25 [ set riskofDeath .002 ]
+  if agerange = 35 [ set riskofDeath .002 ]
+  if agerange = 45 [ set riskofDeath .004 ]
   if agerange = 55 [ set riskofDeath .013 ]
   if agerange = 65 [ set riskofDeath .036 ]
   if agerange = 75 [ set riskofDeath .08 ]
@@ -158,6 +159,7 @@ to calculatedailyrisk
   set dailyrisk ( riskofDeath / Illness_period )
 end
 
+
 to go
   ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday ] ;
   ask medresources [ allocatebed ]
@@ -174,6 +176,7 @@ to go
   DeployStimulus
   setInitialReserves
   CalculateAverageContacts
+  ScaleUp
 
   ask patches [ checkutilisation ]
   tick
@@ -370,7 +373,11 @@ end
 to CalculateAverageContacts
   if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and agerange < 70 and reserves > 0 and color != black ] / ticks ]
   if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black and agerange >= 18 and agerange < 70 and reserves > 0 ] / ticks ]
+end
 
+to scaleup
+  if scale = true and count simuls with [ color = red ] >= 500 and scalePhase = 0 [ set scalephase 1 ask n-of ( count simuls with [ color = red ] / 10 ) simuls [ die ]
+    ask n-of ( count simuls with [ color = red ] / 10 ) simuls with [ color = 85 ] [ hatch 1 [ move-to one-of patches with [ pcolor = black ] ]]]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -475,7 +482,7 @@ SWITCH
 123
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -531,10 +538,10 @@ PENS
 "New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = 10 ] * ( Total_Population / 100 / count Simuls )"
 
 SLIDER
-625
-374
-825
-407
+626
+376
+826
+409
 Illness_period
 Illness_period
 0
@@ -552,7 +559,7 @@ SWITCH
 158
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -662,7 +669,7 @@ SWITCH
 297
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -954,7 +961,7 @@ SWITCH
 617
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1077,7 +1084,7 @@ Triggerday
 Triggerday
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -1267,7 +1274,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+0.0
 1
 1
 NIL
@@ -1413,6 +1420,17 @@ count simuls with [ color = red ]
 0
 1
 11
+
+SWITCH
+95
+868
+200
+903
+Scale
+Scale
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1961,7 +1979,7 @@ NetLogo 6.1.0
     <metric>mean [ R ] of simuls with [ timenow = Illness_period ]</metric>
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )</metric>
+    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
     <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
@@ -2051,7 +2069,7 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy" repetitions="1000" runMetricsEveryStep="true">
+  <experiment name="Containment Policy" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -2072,7 +2090,7 @@ NetLogo 6.1.0
     <metric>mean [ R ] of simuls with [ timenow = Illness_period ]</metric>
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )</metric>
+    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
     <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
@@ -2147,7 +2165,7 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="7"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
       <value value="75"/>
