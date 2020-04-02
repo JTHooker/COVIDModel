@@ -112,7 +112,7 @@ to matchages
   ask n-of int sixtyfive simuls with [ agerange > 55 ] [ set agerange 65 ]
   ask n-of int seventyfive simuls with [ agerange > 65 ] [ set agerange 75 ]
   ask n-of int eightyfive simuls with [ agerange > 75 ] [ set agerange 85 ]
- ; ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ]
+ ;; ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ]
 end
 
 to setdeathrisk
@@ -376,8 +376,16 @@ to CalculateAverageContacts
 end
 
 to scaleup
-  if scale = true and count simuls with [ color = red ] >= 500 and scalePhase = 0 [ set scalephase 1 ask n-of ( count simuls with [ color = red ] / 10 ) simuls [ die ]
-    ask n-of ( count simuls with [ color = red ] / 10 ) simuls with [ color = 85 ] [ hatch 1 [ move-to one-of patches with [ pcolor = black ] ]]]
+  if scale = true and count simuls with [ color = red ] >= 500 and scalePhase = 0 [ set scalephase 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
+    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+        set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ] ;;
+     ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
+    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+        set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
+
+
+
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1428,7 +1436,7 @@ SWITCH
 903
 Scale
 Scale
-1
+0
 1
 -1000
 
