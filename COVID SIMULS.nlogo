@@ -517,7 +517,7 @@ SWITCH
 175
 SpatialDistance
 SpatialDistance
-0
+1
 1
 -1000
 
@@ -594,7 +594,7 @@ SWITCH
 211
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -996,7 +996,7 @@ SWITCH
 692
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1445,7 +1445,7 @@ SWITCH
 976
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1464,7 +1464,7 @@ MONITOR
 1163
 680
 1361
-730
+729
 Scale Phase
 scalePhase
 17
