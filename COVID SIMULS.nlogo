@@ -104,6 +104,7 @@ to setup
   set contact_radius 0
   set days 0
   set Send_to_Hospital false
+  set Scale false
 
   reset-ticks
 end
