@@ -21,6 +21,8 @@ globals [
   AverageContacts
   AverageFinancialContacts
   ScalePhase
+  Days
+  Adjustment
 ]
 
 
@@ -71,7 +73,7 @@ to setup
     clear-all
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
-  ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -40 ]
+  ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -20 ]
   ask medresources [ ask patches in-radius Capacity [ set pcolor white ] ]
   ask n-of Available_Resources patches [ sprout-resources 1 ]
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
@@ -98,6 +100,10 @@ to setup
   matchages
 
   ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
+
+  set contact_radius 0
+  set days 0
+  set Send_to_Hospital false
 
   reset-ticks
 end
@@ -177,6 +183,9 @@ to go
   setInitialReserves
   CalculateAverageContacts
   ScaleUp
+  ;;ScaleDown
+  ForwardTime
+  adjustExpenditure
 
   ask patches [ checkutilisation ]
   tick
@@ -344,10 +353,15 @@ to earn
   if ticks > 1 [
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
-  ifelse ticks > 0 and AverageFinancialContacts > 0 and color != red and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts) ) ]
-   [ set reserves reserves - ( expenditure / 365) * .5 ]
+  ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)  ) ]
+    [ set reserves reserves - ( expenditure / 365) * ( 1 - AverageFinancialContacts) ] ;;; adjust here
   ]
 end
+
+to adjustExpenditure
+  if Initialreserves > 0 [ set Adjustment sum [ reserves ] of simuls with [ color != black ]  / Initialreserves ]
+end
+
 
 to financialstress
   if reserves <= 0 and agerange > 18 and agerange < 70 [ set shape "star" ]
@@ -371,28 +385,42 @@ to setInitialReserves
 end
 
 to CalculateAverageContacts
-  if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and agerange < 70 and reserves > 0 and color != black ] / ticks ]
-  if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black and agerange >= 18 and agerange < 70 and reserves > 0 ] / ticks ]
+  if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and reserves > 0 and color != black ] / ticks ]
+  if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black and agerange >= 18 and agerange < 70 ] / ticks ]
 end
 
 to scaleup
-  if scale = true and count simuls with [ color = red ] >= 500 and scalePhase = 0 [ set scalephase 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
+  ifelse scale = true and count simuls with [ color = red ] >= 250 and scalePhase >= 0 and scalePhase < 5 and count simuls * 1000 < Total_Population and days > 0  [
+    set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ] ;;
+      set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set ageRange ([ageRange ] of one-of simuls) ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
-  ]
+      set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
+ set contact_Radius Contact_Radius + (90 / 5)
+    Set days 0
+  ] [scaledown ]
+
+end
+
+to scaledown
+ if scale = true and scalephase > 0 and count simuls with [ color = red ] < 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
+    set scalephase scalephase - 1 set contact_Radius Contact_radius - (90 / 5) ]
+
+end
+
+to forwardTime
+  set days days + 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-236
-63
-858
-889
+250
+68
+868
+887
 -1
 -1
-4.7025
+10.0
 1
 10
 1
@@ -402,10 +430,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--45
-45
--60
-60
+-30
+30
+-40
+40
 0
 0
 1
@@ -481,10 +509,10 @@ NIL
 1
 
 SWITCH
-625
-90
-825
-123
+623
+89
+823
+122
 SpatialDistance
 SpatialDistance
 1
@@ -499,8 +527,8 @@ SLIDER
 Population
 Population
 1000
-25000
-5000.0
+10000
+2500.0
 500
 1
 NIL
@@ -543,10 +571,10 @@ PENS
 "New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = 10 ] * ( Total_Population / 100 / count Simuls )"
 
 SLIDER
-626
-376
-826
-409
+623
+375
+823
+408
 Illness_period
 Illness_period
 0
@@ -558,9 +586,9 @@ NIL
 HORIZONTAL
 
 SWITCH
-625
+623
 125
-823
+821
 158
 Case_Isolation
 Case_Isolation
@@ -623,9 +651,9 @@ ticks
 11
 
 SLIDER
-625
+623
 339
-827
+825
 372
 InfectionRate
 InfectionRate
@@ -638,9 +666,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-625
+623
 412
-825
+823
 445
 ReInfectionRate
 ReInfectionRate
@@ -653,25 +681,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-629
-842
-833
-875
+623
+749
+827
+782
 Bed_Capacity
 Bed_Capacity
 0
 20
-2.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-625
-264
-825
-297
+623
+263
+823
+296
 Send_to_Hospital
 Send_to_Hospital
 1
@@ -760,10 +788,10 @@ count simuls with [ color = red ] * (Total_Population / population)
 14
 
 SLIDER
-625
-227
-824
-260
+623
+226
+822
+259
 ID_Rate
 ID_Rate
 0
@@ -819,9 +847,9 @@ mean [ timenow ] of simuls with [ color = red ]
 14
 
 SLIDER
-627
+625
 489
-827
+825
 522
 Superspreaders
 Superspreaders
@@ -889,30 +917,30 @@ PENS
 "default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
 
 SLIDER
-625
-157
-823
-190
+623
+156
+821
+189
 Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-75.0
+85.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-625
+623
 192
-824
+822
 225
 Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-75.0
+85.0
 5
 1
 NIL
@@ -966,7 +994,7 @@ SWITCH
 617
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1033,9 +1061,9 @@ PENS
 "default" 1.0 0 -16777216 true "" "if ticks > 1 [ plot ( InfectionChange ) * 10 ]"
 
 SLIDER
-625
+623
 302
-824
+822
 335
 Proportion_Isolating
 Proportion_Isolating
@@ -1088,8 +1116,8 @@ SLIDER
 Triggerday
 Triggerday
 0
-100
-0.0
+150
+60.0
 1
 1
 NIL
@@ -1161,9 +1189,9 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
 
 SLIDER
-625
+623
 452
-827
+825
 485
 Incubation_Period
 Incubation_Period
@@ -1225,8 +1253,8 @@ count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count 
 PLOT
 248
 890
-844
-1043
+866
+1045
 New Infections Per Day '000's
 NIL
 NIL
@@ -1241,9 +1269,9 @@ PENS
 "Confirmed Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )"
 
 SLIDER
-627
+625
 525
-827
+825
 558
 Diffusion_Adjustment
 Diffusion_Adjustment
@@ -1256,9 +1284,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-627
+625
 562
-826
+824
 595
 Age_Isolation
 Age_Isolation
@@ -1271,10 +1299,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-628
-600
-827
-633
+626
+599
+825
+632
 Contact_Radius
 Contact_Radius
 0
@@ -1290,7 +1318,7 @@ PLOT
 780
 1849
 1039
-Productivity
+Cash_Reserves
 NIL
 NIL
 0.0
@@ -1301,7 +1329,7 @@ true
 false
 "" ""
 PENS
-"Financial_Reserves" 1.0 1 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
+"Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
 
 SWITCH
 90
@@ -1310,7 +1338,7 @@ SWITCH
 703
 Stimulus
 Stimulus
-0
+1
 1
 -1000
 
@@ -1321,7 +1349,7 @@ SWITCH
 745
 Cruise
 Cruise
-1
+0
 1
 -1000
 
@@ -1430,12 +1458,63 @@ SWITCH
 95
 868
 200
-903
+901
 Scale
 Scale
 0
 1
 -1000
+
+MONITOR
+971
+75
+1029
+120
+NIL
+Days
+17
+1
+11
+
+MONITOR
+87
+910
+197
+955
+ScalePhase
+scalePhase
+17
+1
+11
+
+PLOT
+1364
+842
+1564
+962
+Financial Contacts
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [ Averagefinancialcontacts ] of simuls * 100"
+
+MONITOR
+1480
+1090
+1552
+1135
+Distressed
+count simuls with [ shape = \"star\" ]
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2074,7 +2153,7 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="Containment Policy Scale" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -2097,6 +2176,7 @@ NetLogo 6.1.0
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
     <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
+    <metric>scalePhase</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -2158,7 +2238,7 @@ NetLogo 6.1.0
       <value value="75"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
-      <value value="5000"/>
+      <value value="2500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Treatment_Benefit">
       <value value="4"/>
@@ -2170,7 +2250,7 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="0"/>
+      <value value="21"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
       <value value="75"/>
@@ -2183,6 +2263,10 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Contact_Radius">
       <value value="45"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Scale">
+      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
