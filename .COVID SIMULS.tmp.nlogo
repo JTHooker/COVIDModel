@@ -704,7 +704,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -805,10 +805,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1158
-342
-1358
-492
+1155
+343
+1360
+493
 Fear & Action
 NIL
 NIL
@@ -1155,10 +1155,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-955
-682
-1248
-832
+953
+685
+1142
+835
 R value
 Time
 R
@@ -1170,13 +1170,13 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "If ticks > Incubation_Period [ plot GlobalR / ( count simuls with [ color  = yellow ] ) ]"
+"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]"
 
 PLOT
-1169
-501
-1369
-622
+1160
+503
+1360
+624
 Population
 NIL
 NIL
@@ -1309,7 +1309,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-18.0
+0.0
 1
 1
 NIL
@@ -1445,7 +1445,7 @@ SWITCH
 976
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1461,15 +1461,15 @@ Days
 11
 
 MONITOR
-162
-985
-272
-1030
-ScalePhase
+1180
+639
+1333
+721
+Scale Phase
 scalePhase
 17
 1
-11
+20
 
 MONITOR
 1669
@@ -1500,6 +1500,16 @@ TEXTBOX
 COVID-19 Policy Options and Impact Model for Australia
 52
 104.0
+1
+
+TEXTBOX
+1208
+759
+1423
+852
+0 - 2,500 Population\n1 - 25,000 \n2 - 250,000\n3 - 2,500,000\n4 - 25,000,000
+12
+0.0
 1
 
 @#$#@#$#@
