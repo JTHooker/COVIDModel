@@ -23,6 +23,7 @@ globals [
   ScalePhase
   Days
   Adjustment
+  GlobalR
 ]
 
 
@@ -145,7 +146,7 @@ end
 
 to resetincome
   if agerange >= 18 and agerange < 70 and income < 10000 [
-    income random-exponential 55000 ]
+    set income random-exponential 55000 ]
 end
 
 to resethealth
@@ -203,7 +204,7 @@ to move
 
 
   if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [ set color red set timenow 0  ]
-  if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 ]
+  if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
@@ -323,7 +324,7 @@ to Cruiseship
   if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
       set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-         resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
+        set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
   ]]
 end
 
@@ -400,13 +401,13 @@ to scaleup
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
  set contact_Radius Contact_Radius + (90 / 5)
     Set days 0
-  ] [scaledown ]
+         ] [scaledown ]
 
 end
 
 to scaledown
- if scale = true and scalephase > 0 and count simuls with [ color = red ] < 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
-    set scalephase scalephase - 1 set contact_Radius Contact_radius - (90 / 5) ]
+;; if scale = true and scalephase > 0 and count simuls with [ color = red ] < 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
+ ;;   set scalephase scalephase - 1 set contact_Radius Contact_radius - (90 / 5) ]
 
 end
 
@@ -660,7 +661,7 @@ InfectionRate
 InfectionRate
 0
 100
-35.0
+50.0
 1
 1
 NIL
@@ -703,7 +704,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -770,7 +771,7 @@ MONITOR
 1402
 931
 1662
-977
+976
 Bed Capacity Scaled for Australia at 65,000k
 count patches with [ pcolor = white ]
 0
@@ -1169,7 +1170,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "If ticks > Incubation_Period [ plot mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]]"
+"R" 1.0 0 -16777216 true "" "If ticks > Incubation_Period [ plot GlobalR / ( count simuls with [ color  = yellow ] ) ]"
 
 PLOT
 1169
@@ -1236,9 +1237,9 @@ NIL
 200.0
 true
 false
-"" ""
+"" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]  "
 PENS
-"Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
+"Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
 
 MONITOR
 335
@@ -1308,7 +1309,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+18.0
 1
 1
 NIL
@@ -1369,7 +1370,7 @@ MONITOR
 1439
 850
 1514
-908
+907
 Growth
 sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 2
@@ -1444,7 +1445,7 @@ SWITCH
 976
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1474,7 +1475,7 @@ MONITOR
 1669
 929
 1924
-979
+978
 Negative $ Reserves
 count simuls with [ shape = \"star\" ] / count simuls
 2
@@ -1494,8 +1495,8 @@ Days since Jan 15 when first case appeared (Jan 25 reported)
 TEXTBOX
 350
 15
-2192
-190
+2193
+91
 COVID-19 Policy Options and Impact Model for Australia
 52
 104.0
