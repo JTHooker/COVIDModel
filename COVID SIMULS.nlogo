@@ -80,7 +80,7 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 120000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
+        set income random-exponential 55000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
     ]
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
@@ -145,7 +145,7 @@ end
 
 to resetincome
   if agerange >= 18 and agerange < 70 and income < 10000 [
-    set income random-exponential 120000 ]
+    set income random-exponential 55000 ]
 end
 
 to resethealth
@@ -323,7 +323,7 @@ to Cruiseship
   if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
       set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 120000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
+        set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
   ]]
 end
 
@@ -415,10 +415,10 @@ to forwardTime
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-250
-68
-868
-887
+325
+121
+943
+940
 -1
 -1
 10.0
@@ -442,10 +442,10 @@ ticks
 30.0
 
 BUTTON
-119
-142
-183
-176
+196
+168
+260
+202
 NIL
 setup
 NIL
@@ -459,10 +459,10 @@ NIL
 1
 
 BUTTON
-87
-190
-151
-224
+163
+215
+227
+249
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
 T
@@ -476,10 +476,10 @@ NIL
 1
 
 BUTTON
-89
-315
-207
-349
+166
+340
+284
+374
 Trace_Patterns
 ask n-of 50 simuls with [ color != black ] [ pen-down ] 
 NIL
@@ -493,10 +493,10 @@ NIL
 1
 
 BUTTON
-89
-362
-207
-396
+166
+388
+284
+422
 UnTrace
 ask turtles [ pen-up ]
 NIL
@@ -510,21 +510,21 @@ NIL
 1
 
 SWITCH
-623
-89
-823
-122
+699
+142
+899
+175
 SpatialDistance
 SpatialDistance
-1
+0
 1
 -1000
 
 SLIDER
-79
-237
-219
-270
+156
+262
+296
+295
 Population
 Population
 1000
@@ -536,10 +536,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-79
-272
-220
-305
+156
+298
+297
+331
 Speed
 Speed
 0
@@ -551,10 +551,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1318
-78
-1913
-341
+1396
+122
+1918
+387
 Susceptible, Infected and Recovered - 000's
 Days from March 10th
 Numbers of people
@@ -569,13 +569,13 @@ PENS
 "Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 100 / count Simuls) "
 "Recovered Proportion" 1.0 0 -14070903 true "" "plot count simuls with [ color = 85 ] * (Total_Population / 100 / count Simuls)"
 "Susceptible" 1.0 0 -1184463 true "" "plot count simuls with [ color = yellow ] * (Total_Population / 100 / count Simuls)"
-"New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = 10 ] * ( Total_Population / 100 / count Simuls )"
+"New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = Incubation_Period ] * ( Total_Population / 100 / count Simuls )"
 
 SLIDER
-623
-375
-823
-408
+699
+428
+899
+461
 Illness_period
 Illness_period
 0
@@ -587,21 +587,21 @@ NIL
 HORIZONTAL
 
 SWITCH
-623
-125
-821
-158
+699
+178
+897
+211
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
 BUTTON
-154
-190
-218
-224
+231
+215
+295
+249
 Go Once
 go
 NIL
@@ -615,10 +615,10 @@ NIL
 1
 
 SLIDER
-1975
-495
-2162
-528
+1936
+569
+2123
+602
 RestrictedMovement
 RestrictedMovement
 0
@@ -630,10 +630,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-262
-824
-417
-881
+338
+876
+493
+933
 Deaths
 Count simuls with [ color = black ] * (Total_Population / population )
 0
@@ -641,10 +641,10 @@ Count simuls with [ color = black ] * (Total_Population / population )
 14
 
 MONITOR
-890
-73
 965
-118
+126
+1040
+171
 Time Count
 ticks
 0
@@ -652,10 +652,10 @@ ticks
 11
 
 SLIDER
-623
-339
-825
-372
+699
+392
+901
+425
 InfectionRate
 InfectionRate
 0
@@ -667,10 +667,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-623
-412
-823
-445
+699
+465
+899
+498
 ReInfectionRate
 ReInfectionRate
 0
@@ -682,25 +682,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-623
-749
-827
-782
+699
+802
+903
+835
 Bed_Capacity
 Bed_Capacity
 0
 20
-0.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-623
-263
-823
-296
+699
+316
+899
+349
 Send_to_Hospital
 Send_to_Hospital
 1
@@ -708,10 +708,10 @@ Send_to_Hospital
 -1000
 
 SLIDER
-55
-629
-244
-662
+130
+705
+319
+738
 Available_Resources
 Available_Resources
 0
@@ -723,10 +723,10 @@ NIL
 HORIZONTAL
 
 PLOT
-883
-629
-1298
-767
+1929
+272
+2184
+417
 Resource Availability
 NIL
 NIL
@@ -741,10 +741,10 @@ PENS
 "default" 1.0 1 -5298144 true "" "if count resources > 0 [ plot mean [ volume ] of resources ]"
 
 SLIDER
-1972
-419
-2161
-452
+1933
+493
+2122
+526
 ProductionRate
 ProductionRate
 0
@@ -756,10 +756,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-888
-251
-1026
-308
+963
+303
+1101
+360
 # simuls
 count simuls * (Total_Population / population)
 0
@@ -767,21 +767,21 @@ count simuls * (Total_Population / population)
 14
 
 MONITOR
-1322
-352
-1557
-397
-Bed Capacity Scaled for Australia at 65k
+1402
+931
+1662
+977
+Bed Capacity Scaled for Australia at 65,000k
 count patches with [ pcolor = white ]
-17
+0
 1
 11
 
 MONITOR
-260
-632
-410
-689
+335
+685
+485
+742
 Total # Infected
 count simuls with [ color = red ] * (Total_Population / population)
 0
@@ -789,10 +789,10 @@ count simuls with [ color = red ] * (Total_Population / population)
 14
 
 SLIDER
-623
-226
-822
-259
+699
+279
+898
+312
 ID_Rate
 ID_Rate
 0
@@ -804,10 +804,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1082
-290
-1282
-440
+1158
+342
+1358
+492
 Fear & Action
 NIL
 NIL
@@ -822,10 +822,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
 
 SLIDER
-1976
-612
-2163
-645
+1938
+686
+2125
+719
 Media_Exposure
 Media_Exposure
 1
@@ -837,10 +837,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-260
-695
-410
-752
+335
+748
+485
+805
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
@@ -848,10 +848,10 @@ mean [ timenow ] of simuls with [ color = red ]
 14
 
 SLIDER
-625
-489
-825
-522
+700
+542
+900
+575
 Superspreaders
 Superspreaders
 0
@@ -863,10 +863,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1976
-572
-2161
-605
+1938
+646
+2123
+679
 Severity_of_illness
 Severity_of_illness
 0
@@ -878,10 +878,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-262
-762
-415
-819
+338
+815
+491
+872
 % Total Infections
 numberInfected / Population * 100
 0
@@ -889,10 +889,10 @@ numberInfected / Population * 100
 14
 
 MONITOR
-1078
-72
-1277
-117
+1153
+125
+1352
+170
 Case Fatality Rate %
 (Population - Count Simuls) / numberInfected * 100
 2
@@ -900,10 +900,10 @@ Case Fatality Rate %
 11
 
 PLOT
-1078
-132
-1278
-282
+1153
+185
+1353
+335
 Case Fatality Rate %
 NIL
 NIL
@@ -918,40 +918,40 @@ PENS
 "default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
 
 SLIDER
-623
-156
-821
-189
+699
+209
+897
+242
 Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+80.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-623
-192
-822
-225
+699
+245
+898
+278
 Proportion_time_Avoid
 Proportion_time_Avoid
 0
 100
-85.0
+80.0
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1972
-380
-2162
-413
+1933
+453
+2123
+486
 Treatment_Benefit
 Treatment_Benefit
 0
@@ -963,10 +963,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1975
-455
-2162
-488
+1936
+529
+2123
+562
 FearTrigger
 FearTrigger
 0
@@ -978,10 +978,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-883
-580
-942
-625
+955
+630
+1014
+675
 R
 mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
 3
@@ -989,10 +989,10 @@ mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
 11
 
 SWITCH
-74
-584
-218
-617
+149
+659
+293
+692
 PolicyTriggerOn
 PolicyTriggerOn
 0
@@ -1000,10 +1000,10 @@ PolicyTriggerOn
 -1000
 
 SLIDER
-1975
-535
-2160
-568
+1936
+609
+2121
+642
 Initial
 Initial
 0
@@ -1015,10 +1015,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-888
-188
-1027
-245
+963
+241
+1102
+298
 Financial Reserves
 mean [ reserves ] of simuls
 1
@@ -1026,11 +1026,11 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1325
-406
-1845
-621
-Number of deceased across age ranges
+1399
+393
+1919
+608
+Estimated count of deceased across age ranges
 NIL
 NIL
 0.0
@@ -1044,10 +1044,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1325
-626
-1845
-776
+1399
+613
+1919
+763
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -1062,10 +1062,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "if ticks > 1 [ plot ( InfectionChange ) * 10 ]"
 
 SLIDER
-623
-302
-822
-335
+699
+355
+898
+388
 Proportion_Isolating
 Proportion_Isolating
 0
@@ -1077,10 +1077,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1668
-652
-1800
-697
+1742
+639
+1874
+684
 Infection Growth %
 infectionchange
 2
@@ -1088,10 +1088,10 @@ infectionchange
 11
 
 INPUTBOX
-72
-409
-228
-470
+149
+435
+305
+496
 Current_Cases
 5000.0
 1
@@ -1099,10 +1099,10 @@ Current_Cases
 Number
 
 INPUTBOX
-72
-474
-228
-535
+149
+499
+305
+560
 Total_Population
 2.5E7
 1
@@ -1110,25 +1110,25 @@ Total_Population
 Number
 
 SLIDER
-59
-544
-233
-577
+136
+569
+310
+602
 Triggerday
 Triggerday
 0
 150
-60.0
+75.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-885
-385
-1040
-430
+961
+438
+1116
+483
 Close contacts per day
 AverageContacts
 2
@@ -1136,10 +1136,10 @@ AverageContacts
 11
 
 PLOT
-880
-451
-1080
-572
+955
+503
+1155
+624
 Close contacts per day
 NIL
 NIL
@@ -1154,10 +1154,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-1925
-226
-2218
-376
+955
+682
+1248
+832
 R value
 Time
 R
@@ -1169,13 +1169,13 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "plot mean [ R ] of simuls with [ color = red and timenow > 13 ]"
+"R" 1.0 0 -16777216 true "" "If ticks > Incubation_Period [ plot mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]]"
 
 PLOT
-1093
-448
-1293
-569
+1169
+501
+1369
+622
 Population
 NIL
 NIL
@@ -1190,10 +1190,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count simuls"
 
 SLIDER
-623
-452
-825
-485
+699
+505
+901
+538
 Incubation_Period
 Incubation_Period
 0
@@ -1205,10 +1205,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1922
-75
-2214
-220
+1931
+123
+2223
+268
 Age ranges
 NIL
 NIL
@@ -1223,11 +1223,11 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
 PLOT
-875
-782
-1321
-1040
-Total Active Infections '000s
+953
+839
+1368
+1098
+Total Active Infections
 NIL
 NIL
 0.0
@@ -1241,10 +1241,10 @@ PENS
 "Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 1000 / Population )"
 
 MONITOR
-259
-574
-412
-623
+335
+626
+488
+675
 New Infections Today
 count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count Simuls )
 0
@@ -1252,11 +1252,11 @@ count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count 
 12
 
 PLOT
-248
-890
-866
-1045
-New Infections Per Day '000's
+323
+942
+941
+1097
+New Infections Per Day
 NIL
 NIL
 0.0
@@ -1267,13 +1267,13 @@ true
 false
 "" ""
 PENS
-"Confirmed Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )"
+"Confirmed Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ]"
 
 SLIDER
-625
-525
-825
-558
+700
+578
+900
+611
 Diffusion_Adjustment
 Diffusion_Adjustment
 0
@@ -1285,10 +1285,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-625
-562
-824
-595
+700
+615
+899
+648
 Age_Isolation
 Age_Isolation
 0
@@ -1300,10 +1300,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-626
-599
-825
-632
+702
+652
+901
+685
 Contact_Radius
 Contact_Radius
 0
@@ -1315,10 +1315,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1326
-780
-1849
-1039
+1400
+772
+1925
+925
 Cash_Reserves
 NIL
 NIL
@@ -1333,10 +1333,10 @@ PENS
 "Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
 
 SWITCH
-90
-670
-194
-703
+165
+745
+269
+778
 Stimulus
 Stimulus
 1
@@ -1344,10 +1344,10 @@ Stimulus
 -1000
 
 SWITCH
-90
-712
-194
-745
+165
+788
+269
+821
 Cruise
 Cruise
 0
@@ -1355,10 +1355,10 @@ Cruise
 -1000
 
 MONITOR
-888
-318
-1007
-367
+963
+370
+1082
+419
 Stimulus
 Sum [ value ] of packages * -1 * (Total_Population / Population )
 0
@@ -1366,10 +1366,10 @@ Sum [ value ] of packages * -1 * (Total_Population / Population )
 12
 
 MONITOR
-1366
-968
-1515
-1025
+1439
+850
+1514
+908
 Growth
 sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 2
@@ -1377,10 +1377,10 @@ sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 14
 
 BUTTON
-88
-760
-194
-795
+163
+835
+269
+870
 Stop Stimulus
 ask packages [ die ] 
 NIL
@@ -1394,39 +1394,21 @@ NIL
 1
 
 INPUTBOX
-889
-126
-1045
-187
+965
+179
+1121
+240
 Days_of_Cash_Reserves
 60.0
 1
 0
 Number
 
-PLOT
-1874
-782
-2500
-1038
-Cash Reserves
-NIL
-NIL
-0.0
-20000.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "histogram [ reserves ] of simuls with [ agerange > 18 and agerange < 70 ] "
-
 MONITOR
-1098
-575
-1183
-620
+1402
+979
+1487
+1024
 Mean income
 mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != black ]
 0
@@ -1434,10 +1416,10 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 11
 
 MONITOR
-1192
-577
-1292
-622
+1496
+981
+1596
+1026
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
 0
@@ -1445,10 +1427,10 @@ mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color
 11
 
 MONITOR
-66
-813
-205
-858
+142
+889
+281
+934
 Count red simuls (raw)
 count simuls with [ color = red ]
 0
@@ -1456,21 +1438,21 @@ count simuls with [ color = red ]
 11
 
 SWITCH
-95
-868
-200
-901
+170
+943
+275
+976
 Scale
 Scale
-0
+1
 1
 -1000
 
 MONITOR
-971
-75
-1029
-120
+1046
+128
+1104
+173
 NIL
 Days
 17
@@ -1478,44 +1460,46 @@ Days
 11
 
 MONITOR
-87
-910
-197
-955
+162
+985
+272
+1030
 ScalePhase
 scalePhase
 17
 1
 11
 
-PLOT
-1364
-842
-1564
-962
-Financial Contacts
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ Averagefinancialcontacts ] of simuls * 100"
-
 MONITOR
-1480
-1090
-1552
-1135
-Distressed
-count simuls with [ shape = \"star\" ]
-0
+1669
+929
+1924
+979
+Negative $ Reserves
+count simuls with [ shape = \"star\" ] / count simuls
+2
 1
-11
+12
+
+TEXTBOX
+110
+609
+325
+647
+Days since Jan 15 when first case appeared (Jan 25 reported)
+12
+15.0
+1
+
+TEXTBOX
+350
+15
+2192
+190
+COVID-19 Policy Options and Impact Model for Australia
+52
+104.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
