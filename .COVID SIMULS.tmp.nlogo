@@ -24,6 +24,7 @@ globals [
   Days
   Adjustment
   GlobalR
+
 ]
 
 
@@ -49,6 +50,7 @@ simuls-own [
   RiskofDeath
   Pace
   PersonalTrust
+  WFHCap
 ]
 
 Packages-own [
@@ -83,7 +85,8 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 55000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set personalTrust random-normal 75 10 resettrust ]
+        set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
+        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 ]
     ]
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
@@ -195,6 +198,7 @@ to go
   ;;ScaleDown
   ForwardTime
   adjustExpenditure
+  Unlock
 
   ask patches [ checkutilisation ]
   tick
@@ -205,9 +209,11 @@ to go
 end
 
 to move
-  if color != red and color != black and spatialDistance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [ set color red set timenow Incubation_Period - ticks  ]
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [ set color red set timenow 0  ]
+  if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [
+    set color red set timenow Incubation_Period - ticks  ]
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [
+    set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Send_to_Hospital = false [ avoidICUs ]
@@ -220,7 +226,7 @@ to isolation
 end
 
 to avoid
-  ifelse SpatialDistance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation
+  ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation
   [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
   [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]
 end
@@ -235,10 +241,12 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [
+    ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 
-  if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [ ask n-of Diffusion_Adjustment simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
+    ask n-of Diffusion_Adjustment simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 end
 
@@ -295,7 +303,8 @@ end
 
 to GlobalTreat
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_Hospital = true and any? simuls with [ color = red and inICU = 0 ]
-    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * ID_Rate ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [ move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
+    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * ID_Rate ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [
+      move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
 
 to treat
@@ -315,10 +324,10 @@ end
 
 to TriggerActionIsolation
   ifelse PolicyTriggerOn = true [
-    if triggerday - ticks < 7 and triggerday - ticks > 0 [ set SpatialDistance true set case_Isolation true set send_to_Hospital true
+    if triggerday - ticks < 7 and triggerday - ticks > 0 [ set Spatial_Distance true set case_Isolation true set send_to_Hospital true
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
-    ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true set Send_to_Hospital true ] [ set SpatialDistance False set Case_Isolation False ]
-  ] [ set SpatialDistance false set Case_Isolation false set Send_to_Hospital false ]
+    ifelse ticks >= triggerday [ set Spatial_Distance true set Case_Isolation true set Send_to_Hospital true ] [ set Spatial_Distance False set Case_Isolation False ]
+  ] [ set Spatial_Distance false set Case_Isolation false set Send_to_Hospital false ]
 
 
 end
@@ -362,10 +371,16 @@ to earn
   if ticks > 1 [
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
-  ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)  ) ]
-    [ set reserves reserves - ( expenditure / 365) * ( 1 - AverageFinancialContacts) ] ;;; adjust here
+  ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [
+      set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)  ) ]
+    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)) -
+      (( expenditure / 365) * ( 1 - AverageFinancialContacts) )] [
+      set reserves reserves - ( expenditure / 365) * ( 1 - AverageFinancialContacts) ]  ] ;;; adjust here
   ]
 end
+
+;;; need to implement WFH capacity and also how to give people expenses on a day of trade
+
 
 to adjustExpenditure
   if Initialreserves > 0 [ set Adjustment sum [ reserves ] of simuls with [ color != black ]  / Initialreserves ]
@@ -399,34 +414,41 @@ to CalculateAverageContacts
 end
 
 to scaleup
-  ifelse scale = true and count simuls with [ color = red ] >= 250 and scalePhase >= 0 and scalePhase < 5 and count simuls * 1000 < Total_Population and days > 0  [
+  ifelse scale = true and count simuls with [ color = red ] >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-      set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set ageRange ([ageRange ] of one-of osimuls) ] ;;
-     ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
+      set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
+      resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) ] ;;
+     ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
+      set ageRange ([ageRange ] of one-of simuls) resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-      set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
- set contact_Radius Contact_Radius + (90 / 5)
+      set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
+      resetlandingSimul set riskofdeath .01  ]
+ set contact_Radius Contact_Radius + (90 / 4)
     Set days 0
          ] [scaledown ]
 
 end
 
 to scaledown
-;; if scale = true and scalephase > 0 and count simuls with [ color = red ] < 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
- ;;   set scalephase scalephase - 1 set contact_Radius Contact_radius - (90 / 5) ]
-
+ if scale = true and count simuls with [ color = red ] <= 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
+    set contact_Radius Contact_radius - (90 / 4)   ]
 end
 
 to forwardTime
   set days days + 1
 end
+
+To Unlock
+  if LockDown_Off = true and ticks >= TimeLockdownoff [
+    set Policytriggeron false ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
 124
-945
-941
+946
+943
 -1
 -1
 10.0
@@ -522,8 +544,8 @@ SWITCH
 142
 899
 175
-SpatialDistance
-SpatialDistance
+Spatial_Distance
+Spatial_Distance
 1
 1
 -1000
@@ -1126,7 +1148,7 @@ Triggerday
 Triggerday
 0
 150
-75.0
+73.0
 1
 1
 NIL
@@ -1244,7 +1266,7 @@ NIL
 200.0
 true
 false
-"" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]  "
+"" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]\n"
 PENS
 "Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
 
@@ -1316,7 +1338,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
@@ -1568,6 +1590,47 @@ false
 "" ""
 PENS
 "default" 1.0 0 -2674135 true "" "plot mean [ personalTrust ] of simuls with [ color != black ]"
+
+SLIDER
+702
+838
+905
+871
+WFH_Capacity
+WFH_Capacity
+0
+100
+33.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+132
+1027
+306
+1061
+TimeLockDownOff
+TimeLockDownOff
+0
+300
+138.0
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+155
+985
+284
+1019
+Lockdown_Off
+Lockdown_Off
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
