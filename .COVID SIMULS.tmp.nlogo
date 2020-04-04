@@ -72,6 +72,7 @@ to setup
     ;;reset-ticks
 
     clear-all
+  import-drawing "Background1.jg"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -20 ]
@@ -306,13 +307,13 @@ to CountInfected
 end
 
 to TriggerActionIsolation
-  if PolicyTriggerOn = true [
+  ifelse PolicyTriggerOn = true [
     if triggerday - ticks < 7 and triggerday - ticks > 0 [ set SpatialDistance true set case_Isolation true set send_to_Hospital true
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
-
-
     ifelse ticks >= triggerday [ set SpatialDistance true set Case_Isolation true set Send_to_Hospital true ] [ set SpatialDistance False set Case_Isolation False ]
-  ]
+  ] [ set SpatialDistance false set Case_Isolation false set Send_to_Hospital false ]
+
+
 end
 
 to spend
@@ -415,10 +416,10 @@ to forwardTime
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-325
-121
-943
-940
+328
+124
+945
+941
 -1
 -1
 10.0
@@ -703,7 +704,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -1118,7 +1119,7 @@ Triggerday
 Triggerday
 0
 150
-20.0
+75.0
 1
 1
 NIL
@@ -1534,12 +1535,12 @@ PTA
 Number
 
 TEXTBOX
-393
-219
-581
-274
+335
+218
+587
+275
 Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
-11
+12
 0.0
 0
 
