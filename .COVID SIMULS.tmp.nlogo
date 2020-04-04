@@ -926,7 +926,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-80.0
+60.0
 5
 1
 NIL
@@ -941,7 +941,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-80.0
+60.0
 5
 1
 NIL
@@ -1534,12 +1534,12 @@ PTA
 Number
 
 TEXTBOX
-335
-218
-587
-275
+393
+219
+581
+274
 Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
-12
+11
 0.0
 0
 
