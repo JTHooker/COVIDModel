@@ -72,7 +72,7 @@ to setup
     ;;reset-ticks
 
     clear-all
-  import-drawing "Background1.jg"
+  import-drawing "Background1.png"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -20 ]
@@ -529,7 +529,7 @@ SLIDER
 Population
 Population
 1000
-10000
+2500
 2500.0
 500
 1
@@ -568,8 +568,8 @@ true
 "" ""
 PENS
 "Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 100 / count Simuls) "
-"Recovered Proportion" 1.0 0 -14070903 true "" "plot count simuls with [ color = 85 ] * (Total_Population / 100 / count Simuls)"
-"Susceptible" 1.0 0 -1184463 true "" "plot count simuls with [ color = yellow ] * (Total_Population / 100 / count Simuls)"
+"Recovered Proportion" 1.0 0 -1184463 true "" "plot count simuls with [ color = 85 ] * (Total_Population / 100 / count Simuls)"
+"Susceptible" 1.0 0 -14070903 true "" "plot count simuls with [ color = yellow ] * (Total_Population / 100 / count Simuls)"
 "New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = Incubation_Period ] * ( Total_Population / 100 / count Simuls )"
 
 SLIDER
@@ -927,7 +927,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-60.0
+85.0
 5
 1
 NIL
@@ -942,7 +942,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-60.0
+85.0
 5
 1
 NIL
@@ -996,7 +996,7 @@ SWITCH
 701
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1309,7 +1309,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+54.0
 1
 1
 NIL
@@ -1518,7 +1518,7 @@ INPUTBOX
 644
 278
 PPA
-60.0
+85.0
 1
 0
 Number
@@ -1529,7 +1529,7 @@ INPUTBOX
 698
 278
 PTA
-60.0
+85.0
 1
 0
 Number
