@@ -48,6 +48,7 @@ simuls-own [
   DailyRisk
   RiskofDeath
   Pace
+  PersonalTrust
 ]
 
 Packages-own [
@@ -82,7 +83,7 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 55000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 ]
+        set income random-exponential 55000  resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set personalTrust random-normal 75 10 resettrust ]
     ]
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
@@ -153,6 +154,12 @@ to resethealth
   if health < 0 [
     set health (100 - agerange) + random-normal 0 5 ]
 end
+
+to resettrust
+  if personalTrust > 100 or PersonalTrust < 0 [
+    set personalTrust random-normal 75 10 ]
+end
+
 
 to calculateIncomeperday
   if agerange >= 18 and agerange < 70 [
@@ -395,7 +402,7 @@ to scaleup
   ifelse scale = true and count simuls with [ color = red ] >= 250 and scalePhase >= 0 and scalePhase < 5 and count simuls * 1000 < Total_Population and days > 0  [
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-      set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set ageRange ([ageRange ] of one-of simuls) ] ;;
+      set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01 set ageRange ([ageRange ] of one-of osimuls) ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul set riskofdeath .01  ]
@@ -1309,7 +1316,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-54.0
+90.0
 1
 1
 NIL
@@ -1543,6 +1550,24 @@ Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) h
 12
 0.0
 0
+
+PLOT
+1609
+984
+1924
+1104
+Trust in Govt
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -2674135 true "" "plot mean [ personalTrust ] of simuls with [ color != black ]"
 
 @#$#@#$#@
 ## WHAT IS IT?
