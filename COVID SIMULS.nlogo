@@ -372,10 +372,11 @@ to earn
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
   ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [
-      set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)  ) ]
-    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)) -
-      (( expenditure / 365) * ( 1 - AverageFinancialContacts) )] [
-      set reserves reserves - ( expenditure / 365) * ( 1 - AverageFinancialContacts) ]  ] ;;; adjust here
+      set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts) - (( expenditure / 365) / 7 ) ) ]
+    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70
+      [ set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts)) -
+      (( expenditure / 365) / 7 )] [
+      set reserves reserves - (( expenditure / 365) / 7) ]  ] ;;; adjust here
   ]
 end
 
@@ -1148,7 +1149,7 @@ Triggerday
 Triggerday
 0
 150
-73.0
+1.0
 1
 1
 NIL
@@ -1338,7 +1339,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL

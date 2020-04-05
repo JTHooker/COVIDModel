@@ -372,10 +372,10 @@ to earn
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
   ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [
-      set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)  ) ]
-    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true [ set reserves reserves + ((income  / 365 ) * (1 / AverageFinancialContacts)) -
-      (( expenditure / 365) * ( 1 - AverageFinancialContacts) )] [
-      set reserves reserves - ( expenditure / 365) * ( 1 - AverageFinancialContacts) ]  ] ;;; adjust here
+      set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts) - (( expenditure / 365) / 7 ) ) ]
+    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true a[ set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts)) -
+      (( expenditure / 365) / 7 )] [
+      set reserves reserves - (( expenditure / 365) / 7) ]  ] ;;; adjust here
   ]
 end
 
@@ -431,8 +431,8 @@ to scaleup
 end
 
 to scaledown
- if scale = true and count simuls with [ color = red ] <= 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
-    set contact_Radius Contact_radius - (90 / 4)   ]
+;; if scale = true and count simuls with [ color = red ] <= 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
+ ;;   set contact_Radius Contact_radius - (90 / 4)   ]
 end
 
 to forwardTime
@@ -546,7 +546,7 @@ SWITCH
 175
 Spatial_Distance
 Spatial_Distance
-1
+0
 1
 -1000
 
@@ -623,7 +623,7 @@ SWITCH
 211
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -733,7 +733,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -1025,7 +1025,7 @@ SWITCH
 701
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1148,7 +1148,7 @@ Triggerday
 Triggerday
 0
 150
-73.0
+1.0
 1
 1
 NIL
@@ -1474,7 +1474,7 @@ SWITCH
 976
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1600,7 +1600,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-33.0
+15.0
 1
 1
 NIL
@@ -1628,7 +1628,7 @@ SWITCH
 1019
 Lockdown_Off
 Lockdown_Off
-0
+1
 1
 -1000
 
