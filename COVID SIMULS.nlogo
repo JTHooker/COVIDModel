@@ -75,7 +75,7 @@ to setup
     ;;reset-ticks
 
     clear-all
-  import-drawing "Background1.png"
+ ;; import-drawing "Background1.png"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -20 ]
@@ -542,12 +542,12 @@ NIL
 
 SWITCH
 699
-142
+135
 899
-175
+168
 Spatial_Distance
 Spatial_Distance
-1
+0
 1
 -1000
 
@@ -618,13 +618,13 @@ NIL
 HORIZONTAL
 
 SWITCH
-699
-178
-897
-211
+700
+172
+898
+205
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -734,7 +734,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-1
+0
 1
 -1000
 
@@ -949,9 +949,9 @@ PENS
 "default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
 
 SLIDER
-699
+700
 209
-897
+898
 242
 Proportion_People_Avoid
 Proportion_People_Avoid
@@ -1013,17 +1013,17 @@ MONITOR
 630
 1014
 675
-R
+R0
 mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
-3
+2
 1
 11
 
 SWITCH
-152
-668
-296
-701
+150
+579
+294
+612
 PolicyTriggerOn
 PolicyTriggerOn
 1
@@ -1141,15 +1141,15 @@ Total_Population
 Number
 
 SLIDER
-136
-569
-310
-602
+132
+618
+306
+651
 Triggerday
 Triggerday
 0
 150
-1.0
+150.0
 1
 1
 NIL
@@ -1189,7 +1189,7 @@ PLOT
 685
 1142
 835
-R value
+R0
 Time
 R
 0.0
@@ -1283,10 +1283,10 @@ count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count 
 12
 
 PLOT
-323
-942
-941
-1097
+328
+943
+946
+1098
 New Infections Per Day
 NIL
 NIL
@@ -1296,9 +1296,9 @@ NIL
 10.0
 true
 false
-"" ""
+"" "if Scalephase = 1 [ plot count simuls with [ color = red and timenow = 10 ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and timenow = 10 ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and timenow = 10 ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and timenow = 10 ] * 10000 ]"
 PENS
-"Confirmed Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ]"
+"New Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] "
 
 SLIDER
 700
@@ -1339,7 +1339,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
@@ -1475,7 +1475,7 @@ SWITCH
 976
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1513,10 +1513,10 @@ count simuls with [ shape = \"star\" ] / count simuls
 12
 
 TEXTBOX
-154
-610
-326
-659
+149
+658
+321
+707
 Days since approximately Jan 20 when first case appeared (Jan 25 reported)
 12
 15.0
@@ -1525,10 +1525,10 @@ Days since approximately Jan 20 when first case appeared (Jan 25 reported)
 TEXTBOX
 350
 15
-2193
-91
+2195
+95
 COVID-19 Policy Options and Impact Model for Australia
-52
+60
 104.0
 1
 
@@ -1543,10 +1543,10 @@ TEXTBOX
 1
 
 INPUTBOX
-594
-218
-644
-278
+530
+216
+609
+284
 PPA
 85.0
 1
@@ -1554,10 +1554,10 @@ PPA
 Number
 
 INPUTBOX
-648
-218
-698
-278
+615
+216
+700
+285
 PTA
 85.0
 1
@@ -1565,10 +1565,10 @@ PTA
 Number
 
 TEXTBOX
-335
-218
-587
-275
+345
+195
+520
+295
 Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
 12
 0.0
