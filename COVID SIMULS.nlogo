@@ -323,11 +323,11 @@ to CountInfected
 end
 
 to TriggerActionIsolation
-  ifelse PolicyTriggerOn = true [
-    if triggerday - ticks < 7 and triggerday - ticks > 0 [ set Spatial_Distance true set case_Isolation true set send_to_Hospital true
+  ifelse PolicyTriggerOn = true and Freewheel = false  [
+    if triggerday - ticks < 7 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set send_to_Hospital true
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
-    ifelse ticks >= triggerday [ set Spatial_Distance true set Case_Isolation true set Send_to_Hospital true ] [ set Spatial_Distance False set Case_Isolation False ]
-  ] [ set Spatial_Distance false set Case_Isolation false set Send_to_Hospital false ]
+    ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Send_to_Hospital true ] [ set Spatial_Distance False set Case_Isolation False ]
+  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Send_to_Hospital false ] ]
 
 
 end
@@ -473,10 +473,10 @@ ticks
 30.0
 
 BUTTON
-196
-168
-260
-202
+193
+175
+257
+209
 NIL
 setup
 NIL
@@ -490,10 +490,10 @@ NIL
 1
 
 BUTTON
-163
-215
-227
-249
+158
+220
+222
+254
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
 T
@@ -507,10 +507,10 @@ NIL
 1
 
 BUTTON
-166
-340
-284
-374
+163
+346
+281
+380
 Trace_Patterns
 ask n-of 50 simuls with [ color != black ] [ pen-down ] 
 NIL
@@ -524,10 +524,10 @@ NIL
 1
 
 BUTTON
-166
-388
-284
-422
+163
+395
+281
+429
 UnTrace
 ask turtles [ pen-up ]
 NIL
@@ -547,15 +547,15 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
 SLIDER
-156
-262
-296
-295
+153
+269
+293
+302
 Population
 Population
 1000
@@ -567,10 +567,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-156
-298
-297
-331
+153
+305
+294
+338
 Speed
 Speed
 0
@@ -624,15 +624,15 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
 BUTTON
-231
-215
-295
-249
+228
+222
+292
+256
 Go Once
 go
 NIL
@@ -734,15 +734,15 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
 SLIDER
-130
-705
-319
-738
+126
+712
+315
+745
 Available_Resources
 Available_Resources
 0
@@ -957,7 +957,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+97.0
 5
 1
 NIL
@@ -972,7 +972,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+97.0
 5
 1
 NIL
@@ -1020,13 +1020,13 @@ mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
 11
 
 SWITCH
-150
-579
-294
-612
+146
+585
+290
+618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1119,10 +1119,10 @@ infectionchange
 11
 
 INPUTBOX
-149
-435
-305
-496
+146
+442
+302
+503
 Current_Cases
 5000.0
 1
@@ -1130,10 +1130,10 @@ Current_Cases
 Number
 
 INPUTBOX
-149
-499
-305
-560
+146
+506
+302
+567
 Total_Population
 2.5E7
 1
@@ -1141,15 +1141,15 @@ Total_Population
 Number
 
 SLIDER
-132
-618
-306
-651
+128
+623
+302
+656
 Triggerday
 Triggerday
 0
 150
-150.0
+27.0
 1
 1
 NIL
@@ -1339,7 +1339,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
@@ -1364,24 +1364,24 @@ PENS
 "Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
 
 SWITCH
-165
-745
-269
-778
+162
+752
+266
+785
 Stimulus
 Stimulus
-1
+0
 1
 -1000
 
 SWITCH
-165
-788
-269
-821
+162
+795
+266
+828
 Cruise
 Cruise
-1
+0
 1
 -1000
 
@@ -1408,10 +1408,10 @@ sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 14
 
 BUTTON
-163
-835
-269
-870
+160
+842
+266
+877
 Stop Stimulus
 ask packages [ die ] 
 NIL
@@ -1458,10 +1458,10 @@ mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color
 11
 
 MONITOR
-142
-889
-281
-934
+139
+896
+278
+941
 Count red simuls (raw)
 count simuls with [ color = red ]
 0
@@ -1469,10 +1469,10 @@ count simuls with [ color = red ]
 11
 
 SWITCH
-170
-943
-275
-976
+166
+951
+271
+984
 Scale
 Scale
 0
@@ -1513,10 +1513,10 @@ count simuls with [ shape = \"star\" ] / count simuls
 12
 
 TEXTBOX
-149
-658
-321
-707
+145
+663
+317
+712
 Days since approximately Jan 20 when first case appeared (Jan 25 reported)
 12
 15.0
@@ -1608,10 +1608,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-132
-1027
-306
-1061
+129
+1033
+303
+1067
 TimeLockDownOff
 TimeLockDownOff
 0
@@ -1623,15 +1623,36 @@ NIL
 HORIZONTAL
 
 SWITCH
-155
-985
-284
-1019
+152
+992
+281
+1026
 Lockdown_Off
 Lockdown_Off
 1
 1
 -1000
+
+SWITCH
+178
+130
+287
+165
+Freewheel
+Freewheel
+0
+1
+-1000
+
+TEXTBOX
+143
+80
+358
+118
+Leave Freewheel to true to manipulate policy on the fly
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
