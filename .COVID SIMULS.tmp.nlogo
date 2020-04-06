@@ -22,8 +22,9 @@ globals [
   AverageFinancialContacts
   ScalePhase
   Days
-
   GlobalR
+  CaseFatalityRate
+  DeathCount
 
 ]
 
@@ -197,8 +198,8 @@ to go
   ScaleUp
   ;;ScaleDown
   ForwardTime
-  adjustExpenditure
   Unlock
+  setCaseFatalityRate
 
   ask patches [ checkutilisation ]
   tick
@@ -318,10 +319,6 @@ to PossiblyDie
   if InICU = 1 and Severity_of_illness / Illness_Period > random 100 [ set health health - Severity_of_Illness / Treatment_Benefit ]
 end
 
-to CountInfected
-  set numberinfected ( Population - count simuls ) + (count simuls with [ color != 85 ])
-end
-
 to TriggerActionIsolation
   ifelse PolicyTriggerOn = true and Freewheel = false  [
     if triggerday - ticks < 7 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set send_to_Hospital true
@@ -356,7 +353,12 @@ to countcontacts
 end
 
 to karkit
-  if color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 ]
+  if scalephase = 0 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1 ]
+   if scalephase = 1 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10 ]
+   if scalephase = 2 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 100 ]
+   if scalephase = 3 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1000 ]
+   if scalephase = 4 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10000 ]
+
 end
 
 to respeed
@@ -381,11 +383,6 @@ to earn
 end
 
 ;;; need to implement WFH capacity and also how to give people expenses on a day of trade
-
-
-to adjustExpenditure
-  if Initialreserves > 0 [ set Adjustment sum [ reserves ] of simuls with [ color != black ]  / Initialreserves ]
-end
 
 
 to financialstress
@@ -443,6 +440,18 @@ end
 To Unlock
   if LockDown_Off = true and ticks >= TimeLockdownoff [
     set Policytriggeron false ]
+end
+
+to CountInfected
+  if Scalephase = 0 [ set numberinfected (count simuls with [ color != 85 ]) ]
+  if Scalephase = 1 [ set numberinfected (count simuls with [ color != 85 ]) * 10 ]
+  if ScalePhase = 2 [ set numberinfected (count simuls with [ color != 85 ]) * 100 ]
+  if ScalePhase = 3 [ set numberinfected (count simuls with [ color != 85 ]) * 1000 ]
+  if ScalePhase = 4 [ set numberinfected (count simuls with [ color != 85 ]) * 10000 ]
+end
+
+to setCaseFatalityRate
+  set casefatalityrate  ( Deathcount / numberInfected )
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -666,7 +675,7 @@ MONITOR
 493
 933
 Deaths
-Count simuls with [ color = black ] * (Total_Population / population )
+Deathcount
 0
 1
 14
@@ -691,7 +700,7 @@ InfectionRate
 InfectionRate
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -914,7 +923,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / Population * 100
+CountInfected
 0
 1
 14
@@ -922,10 +931,10 @@ numberInfected / Population * 100
 MONITOR
 1153
 125
-1352
-170
+1283
+171
 Case Fatality Rate %
-(Population - Count Simuls) / numberInfected * 100
+caseFatalityRate * 100
 2
 1
 11
@@ -941,12 +950,12 @@ NIL
 0.0
 10.0
 0.0
-10.0
+0.05
 true
 false
 "" ""
 PENS
-"default" 1.0 0 -5298144 true "" "if count simuls with [ color = black ] > 1 [ plot (Population - Count Simuls) / numberInfected * 100 ]"
+"default" 1.0 0 -5298144 true "" "plot caseFatalityRate * 100"
 
 SLIDER
 700
@@ -1339,7 +1348,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
