@@ -22,7 +22,7 @@ globals [
   AverageFinancialContacts
   ScalePhase
   Days
-  Adjustment
+
   GlobalR
 
 ]
@@ -303,7 +303,7 @@ end
 
 to GlobalTreat
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_Hospital = true and any? simuls with [ color = red and inICU = 0 ]
-    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * ID_Rate ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [
+    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * Track_and_Trace_Efficiency ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [
       move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
 
@@ -375,8 +375,8 @@ to earn
       set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts) - (( expenditure / 365) / 7 ) ) ]
     [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70
       [ set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts)) -
-      (( expenditure / 365) / 7 )] [
-      set reserves reserves - (( expenditure / 365) / 7) ]  ] ;;; adjust here
+      (( expenditure / 365) / 7 ) ] [
+      set reserves reserves - (( expenditure / 365) / 7) * .5 ]  ] ;;; adjust here
   ]
 end
 
@@ -691,7 +691,7 @@ InfectionRate
 InfectionRate
 0
 100
-50.0
+0.0
 1
 1
 NIL
@@ -822,14 +822,14 @@ count simuls with [ color = red ] * (Total_Population / population)
 SLIDER
 699
 279
-898
-312
-ID_Rate
-ID_Rate
+904
+314
+Track_and_Trace_Efficiency
+Track_and_Trace_Efficiency
 0
-1
+.5
 0.1
-.01
+.1
 1
 NIL
 HORIZONTAL
@@ -957,7 +957,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-97.0
+85.0
 5
 1
 NIL
@@ -972,7 +972,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-97.0
+85.0
 5
 1
 NIL
@@ -1124,7 +1124,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5000.0
+5687.0
 1
 0
 Number
@@ -1370,7 +1370,7 @@ SWITCH
 785
 Stimulus
 Stimulus
-0
+1
 1
 -1000
 
@@ -1381,7 +1381,7 @@ SWITCH
 828
 Cruise
 Cruise
-0
+1
 1
 -1000
 
@@ -1426,9 +1426,9 @@ NIL
 
 INPUTBOX
 965
-179
+176
 1121
-240
+237
 Days_of_Cash_Reserves
 60.0
 1
@@ -1593,10 +1593,10 @@ PENS
 "default" 1.0 0 -2674135 true "" "plot mean [ personalTrust ] of simuls with [ color != black ]"
 
 SLIDER
-702
-838
-905
-871
+700
+839
+903
+872
 WFH_Capacity
 WFH_Capacity
 0
@@ -1649,7 +1649,7 @@ TEXTBOX
 80
 358
 118
-Leave Freewheel to true to manipulate policy on the fly
+Leave Freewheel to 'on' to manipulate policy on the fly
 12
 0.0
 1
