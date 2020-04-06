@@ -556,7 +556,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -633,7 +633,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -896,7 +896,7 @@ Superspreaders
 Superspreaders
 0
 100
-100.0
+87.0
 1
 1
 NIL
@@ -1035,7 +1035,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1110,7 +1110,7 @@ Proportion_Isolating
 Proportion_Isolating
 0
 100
-0.0
+100.0
 5
 1
 NIL
@@ -1133,7 +1133,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5772.0
+5796.0
 1
 0
 Number
@@ -1308,7 +1308,7 @@ true
 false
 "" "if Scalephase = 1 [ plot count simuls with [ color = red and timenow = 10 ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and timenow = 10 ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and timenow = 10 ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and timenow = 10 ] * 10000 ]"
 PENS
-"New Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] "
+"New Cases" 1.0 1 -5298144 true "" "plot count simuls with [ color = red and timenow = 10 ] "
 
 SLIDER
 700
@@ -1349,7 +1349,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+36.0
 1
 1
 NIL
@@ -1457,9 +1457,9 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 11
 
 MONITOR
-1496
+1495
 981
-1596
+1595
 1026
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
@@ -1485,7 +1485,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1626,7 +1626,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-95.0
+185.0
 1
 1
 NIL
@@ -1639,7 +1639,7 @@ SWITCH
 1026
 Lockdown_Off
 Lockdown_Off
-1
+0
 1
 -1000
 
@@ -2379,7 +2379,7 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="ID_Rate">
+    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
       <value value="0.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="PolicyTriggerOn">

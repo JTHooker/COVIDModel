@@ -556,7 +556,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -584,7 +584,7 @@ Speed
 Speed
 0
 5
-1.0
+1.7
 .1
 1
 NIL
@@ -633,7 +633,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -743,7 +743,7 @@ SWITCH
 349
 Send_to_Hospital
 Send_to_Hospital
-0
+1
 1
 -1000
 
@@ -896,7 +896,7 @@ Superspreaders
 Superspreaders
 0
 100
-100.0
+87.0
 1
 1
 NIL
@@ -1035,7 +1035,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1133,7 +1133,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5000.0
+5796.0
 1
 0
 Number
@@ -1278,7 +1278,7 @@ true
 false
 "" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]\n"
 PENS
-"Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
+"Current Cases" 1.0 1 -7858858 true "" "plot count simuls with [ color = red ] "
 "Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
 
 MONITOR
@@ -1308,7 +1308,7 @@ true
 false
 "" "if Scalephase = 1 [ plot count simuls with [ color = red and timenow = 10 ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and timenow = 10 ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and timenow = 10 ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and timenow = 10 ] * 10000 ]"
 PENS
-"New Cases" 1.0 1 -13345367 true "" "plot count simuls with [ color = red and timenow = 10 ] "
+"New Cases" 1.0 1 -5298144 true "" "plot count simuls with [ color = red and timenow = 10 ] "
 
 SLIDER
 700
@@ -1349,7 +1349,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+36.0
 1
 1
 NIL
@@ -1457,9 +1457,9 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 11
 
 MONITOR
-1496
+1495
 981
-1596
+1595
 1026
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
