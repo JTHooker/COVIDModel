@@ -556,7 +556,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-1
+0
 1
 -1000
 
@@ -633,7 +633,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -923,7 +923,7 @@ MONITOR
 491
 872
 % Total Infections
-CountInfected
+numberInfected
 0
 1
 14
@@ -1133,7 +1133,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5687.0
+5772.0
 1
 0
 Number
@@ -1158,7 +1158,7 @@ Triggerday
 Triggerday
 0
 150
-27.0
+65.0
 1
 1
 NIL
@@ -1267,7 +1267,7 @@ PLOT
 839
 1368
 1098
-Total Active Infections
+Active (red) and Total (blue) Infections
 NIL
 NIL
 0.0
@@ -1279,6 +1279,7 @@ false
 "" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]\n"
 PENS
 "Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
+"Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
 
 MONITOR
 335
@@ -1348,7 +1349,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
@@ -1484,7 +1485,7 @@ SWITCH
 984
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1625,7 +1626,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-138.0
+95.0
 1
 1
 NIL
@@ -1649,7 +1650,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-0
+1
 1
 -1000
 
@@ -2300,7 +2301,7 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy Scale" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="Containment Policy Scale" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
@@ -2324,10 +2325,13 @@ NetLogo 6.1.0
     <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
     <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
     <metric>scalePhase</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="SpatialDistance">
+    <enumeratedValueSet variable="Spatial_Distance">
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_Isolating">
@@ -2382,7 +2386,7 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="75"/>
+      <value value="85"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="2500"/>
@@ -2397,10 +2401,10 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="75"/>
+      <value value="65"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="75"/>
+      <value value="85"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="50"/>
@@ -2413,6 +2417,18 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Scale">
       <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Lockdown_Off">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Freewheel">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TimelockdownOff">
+      <value value="95"/>
+      <value value="125"/>
+      <value value="155"/>
+      <value value="185"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
