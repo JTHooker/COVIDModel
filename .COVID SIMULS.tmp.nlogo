@@ -606,7 +606,7 @@ Speed
 Speed
 0
 5
-1.7
+1.0
 .1
 1
 NIL
@@ -892,7 +892,7 @@ Media_Exposure
 Media_Exposure
 1
 2500000
-2500000.0
+50.0
 1
 1
 NIL
@@ -1155,7 +1155,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5881.0
+5888.0
 1
 0
 Number
@@ -1371,7 +1371,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
@@ -2337,7 +2337,7 @@ NetLogo 6.1.0
   <experiment name="Containment Policy Scale" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
+    <exitCondition>ticks = 500</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
