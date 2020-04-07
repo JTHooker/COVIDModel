@@ -25,6 +25,8 @@ globals [
   GlobalR
   CaseFatalityRate
   DeathCount
+  DailyCases
+  Scaled_Population
 
 ]
 
@@ -180,7 +182,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime karkit isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday ] ;
+  ask simuls [ move avoid recover settime death isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock ]
@@ -200,6 +202,8 @@ to go
   ForwardTime
   Unlock
   setCaseFatalityRate
+  countDailyCases
+  calculatePopulationScale
 
   ask patches [ checkutilisation ]
   tick
@@ -279,13 +283,17 @@ to deplete
 end
 
 to createfear
-  set fear fear + Fearfactor + random-normal -2 1
+  set fear ( fear + Fearfactor ) * random-normal .9 .1
   if fear < 0 [ set fear 0 ]
  ; if fear > 100 [ set fear 100 ]
 end
 
 to GlobalFear
-  set fearFactor (count simuls with [ color = red ]) / (count simuls) * media_Exposure
+ if scalephase = 0 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population )  * media_Exposure ]
+ if scalephase = 1 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10  * media_Exposure ]
+ if scalephase = 2 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 100  * media_Exposure ]
+ if scalephase = 3 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 1000  * media_Exposure ]
+ if scalephase = 4 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10000  * media_Exposure ]
 end
 
 to gatherreseources
@@ -325,8 +333,6 @@ to TriggerActionIsolation
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
     ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Send_to_Hospital true ] [ set Spatial_Distance False set Case_Isolation False ]
   ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Send_to_Hospital false ] ]
-
-
 end
 
 to spend
@@ -352,13 +358,12 @@ to countcontacts
     set contacts ( contacts + count other simuls-here ) ]
 end
 
-to karkit
-  if scalephase = 0 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1 ]
+to death
+   if scalephase = 0 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1 ]
    if scalephase = 1 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10 ]
    if scalephase = 2 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 100 ]
    if scalephase = 3 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1000 ]
    if scalephase = 4 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10000 ]
-
 end
 
 to respeed
@@ -452,6 +457,23 @@ end
 
 to setCaseFatalityRate
   set casefatalityrate  ( Deathcount / numberInfected )
+end
+
+to countDailyCases
+  if Scalephase = 0 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) ]
+  if Scalephase = 1 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10  ]
+  if Scalephase = 2 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 100 ]
+  if Scalephase = 3 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 1000 ]
+  if Scalephase = 4 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10000 ]
+
+end
+
+to calculatePopulationScale
+  if scalephase = 0 [ set Scaled_Population ( count simuls ) ]
+  if scalephase = 1 [ set Scaled_Population ( count simuls ) * 10 ]
+  if scalephase = 2 [ set Scaled_Population ( count simuls ) * 100 ]
+  if scalephase = 3 [ set Scaled_Population ( count simuls ) * 1000 ]
+  if scalephase = 4 [ set Scaled_Population ( count simuls ) * 10000 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -584,7 +606,7 @@ Speed
 Speed
 0
 5
-1.0
+1.7
 .1
 1
 NIL
@@ -823,7 +845,7 @@ MONITOR
 485
 742
 Total # Infected
-count simuls with [ color = red ] * (Total_Population / population)
+numberInfected
 0
 1
 14
@@ -869,8 +891,8 @@ SLIDER
 Media_Exposure
 Media_Exposure
 1
-100
-50.0
+2500000
+2500000.0
 1
 1
 NIL
@@ -896,7 +918,7 @@ Superspreaders
 Superspreaders
 0
 100
-87.0
+100.0
 1
 1
 NIL
@@ -923,8 +945,8 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected
-0
+numberInfected / Total_Population * 100
+2
 1
 14
 
@@ -1133,7 +1155,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5796.0
+5881.0
 1
 0
 Number
@@ -1278,7 +1300,7 @@ true
 false
 "" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]\n"
 PENS
-"Current Cases" 1.0 1 -2674135 true "" "plot count simuls with [ color = red ] "
+"Current Cases" 1.0 1 -7858858 true "" "if Scalephase = 0 [ plot count simuls with [ color = red ] ]"
 "Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
 
 MONITOR
@@ -1287,7 +1309,7 @@ MONITOR
 488
 675
 New Infections Today
-count simuls with [ color = red and timenow = 10 ] * ( Total_Population / count Simuls )
+DailyCases
 0
 1
 12
@@ -1349,7 +1371,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-36.0
+90.0
 1
 1
 NIL
@@ -1650,7 +1672,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-1
+0
 1
 -1000
 
@@ -1663,6 +1685,17 @@ Leave Freewheel to 'on' to manipulate policy on the fly
 12
 0.0
 1
+
+MONITOR
+1292
+128
+1372
+174
+NIL
+count simuls
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
