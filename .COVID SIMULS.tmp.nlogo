@@ -27,6 +27,21 @@ globals [
   DeathCount
   DailyCases
   Scaled_Population
+  ICUBedsRequired
+
+  DNA1
+  DNA2
+  DNA3
+  DNA4
+  DNA5
+  DNA6
+
+  DNA1_1
+  DNA2_1
+  DNA3_1
+  DNA4_1
+  DNA5_1
+  DNA6_1
 
 ]
 
@@ -54,6 +69,7 @@ simuls-own [
   Pace
   PersonalTrust
   WFHCap
+  RequireICU
 ]
 
 Packages-own [
@@ -89,7 +105,7 @@ to setup
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
         set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
-        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 ]
+        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 ]
     ]
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
@@ -112,7 +128,7 @@ to setup
 
   set contact_radius 0
   set days 0
-  set Send_to_Hospital false
+  set Quarantine false
 
   reset-ticks
 end
@@ -182,7 +198,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime death isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday ] ;
+  ask simuls [ move avoid recover settime death isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock ]
@@ -204,6 +220,8 @@ to go
   setCaseFatalityRate
   countDailyCases
   calculatePopulationScale
+  CalculateICUBedsRequired
+
 
   ask patches [ checkutilisation ]
   tick
@@ -221,7 +239,7 @@ to move
     set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
   if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
-  if color = red and Send_to_Hospital = false [ avoidICUs ]
+  if color = red and Quarantine = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
@@ -257,7 +275,7 @@ end
 
 to recover
   if timenow > Illness_Period and color != black  [
-    set color yellow set timenow 0 set health (100 - agerange ) set inICU 0  ]
+    set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ]
 end
 
 to reinfect
@@ -311,7 +329,7 @@ set heading heading + 5
 end
 
 to GlobalTreat
-  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Send_to_Hospital = true and any? simuls with [ color = red and inICU = 0 ]
+  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? simuls with [ color = red and inICU = 0 ]
     [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * Track_and_Trace_Efficiency ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [
       move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
@@ -329,10 +347,10 @@ end
 
 to TriggerActionIsolation
   ifelse PolicyTriggerOn = true and Freewheel = false  [
-    if triggerday - ticks < 7 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set send_to_Hospital true
+    if triggerday - ticks < 7 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
-    ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Send_to_Hospital true ] [ set Spatial_Distance False set Case_Isolation False ]
-  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Send_to_Hospital false ] ]
+    ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ] [ set Spatial_Distance False set Case_Isolation False ]
+  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false ] ]
 end
 
 to spend
@@ -359,11 +377,11 @@ to countcontacts
 end
 
 to death
-   if scalephase = 0 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1 ]
-   if scalephase = 1 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10 ]
-   if scalephase = 2 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 100 ]
-   if scalephase = 3 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 1000 ]
-   if scalephase = 4 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set deathcount deathcount + 10000 ]
+   if scalephase = 0 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
+   if scalephase = 1 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
+   if scalephase = 2 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
+   if scalephase = 3 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
+   if scalephase = 4 and color = red and timenow = Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
 end
 
 to respeed
@@ -417,16 +435,16 @@ to CalculateAverageContacts
 end
 
 to scaleup
-  ifelse scale = true and count simuls with [ color = red ] >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [
+  ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
       set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
-      resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) ] ;;
+      resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100 ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth
     set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
-      resetlandingSimul set riskofdeath .01  ]
+      resetlandingSimul set riskofdeath .01 set requireICU random 100 ]
  set contact_Radius Contact_Radius + (90 / 4)
     Set days 0
          ] [scaledown ]
@@ -461,7 +479,7 @@ end
 
 to countDailyCases
   if Scalephase = 0 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) ]
-  if Scalephase = 1 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10  ]
+  if Scalephase = 1 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10 ]
   if Scalephase = 2 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 100 ]
   if Scalephase = 3 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 1000 ]
   if Scalephase = 4 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10000 ]
@@ -474,6 +492,18 @@ to calculatePopulationScale
   if scalephase = 2 [ set Scaled_Population ( count simuls ) * 100 ]
   if scalephase = 3 [ set Scaled_Population ( count simuls ) * 1000 ]
   if scalephase = 4 [ set Scaled_Population ( count simuls ) * 10000 ]
+end
+
+to checkICU
+  if color = red and RequireICU < ICU_Required [ set requireICU 1 ]
+end
+
+to CalculateICUBedsRequired
+  if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ cRequireICU = 1 ] ) ]
+    if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 10 ]
+      if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 100]
+        if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 1000 ]
+          if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 10000 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -763,8 +793,8 @@ SWITCH
 316
 899
 349
-Send_to_Hospital
-Send_to_Hospital
+Quarantine
+Quarantine
 1
 1
 -1000
@@ -842,8 +872,8 @@ count patches with [ pcolor = white ]
 MONITOR
 335
 685
-485
-742
+493
+743
 Total # Infected
 numberInfected
 0
@@ -901,8 +931,8 @@ HORIZONTAL
 MONITOR
 335
 748
-485
-805
+494
+806
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
@@ -1302,6 +1332,7 @@ false
 PENS
 "Current Cases" 1.0 1 -7858858 true "" "if Scalephase = 0 [ plot count simuls with [ color = red ] ]"
 "Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
+"ICU Beds Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
 
 MONITOR
 335
@@ -1341,7 +1372,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 0
 10
-0.0
+10.0
 1
 1
 NIL
@@ -1402,7 +1433,7 @@ SWITCH
 785
 Stimulus
 Stimulus
-1
+0
 1
 -1000
 
@@ -1648,7 +1679,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-185.0
+148.0
 1
 1
 NIL
@@ -1661,7 +1692,7 @@ SWITCH
 1026
 Lockdown_Off
 Lockdown_Off
-0
+1
 1
 -1000
 
@@ -1696,6 +1727,32 @@ count simuls
 17
 1
 11
+
+SLIDER
+700
+877
+904
+911
+ICU_Required
+ICU_Required
+0
+100
+6.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+335
+570
+489
+620
+ICU Beds Needed
+ICUBedsRequired
+0
+1
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
