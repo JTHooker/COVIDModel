@@ -499,11 +499,11 @@ to checkICU
 end
 
 to CalculateICUBedsRequired
-  if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ cRequireICU = 1 ] ) ]
-    if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 10 ]
-      if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 100]
-        if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 1000 ]
-          if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ RequireICU = 1 ] ) * 10000 ]
+  if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) ]
+    if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10 ]
+      if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 100]
+        if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 1000 ]
+          if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10000 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -817,7 +817,7 @@ HORIZONTAL
 PLOT
 1929
 272
-2184
+2226
 417
 Resource Availability
 NIL
@@ -1319,7 +1319,7 @@ PLOT
 839
 1368
 1098
-Active (red) and Total (blue) Infections
+Active (red) and Total (blue) Infections ICU Beds (black)
 NIL
 NIL
 0.0
@@ -1402,7 +1402,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
@@ -1554,10 +1554,10 @@ Days
 11
 
 MONITOR
-1163
-680
-1361
-729
+1160
+687
+1358
+736
 Scale Phase
 scalePhase
 17
@@ -1596,10 +1596,10 @@ COVID-19 Policy Options and Impact Model for Australia
 1
 
 TEXTBOX
-1166
-738
-1381
-831
+1164
+744
+1379
+837
 0 - 2,500 Population\n1 - 25,000 \n2 - 250,000\n3 - 2,500,000\n4 - 25,000,000
 12
 0.0
@@ -1703,7 +1703,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-0
+1
 1
 -1000
 
@@ -1737,7 +1737,7 @@ ICU_Required
 ICU_Required
 0
 100
-6.0
+5.0
 1
 1
 NIL
@@ -1753,6 +1753,24 @@ ICUBedsRequired
 0
 1
 12
+
+PLOT
+1939
+733
+2241
+883
+ICU Beds Required
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
 
 @#$#@#$#@
 ## WHAT IS IT?
