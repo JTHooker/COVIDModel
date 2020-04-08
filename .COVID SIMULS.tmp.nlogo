@@ -28,6 +28,7 @@ globals [
   DailyCases
   Scaled_Population
   ICUBedsRequired
+  scaled_Bed_Capacity
 
   DNA1
   DNA2
@@ -97,14 +98,15 @@ to setup
  ;; import-drawing "Background1.png"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
-  ask medresources [ set color white set shape "Health care" set size 10 set capacity Bed_Capacity set xcor 20 set ycor -20 ]
-  ask medresources [ ask patches in-radius Capacity [ set pcolor white ] ]
+  ask medresources [ set color white set shape "Health care" set size 5 set xcor 20 set ycor -20 ]
+  calculateScaledBedCapacity
+  ask medresources [ ask n-of Scaled_Bed_Capacity patches in-radius 5 [ set pcolor white ] ]
   ask n-of Available_Resources patches [ sprout-resources 1 ]
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
+        set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
         set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 ]
     ]
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
@@ -124,11 +126,13 @@ to setup
 
   matchages
 
-  ask simuls [  set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
+  ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
 
   set contact_radius 0
   set days 0
   set Quarantine false
+
+
 
   reset-ticks
 end
@@ -169,7 +173,7 @@ end
 
 to resetincome
   if agerange >= 18 and agerange < 70 and income < 10000 [
-    set income random-exponential 55000 ]
+    set income random-exponential Mean_Individual_Income ]
 end
 
 to resethealth
@@ -221,6 +225,7 @@ to go
   countDailyCases
   calculatePopulationScale
   CalculateICUBedsRequired
+  calculateScaledBedCapacity
 
 
   ask patches [ checkutilisation ]
@@ -283,7 +288,7 @@ to reinfect
 end
 
 to allocatebed
-  ask patches in-radius Bed_Capacity [ set pcolor white ]
+  if freewheel = true [ ask patches in-radius Bed_Capacity [ set pcolor white ] ]
 end
 
 to avoidICUs
@@ -361,7 +366,7 @@ to Cruiseship
   if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
       set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
-        set income random-exponential 55000 resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
+        set income random-exponential Mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
   ]]
 end
 
@@ -504,6 +509,10 @@ to CalculateICUBedsRequired
       if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 100]
         if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 1000 ]
           if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10000 ]
+end
+
+to calculateScaledBedCapacity
+   set scaled_Bed_Capacity ( Hospital_Beds_In_Australia / 2500 )
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -768,21 +777,6 @@ ReInfectionRate
 0
 100
 0.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-699
-802
-903
-835
-Bed_Capacity
-Bed_Capacity
-0
-20
-2.0
 1
 1
 NIL
@@ -1185,7 +1179,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5888.0
+6000.0
 1
 0
 Number
@@ -1346,10 +1340,10 @@ DailyCases
 12
 
 PLOT
-328
-943
-946
-1098
+329
+945
+631
+1100
 New Infections Per Day
 NIL
 NIL
@@ -1402,7 +1396,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-90.0
+0.0
 1
 1
 NIL
@@ -1664,7 +1658,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-33.0
+0.0
 1
 1
 NIL
@@ -1755,11 +1749,11 @@ ICUBedsRequired
 12
 
 PLOT
-1939
-733
-2241
-883
-ICU Beds Required
+629
+945
+948
+1099
+ICU Beds Available vs Required
 NIL
 NIL
 0.0
@@ -1770,7 +1764,68 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
+"Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
+"Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_in_Australia - ICUBedsRequired"
+
+SLIDER
+1065
+634
+1274
+668
+Mean_Individual_Income
+Mean_Individual_Income
+0
+100000
+5000.0
+5000
+1
+NIL
+HORIZONTAL
+
+SLIDER
+335
+532
+510
+566
+ICU_Beds_in_Australia
+ICU_Beds_in_Australia
+0
+20000
+3500.0
+50
+1
+NIL
+HORIZONTAL
+
+SLIDER
+699
+799
+904
+833
+Hospital_Beds_in_Australia
+Hospital_Beds_in_Australia
+0
+200000
+200000.0
+5000
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1938
+727
+2128
+761
+Bed_Capacity
+Bed_Capacity
+0
+20
+4.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
