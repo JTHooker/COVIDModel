@@ -1532,7 +1532,7 @@ SWITCH
 984
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1697,7 +1697,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-1
+0
 1
 -1000
 
