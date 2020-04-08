@@ -12,4 +12,4 @@ We apologise in advance for the lack of commenting in the code. Hopefully you ca
 
 If you have any specific questions or would like to contribute / comment, please contact jason.thompson@unimelb.edu.au .
 
-IMPORTANT! Users must download and import the Netlogo DIST extension for the model to run. This is related to the economic exchange between agents.
+more details on the model can be seen at https://jasonthompsondotblog.wpcomstaging.com/2020/04/08/documentation-for-the-abm/
