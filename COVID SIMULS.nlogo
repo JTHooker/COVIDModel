@@ -500,7 +500,7 @@ to calculatePopulationScale
 end
 
 to checkICU
-  if color = red and RequireICU < ICU_Required [ set requireICU 1 ]
+  if color = red and RequireICU < ICU_Required and timenow >= incubation_Period [ set requireICU 1 ]
 end
 
 to CalculateICUBedsRequired
@@ -1532,7 +1532,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1806,7 +1806,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-200000.0
+65000.0
 5000
 1
 NIL

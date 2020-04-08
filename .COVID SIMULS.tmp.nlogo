@@ -500,7 +500,7 @@ to calculatePopulationScale
 end
 
 to checkICU
-  if color = red and RequireICU < ICU_Required [ set requireICU 1 ]
+  if color = red and RequireICU < ICU_Required a[ set requireICU 1 ]
 end
 
 to CalculateICUBedsRequired
@@ -1532,7 +1532,7 @@ SWITCH
 984
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1697,7 +1697,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-1
+0
 1
 -1000
 
@@ -1761,7 +1761,7 @@ NIL
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
 "Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
@@ -1806,7 +1806,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-200000.0
+65000.0
 5000
 1
 NIL
