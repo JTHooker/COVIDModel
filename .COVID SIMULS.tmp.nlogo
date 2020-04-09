@@ -2,7 +2,7 @@
 
 globals [
 
-  FearFactor
+  anxietyFactor
   NumberInfected
   InfectionChange
   TodayInfections
@@ -29,6 +29,7 @@ globals [
   Scaled_Population
   ICUBedsRequired
   scaled_Bed_Capacity
+  currentInfections
 
   DNA1
   DNA2
@@ -56,7 +57,7 @@ simuls-own [
   timenow
   health
   inICU
-  fear
+  anxiety
   sensitivity
   R
   income
@@ -105,7 +106,7 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
         set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 ]
     ]
@@ -131,8 +132,6 @@ to setup
   set contact_radius 0
   set days 0
   set Quarantine false
-
-
 
   reset-ticks
 end
@@ -202,14 +201,14 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime death isolation reinfect createfear gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU ] ;
+  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock ]
   finished
   CruiseShip
   GlobalTreat
-  GlobalFear
+  Globalanxiety
   SuperSpread
   CountInfected
   CalculateDailyGrowth
@@ -224,8 +223,9 @@ to go
   setCaseFatalityRate
   countDailyCases
   calculatePopulationScale
-  CalculateICUBedsRequired
+  calculateICUBedsRequired
   calculateScaledBedCapacity
+  calculateCurrentInfections
 
 
   ask patches [ checkutilisation ]
@@ -243,13 +243,13 @@ to move
   if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [
     set color red set timenow 0  ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
-  if color = red and Case_Isolation = false and Proportion_Isolating < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
+  if color = red and Case_Isolation = false and Compliance_with_Isolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Quarantine = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
 to isolation
-  if Case_Isolation = true and color = red and Proportion_Isolating > random 100 and timenow > IncubationPD [
+  if Case_Isolation = true and color = red and Compliance_with_Isolation > random 100 and timenow > IncubationPD [
     move-to patch-here set pace 0 ]
 end
 
@@ -305,23 +305,23 @@ to deplete
     set volume volume - .1 ]
 end
 
-to createfear
-  set fear ( fear + Fearfactor ) * random-normal .9 .1
-  if fear < 0 [ set fear 0 ]
- ; if fear > 100 [ set fear 100 ]
+to createanxiety
+  set anxiety ( anxiety + anxietyfactor ) * random-normal .9 .1
+  if anxiety < 0 [ set anxiety 0 ]
+ ; if anxiety > 100 [ set anxiety 100 ]
 end
 
-to GlobalFear
- if scalephase = 0 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population )  * media_Exposure ]
- if scalephase = 1 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10  * media_Exposure ]
- if scalephase = 2 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 100  * media_Exposure ]
- if scalephase = 3 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 1000  * media_Exposure ]
- if scalephase = 4 [  set fearFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10000  * media_Exposure ]
+to Globalanxiety
+ if scalephase = 0 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population )  * media_Exposure ]
+ if scalephase = 1 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10  * media_Exposure ]
+ if scalephase = 2 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 100  * media_Exposure ]
+ if scalephase = 3 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 1000  * media_Exposure ]
+ if scalephase = 4 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10000  * media_Exposure ]
 end
 
 to gatherreseources
-  if (fear * sensitivity) > random 100 and count resources > 0 and InICU = 0  [ face min-one-of resources with [ volume >= 0 ] [ distance myself ]  ]
-  if any? resources-here with [ volume >= 0 ] and fear > 0 [ set fear mean [ fearfactor ] of neighbors move-to one-of patches with [ pcolor = black ] ]
+  if (anxiety * sensitivity) > random 100 and count resources > 0 and InICU = 0  [ face min-one-of resources with [ volume >= 0 ] [ distance myself ]  ]
+  if any? resources-here with [ volume >= 0 ] and anxiety > 0 [ set anxiety mean [ anxietyfactor ] of neighbors move-to one-of patches with [ pcolor = black ] ]
 end
 
 to resize
@@ -365,7 +365,7 @@ end
 to Cruiseship
   if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
-      set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+      set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential Mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
   ]]
 end
@@ -442,12 +442,12 @@ end
 to scaleup
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
-    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
       set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100 ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth
-    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set fear 0 set sensitivity random-float 1 set R 0
+    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set requireICU random 100 ]
  set contact_Radius Contact_Radius + (90 / 4)
@@ -500,7 +500,7 @@ to calculatePopulationScale
 end
 
 to checkICU
-  if color = red and RequireICU < ICU_Required a[ set requireICU 1 ]
+  if color = red and RequireICU < ICU_Required and timenow >= incubation_Period [ set requireICU 1 ]
 end
 
 to CalculateICUBedsRequired
@@ -513,6 +513,14 @@ end
 
 to calculateScaledBedCapacity
    set scaled_Bed_Capacity ( Hospital_Beds_In_Australia / 2500 )
+end
+
+to calculateCurrentInfections
+   if Scalephase = 0 [ set currentInfections ( count simuls with [ color = red ]) ]
+   if Scalephase = 1 [ set currentInfections ( count simuls with [ color = red ]) * 10 ]
+   if Scalephase = 2 [ set currentInfections ( count simuls with [ color = red ]) * 100 ]
+   if Scalephase = 3 [ set currentInfections ( count simuls with [ color = red ]) * 1000 ]
+   if Scalephase = 4 [ set currentInfections ( count simuls with [ color = red ]) * 10000 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -617,7 +625,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-1
+0
 1
 -1000
 
@@ -694,7 +702,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -789,7 +797,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-1
+0
 1
 -1000
 
@@ -905,7 +913,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -2674135 true "" "plot mean [ fear ] of simuls"
+"default" 1.0 1 -2674135 true "" "plot mean [ anxiety ] of simuls"
 
 SLIDER
 1938
@@ -1081,7 +1089,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1152,8 +1160,8 @@ SLIDER
 355
 898
 388
-Proportion_Isolating
-Proportion_Isolating
+Compliance_with_Isolation
+Compliance_with_Isolation
 0
 100
 100.0
@@ -1179,7 +1187,7 @@ INPUTBOX
 302
 503
 Current_Cases
-6000.0
+5000.0
 1
 0
 Number
@@ -1322,9 +1330,9 @@ NIL
 200.0
 true
 false
-"" "if Scalephase = 1 [ plot count simuls with [ color = red ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red ] * 10000 ]\n"
+"" "\n"
 PENS
-"Current Cases" 1.0 1 -7858858 true "" "if Scalephase = 0 [ plot count simuls with [ color = red ] ]"
+"Current Cases" 1.0 1 -7858858 true "" "plot currentInfections"
 "Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
 "ICU Beds Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
 
@@ -1396,7 +1404,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
@@ -1532,7 +1540,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1658,7 +1666,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-0.0
+3.0
 1
 1
 NIL
@@ -1673,7 +1681,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-148.0
+185.0
 1
 1
 NIL
@@ -1697,7 +1705,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-0
+1
 1
 -1000
 
@@ -2467,7 +2475,7 @@ NetLogo 6.1.0
   <experiment name="Containment Policy Scale" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>ticks = 500</exitCondition>
+    <exitCondition>ticks = 400</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
@@ -2491,13 +2499,15 @@ NetLogo 6.1.0
     <metric>numberInfected</metric>
     <metric>deathcount</metric>
     <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Spatial_Distance">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_Isolating">
+    <enumeratedValueSet variable="Compliance_with_Isolation">
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Total_Population">
@@ -2512,8 +2522,8 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Bed_Capacity">
-      <value value="2"/>
+    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
+      <value value="65000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ReInfectionRate">
       <value value="0"/>
@@ -2527,7 +2537,7 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="Severity_of_illness">
       <value value="15"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Send_to_Hospital">
+    <enumeratedValueSet variable="Quarantine">
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ProductionRate">
@@ -2582,15 +2592,12 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Lockdown_Off">
-      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Freewheel">
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimelockdownOff">
-      <value value="95"/>
-      <value value="125"/>
-      <value value="155"/>
       <value value="185"/>
     </enumeratedValueSet>
   </experiment>
