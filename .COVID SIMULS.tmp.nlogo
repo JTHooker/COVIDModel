@@ -96,7 +96,7 @@ to setup
     ;;reset-ticks
 
     clear-all
- ;; import-drawing "Background1.png"
+ ;;import-drawing "Background1.png"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 5 set xcor 20 set ycor -20 ]
@@ -157,7 +157,7 @@ to setdeathrisk
   if agerange = 45 [ set riskofDeath .004 ]
   if agerange = 55 [ set riskofDeath .013 ]
   if agerange = 65 [ set riskofDeath .036 ]
-  if agerange = 75 [ set riskofDeath .08 ]
+  if agerange = 75 [ set riskofDeath .08  ]
   if agerange = 85 [ set riskofDeath .148 ]
   if agerange = 95 [ set riskofDeath .148 ]
 end
@@ -204,7 +204,7 @@ to go
   ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
-  ask packages [ absorbshock ]
+  ask packages [ absorbshock movepackages ]
   finished
   CruiseShip
   GlobalTreat
@@ -226,6 +226,7 @@ to go
   calculateICUBedsRequired
   calculateScaledBedCapacity
   calculateCurrentInfections
+
 
 
   ask patches [ checkutilisation ]
@@ -419,7 +420,7 @@ to financialstress
 end
 
 to DeployStimulus
-  if mouse-down? and stimulus = true [ create-packages 1 [ setxy mouse-xcor mouse-ycor set shape "box" set value 0 set color orange set size 5 ] ]
+  if mouse-down? and stimulus = true [ create-packages 1 [ setxy mouse-xcor mouse-ycor set shape "box" set value 0 set color orange set size 5  ] ]
 end
 
 to absorbshock
@@ -521,6 +522,10 @@ to calculateCurrentInfections
    if Scalephase = 2 [ set currentInfections ( count simuls with [ color = red ]) * 100 ]
    if Scalephase = 3 [ set currentInfections ( count simuls with [ color = red ]) * 1000 ]
    if Scalephase = 4 [ set currentInfections ( count simuls with [ color = red ]) * 10000 ]
+end
+
+to movepackages
+  set heading heading + 5 - 5 fd .5
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -625,7 +630,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -702,7 +707,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -797,7 +802,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-0
+1
 1
 -1000
 
@@ -861,10 +866,10 @@ count simuls * (Total_Population / population)
 14
 
 MONITOR
-1402
-931
-1662
-976
+1400
+934
+1660
+979
 Bed Capacity Scaled for Australia at 65,000k
 count patches with [ pcolor = white ]
 0
@@ -1020,7 +1025,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+100.0
 5
 1
 NIL
@@ -1035,7 +1040,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+100.0
 5
 1
 NIL
@@ -1089,7 +1094,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1187,7 +1192,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5000.0
+1000.0
 1
 0
 Number
@@ -1198,7 +1203,7 @@ INPUTBOX
 302
 567
 Total_Population
-2.5E7
+5000000.0
 1
 0
 Number
@@ -1348,10 +1353,10 @@ DailyCases
 12
 
 PLOT
-329
-945
-631
-1100
+330
+942
+632
+1097
 New Infections Per Day
 NIL
 NIL
@@ -1404,7 +1409,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+0.0
 1
 1
 NIL
@@ -1495,16 +1500,16 @@ INPUTBOX
 1121
 237
 Days_of_Cash_Reserves
-60.0
+30.0
 1
 0
 Number
 
 MONITOR
-1402
-979
-1487
-1024
+1400
+982
+1485
+1027
 Mean income
 mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != black ]
 0
@@ -1512,10 +1517,10 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 11
 
 MONITOR
-1495
-981
-1595
-1026
+1492
+982
+1592
+1027
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
 0
@@ -1540,7 +1545,7 @@ SWITCH
 984
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1666,7 +1671,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-3.0
+33.0
 1
 1
 NIL
@@ -1681,7 +1686,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-185.0
+98.0
 1
 1
 NIL
@@ -1694,7 +1699,7 @@ SWITCH
 1026
 Lockdown_Off
 Lockdown_Off
-1
+0
 1
 -1000
 
@@ -1705,7 +1710,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-1
+0
 1
 -1000
 
@@ -1757,10 +1762,10 @@ ICUBedsRequired
 12
 
 PLOT
-629
-945
-948
-1099
+630
+942
+949
+1097
 ICU Beds Available vs Required
 NIL
 NIL
@@ -1784,7 +1789,7 @@ Mean_Individual_Income
 Mean_Individual_Income
 0
 100000
-5000.0
+55000.0
 5000
 1
 NIL
@@ -1799,7 +1804,7 @@ ICU_Beds_in_Australia
 ICU_Beds_in_Australia
 0
 20000
-3500.0
+4200.0
 50
 1
 NIL
@@ -1814,7 +1819,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-65000.0
+60000.0
 5000
 1
 NIL
@@ -2501,6 +2506,7 @@ NetLogo 6.1.0
     <metric>casefatalityrate</metric>
     <metric>ICUBedsRequired</metric>
     <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -2559,7 +2565,11 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="55"/>
+      <value value="65"/>
+      <value value="75"/>
       <value value="85"/>
+      <value value="95"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="2500"/>
@@ -2577,7 +2587,7 @@ NetLogo 6.1.0
       <value value="65"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="85"/>
+      <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="50"/>
