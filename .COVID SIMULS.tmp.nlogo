@@ -30,6 +30,7 @@ globals [
   ICUBedsRequired
   scaled_Bed_Capacity
   currentInfections
+  eliminationDate
 
   DNA1
   DNA2
@@ -96,7 +97,7 @@ to setup
     ;;reset-ticks
 
     clear-all
- ;;import-drawing "Background1.png"
+  import-drawing "Background1.png"
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 5 set xcor 20 set ycor -20 ]
@@ -132,6 +133,7 @@ to setup
   set contact_radius 0
   set days 0
   set Quarantine false
+  set eliminationDate 0
 
   reset-ticks
 end
@@ -226,6 +228,7 @@ to go
   calculateICUBedsRequired
   calculateScaledBedCapacity
   calculateCurrentInfections
+  calculateEliminationDate
 
 
 
@@ -353,7 +356,7 @@ end
 
 to TriggerActionIsolation
   ifelse PolicyTriggerOn = true and Freewheel = false  [
-    if triggerday - ticks < 7 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true
+    if triggerday - ticks < 14 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true
        set Proportion_People_Avoid 100 -  ((100 - PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 100 - ((100 - PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
     ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ] [ set Spatial_Distance False set Case_Isolation False ]
   ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false ] ]
@@ -527,6 +530,10 @@ end
 to movepackages
   set heading heading + 5 - 5 fd .5
 end
+
+to calculateEliminationDate
+  if ticks > 1 and count simuls with [ color = red ] = 0 and eliminationDate = 0 [ set eliminationDate ticks ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -630,7 +637,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-1
+0
 1
 -1000
 
@@ -707,7 +714,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-1
+0
 1
 -1000
 
@@ -802,7 +809,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-1
+0
 1
 -1000
 
@@ -1025,7 +1032,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-100.0
+85.0
 5
 1
 NIL
@@ -1040,7 +1047,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-100.0
+85.0
 5
 1
 NIL
@@ -1094,7 +1101,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1169,7 +1176,7 @@ Compliance_with_Isolation
 Compliance_with_Isolation
 0
 100
-100.0
+90.0
 5
 1
 NIL
@@ -1192,7 +1199,7 @@ INPUTBOX
 302
 503
 Current_Cases
-1000.0
+5000.0
 1
 0
 Number
@@ -1203,7 +1210,7 @@ INPUTBOX
 302
 567
 Total_Population
-5000000.0
+2.5E7
 1
 0
 Number
@@ -1409,7 +1416,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -1545,7 +1552,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1583,11 +1590,11 @@ count simuls with [ shape = \"star\" ] / count simuls
 12
 
 TEXTBOX
-145
-663
-317
-712
-Days since approximately Jan 20 when first case appeared (Jan 25 reported)
+142
+660
+314
+709
+Days since approximately Jan 15 when first case appeared (Jan 25 reported)
 12
 15.0
 1
@@ -1686,7 +1693,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-98.0
+185.0
 1
 1
 NIL
@@ -1699,7 +1706,7 @@ SWITCH
 1026
 Lockdown_Off
 Lockdown_Off
-0
+1
 1
 -1000
 
@@ -1710,7 +1717,7 @@ SWITCH
 165
 Freewheel
 Freewheel
-0
+1
 1
 -1000
 
@@ -1819,7 +1826,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-60000.0
+65000.0
 5000
 1
 NIL
@@ -2477,10 +2484,10 @@ NetLogo 6.1.0
       <value value="45"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Containment Policy Scale" repetitions="30" runMetricsEveryStep="true">
+  <experiment name="Containment Policy Scale" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>ticks = 400</exitCondition>
+    <exitCondition>ticks = 300</exitCondition>
     <metric>count simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = 85 ]</metric>
     <metric>count simuls with [color = black ]</metric>
@@ -2507,6 +2514,7 @@ NetLogo 6.1.0
     <metric>ICUBedsRequired</metric>
     <metric>DailyCases</metric>
     <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -2514,7 +2522,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Compliance_with_Isolation">
-      <value value="100"/>
+      <value value="90"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Total_Population">
       <value value="25000000"/>
@@ -2565,11 +2573,7 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="55"/>
-      <value value="65"/>
-      <value value="75"/>
       <value value="85"/>
-      <value value="95"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="2500"/>
@@ -2587,7 +2591,7 @@ NetLogo 6.1.0
       <value value="65"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="100"/>
+      <value value="85"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="50"/>
