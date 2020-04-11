@@ -203,7 +203,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU ] ;
+  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU  ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock movepackages ]
@@ -229,7 +229,7 @@ to go
   calculateScaledBedCapacity
   calculateCurrentInfections
   calculateEliminationDate
-
+  assesslinks
 
 
   ask patches [ checkutilisation ]
@@ -243,9 +243,9 @@ end
 to move
   if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
   if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [
-    set color red set timenow Incubation_Period - ticks  ]
+    set color red set timenow Incubation_Period - ticks   ]
   if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [
-    set color red set timenow 0  ]
+    set color red set timenow 0   ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
   if color = red and Case_Isolation = false and Compliance_with_Isolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Quarantine = false [ avoidICUs ]
@@ -534,6 +534,12 @@ end
 to calculateEliminationDate
   if ticks > 1 and count simuls with [ color = red ] = 0 and eliminationDate = 0 [ set eliminationDate ticks ]
 end
+
+to assesslinks
+  if link_switch = true [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ]
+  ask links [ set color red ]
+  ask simuls with [ color != red ] [ ask my-out-links [ die ] ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -637,7 +643,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -714,7 +720,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -809,7 +815,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-0
+1
 1
 -1000
 
@@ -887,7 +893,7 @@ MONITOR
 335
 685
 493
-743
+742
 Total # Infected
 numberInfected
 0
@@ -898,7 +904,7 @@ SLIDER
 699
 279
 904
-314
+312
 Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
@@ -946,7 +952,7 @@ MONITOR
 335
 748
 494
-806
+805
 Mean Days infected
 mean [ timenow ] of simuls with [ color = red ]
 2
@@ -962,7 +968,7 @@ Superspreaders
 Superspreaders
 0
 100
-100.0
+0.0
 1
 1
 NIL
@@ -998,7 +1004,7 @@ MONITOR
 1153
 125
 1283
-171
+170
 Case Fatality Rate %
 caseFatalityRate * 100
 2
@@ -1101,7 +1107,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1260,10 +1266,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-1384
-269
-2164
-698
+952
+690
+1151
+832
 R0
 Time
 R
@@ -1416,7 +1422,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -1514,9 +1520,9 @@ Number
 
 MONITOR
 1400
-982
+987
 1485
-1027
+1032
 Mean income
 mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != black ]
 0
@@ -1525,9 +1531,9 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 
 MONITOR
 1492
-982
+987
 1592
-1027
+1032
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
 0
@@ -1552,7 +1558,7 @@ SWITCH
 984
 Scale
 Scale
-0
+1
 1
 -1000
 
@@ -1688,7 +1694,7 @@ SLIDER
 129
 1033
 303
-1067
+1066
 TimeLockDownOff
 TimeLockDownOff
 0
@@ -1703,7 +1709,7 @@ SWITCH
 152
 992
 281
-1026
+1025
 Lockdown_Off
 Lockdown_Off
 1
@@ -1714,7 +1720,7 @@ SWITCH
 178
 130
 287
-165
+163
 Freewheel
 Freewheel
 1
@@ -1735,7 +1741,7 @@ MONITOR
 1292
 128
 1372
-174
+173
 NIL
 count simuls
 17
@@ -1746,7 +1752,7 @@ SLIDER
 700
 877
 904
-911
+910
 ICU_Required
 ICU_Required
 0
@@ -1761,7 +1767,7 @@ MONITOR
 335
 570
 489
-620
+619
 ICU Beds Needed
 ICUBedsRequired
 0
@@ -1788,9 +1794,9 @@ PENS
 "Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_in_Australia - ICUBedsRequired"
 
 SLIDER
-1065
-634
-1274
+1027
+635
+1236
 668
 Mean_Individual_Income
 Mean_Individual_Income
@@ -1806,7 +1812,7 @@ SLIDER
 335
 532
 510
-566
+565
 ICU_Beds_in_Australia
 ICU_Beds_in_Australia
 0
@@ -1821,7 +1827,7 @@ SLIDER
 699
 799
 904
-833
+832
 Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
@@ -1836,7 +1842,7 @@ SLIDER
 1938
 727
 2128
-761
+760
 Bed_Capacity
 Bed_Capacity
 0
@@ -1846,6 +1852,28 @@ Bed_Capacity
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1529
+1047
+1593
+1096
+Links
+count links / count simuls with [ color = red ]
+0
+1
+12
+
+SWITCH
+1400
+1057
+1514
+1090
+Link_Switch
+Link_Switch
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
