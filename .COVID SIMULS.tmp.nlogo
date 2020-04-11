@@ -31,6 +31,7 @@ globals [
   scaled_Bed_Capacity
   currentInfections
   eliminationDate
+  PotentialContacts
 
   DNA1
   DNA2
@@ -73,6 +74,14 @@ simuls-own [
   PersonalTrust
   WFHCap
   RequireICU
+  NewV
+  saliencyMessage
+  saliencyExperience
+  vMax
+  vMin
+  CareAttitude
+  SelfCapacity
+  newAssociationstrength
 ]
 
 Packages-own [
@@ -230,6 +239,7 @@ to go
   calculateCurrentInfections
   calculateEliminationDate
   assesslinks
+  calculatePotentialContacts
 
 
   ask patches [ checkutilisation ]
@@ -273,13 +283,13 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red ] >= Diffusion_Adjustment and Case_Isolation = false [  if Superspreaders > random 100 [
-    ask n-of Diffusion_Adjustment simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red ] >= 0 and Case_Isolation = false [  if Superspreaders > random 100 [
+    ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 
   if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
-    ask n-of Diffusion_Adjustment simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
-    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
+    ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
+    if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
 end
 
 to recover
@@ -536,9 +546,28 @@ to calculateEliminationDate
 end
 
 to assesslinks
-  if link_switch = true [ ask simuls with [ color = red ] [ create-links-with other simuls-here] ]
+  if link_switch = true [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ]
   ask links [ set color red ]
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ]
+end
+
+to calculateCarefactor
+  set newv ( ( saliencyMessage * SaliencyExperience ) * (( vmax - initialassociationstrength ) * ( Careattitude * selfCapacity )))   ;; experience can be fear
+  if newv > vmax [ set newv vmax ]
+  if newv < vmin [ set newv vmin ]
+  set newAssociationstrength ( initialAssociationstrength + newv )
+  set vmax maxv set vmin minv
+  set saliencyMessage PHWarnings set SaliencyExperience Saliency_of_Experience set CareAttitude Care_Attitude set selfCapacity Self_capacity
+  if saliencyMessage > 1 [ set saliencymessage 1 ]
+  if saliencyExperience > 1 [ set saliencyExperience 1 ]
+end
+
+to calculatePotentialContacts
+  if Scalephase = 0 [ set PotentialContacts ( count links ) ]
+   if Scalephase = 1 [ set PotentialContacts ( count links ) * 10 ]
+   if Scalephase = 2 [ set PotentialContacts ( count links ) * 100 ]
+   if Scalephase = 3 [ set PotentialContacts ( count links ) * 1000 ]
+   if Scalephase = 4 [ set PotentialContacts ( count links ) * 10000 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -643,7 +672,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -671,7 +700,7 @@ Speed
 Speed
 0
 5
-1.0
+5.0
 .1
 1
 NIL
@@ -720,7 +749,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -815,7 +844,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-0
+1
 1
 -1000
 
@@ -941,7 +970,7 @@ SLIDER
 Media_Exposure
 Media_Exposure
 1
-2500000
+100
 50.0
 1
 1
@@ -1107,7 +1136,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1205,7 +1234,7 @@ INPUTBOX
 302
 503
 Current_Cases
-5000.0
+6292.0
 1
 0
 Number
@@ -1390,9 +1419,9 @@ SLIDER
 611
 Diffusion_Adjustment
 Diffusion_Adjustment
-0
-10
-10.0
+1
+1000
+100.0
 1
 1
 NIL
@@ -1422,7 +1451,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -1558,7 +1587,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
@@ -1874,6 +1903,105 @@ Link_Switch
 0
 1
 -1000
+
+INPUTBOX
+1942
+775
+2097
+835
+InitialAssociationStrength
+0.0
+1
+0
+Number
+
+INPUTBOX
+1945
+842
+2100
+902
+MaxV
+1.0
+1
+0
+Number
+
+INPUTBOX
+1945
+912
+2100
+972
+MinV
+0.0
+1
+0
+Number
+
+INPUTBOX
+1947
+977
+2102
+1037
+PHWarnings
+0.8
+1
+0
+Number
+
+INPUTBOX
+1949
+1044
+2104
+1104
+Saliency_of_Experience
+1.0
+1
+0
+Number
+
+INPUTBOX
+2104
+774
+2259
+834
+Care_Attitude
+0.5
+1
+0
+Number
+
+INPUTBOX
+2107
+842
+2262
+902
+Self_Capacity
+0.8
+1
+0
+Number
+
+SWITCH
+2107
+912
+2262
+946
+Dynamic_Behaviour
+Dynamic_Behaviour
+1
+1
+-1000
+
+MONITOR
+2145
+459
+2259
+504
+Potential contacts
+PotentialContacts
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
