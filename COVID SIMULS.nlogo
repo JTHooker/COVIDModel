@@ -32,6 +32,12 @@ globals [
   currentInfections
   eliminationDate
   PotentialContacts
+  bluecount
+  yellowcount
+  redcount
+  todayInfected
+  cumulativeInfected
+  scaledPopulation
 
   DNA1
   DNA2
@@ -82,6 +88,7 @@ simuls-own [
   CareAttitude
   SelfCapacity
   newAssociationstrength
+
 ]
 
 Packages-own [
@@ -240,6 +247,13 @@ to go
   calculateEliminationDate
   assesslinks
   calculatePotentialContacts
+  countRed
+  countBlue
+  countYellow
+  scaledownhatch
+  calculateYesterdayInfected
+  calculateTodayInfected
+  calculateScaledPopulation
 
 
   ask patches [ checkutilisation ]
@@ -289,7 +303,8 @@ to superSpread
 
   if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
     ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
-    if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
+    if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
+        [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
 end
 
 to recover
@@ -471,8 +486,13 @@ to scaleup
 end
 
 to scaledown
-;; if scale = true and count simuls with [ color = red ] <= 25 and count simuls with [ color = yellow ] > count simuls with [ color = red ] and days > 0 [
- ;;   set contact_Radius Contact_radius - (90 / 4)   ]
+  if scale = true and count simuls with [ color = red ] <= 25 and yellowcount > redcount and days > 0 and scalephase > 0 [ ask n-of (count simuls with [ color = red ] * .9 ) simuls with [ color = red ]
+    [ hatch 10 move-to one-of patches with [ pcolor = black ] ]
+  set contact_Radius Contact_radius - (90 / 4) set scalephase scalephase - 1  ]
+end
+
+to scaledownhatch
+  if count simuls > Population [  ask n-of 10 simuls with [ color != red and color != black ] [ die ] ]
 end
 
 to forwardTime
@@ -485,15 +505,17 @@ To Unlock
 end
 
 to CountInfected
-  if Scalephase = 0 [ set numberinfected (count simuls with [ color != 85 ]) ]
-  if Scalephase = 1 [ set numberinfected (count simuls with [ color != 85 ]) * 10 ]
-  if ScalePhase = 2 [ set numberinfected (count simuls with [ color != 85 ]) * 100 ]
-  if ScalePhase = 3 [ set numberinfected (count simuls with [ color != 85 ]) * 1000 ]
-  if ScalePhase = 4 [ set numberinfected (count simuls with [ color != 85 ]) * 10000 ]
+
+  set numberinfected cumulativeInfected
+;  if Scalephase = 0 [ set numberinfected cumulativeInfected  ]
+;  if Scalephase = 1 [ set numberinfected cumulativeInfected * 10  ]
+;  if ScalePhase = 2 [ set numberinfected cumulativeInfected * 100  ]
+;  if ScalePhase = 3 [ set numberinfected cumulativeInfected * 1000  ]
+;  if ScalePhase = 4 [ set numberinfected cumulativeInfected * 10000  ]
 end
 
 to setCaseFatalityRate
-  set casefatalityrate  ( Deathcount / numberInfected )
+  if Deathcount > 0 [ set casefatalityrate  ( Deathcount / numberInfected ) ]
 end
 
 to countDailyCases
@@ -518,7 +540,7 @@ to checkICU
 end
 
 to CalculateICUBedsRequired
-  if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) ]
+  if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] )   ]
     if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10 ]
       if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 100]
         if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 1000 ]
@@ -552,7 +574,7 @@ to assesslinks
 end
 
 to calculateCarefactor
-  set newv ( ( saliencyMessage * SaliencyExperience ) * (( vmax - initialassociationstrength ) * ( Careattitude * selfCapacity )))   ;; experience can be fear
+  set newv ( ( saliencyMessage * SaliencyExperience ) * (( vmax - initialassociationstrength ) * ( Careattitude * selfCapacity )))   ;; experience can be fear ;; we can analyse who got infected - vulnerable communities
   if newv > vmax [ set newv vmax ]
   if newv < vmin [ set newv vmin ]
   set newAssociationstrength ( initialAssociationstrength + newv )
@@ -563,12 +585,42 @@ to calculateCarefactor
 end
 
 to calculatePotentialContacts
-  if Scalephase = 0 [ set PotentialContacts ( count links ) ]
+   if Scalephase = 0 [ set PotentialContacts ( count links ) ]
    if Scalephase = 1 [ set PotentialContacts ( count links ) * 10 ]
    if Scalephase = 2 [ set PotentialContacts ( count links ) * 100 ]
    if Scalephase = 3 [ set PotentialContacts ( count links ) * 1000 ]
    if Scalephase = 4 [ set PotentialContacts ( count links ) * 10000 ]
 end
+
+to countred
+  set redCount count simuls with [ color = red ]
+end
+
+to countblue
+  set blueCount count simuls with [ color = 85 ]
+end
+
+to countyellow
+  set yellowcount count simuls with [ color = yellow ]
+end
+
+to calculateTodayInfected
+  set todayInfected dailycases
+end
+
+to calculateYesterdayInfected
+  set cumulativeInfected cumulativeInfected + todayInfected
+end
+
+to calculateScaledPopulation
+  if scalephase = 0 [ set scaledPopulation Total_Population / 10000 ]
+  if scalephase = 1 [ set scaledPopulation Total_Population / 1000 ]
+  if scalephase = 2 [ set scaledPopulation Total_Population / 100 ]
+  if scalephase = 3 [ set scaledPopulation Total_Population / 10 ]
+  if scalephase = 4 [ set scaledPopulation Total_Population ]
+end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -700,7 +752,7 @@ Speed
 Speed
 0
 5
-0.5
+1.0
 .1
 1
 NIL
@@ -723,8 +775,8 @@ true
 "" ""
 PENS
 "Infected Proportion" 1.0 0 -2674135 true "" "plot count simuls with [ color = red ] * (Total_Population / 100 / count Simuls) "
-"Recovered Proportion" 1.0 0 -1184463 true "" "plot count simuls with [ color = 85 ] * (Total_Population / 100 / count Simuls)"
-"Susceptible" 1.0 0 -14070903 true "" "plot count simuls with [ color = yellow ] * (Total_Population / 100 / count Simuls)"
+"Susceptible" 1.0 0 -14070903 true "" "plot count simuls with [ color = 85 ] * (Total_Population / 100 / count Simuls)"
+"Recovered" 1.0 0 -987046 true "" "plot count simuls with [ color = yellow ] * (Total_Population / 100 / count Simuls)"
 "New Infections" 1.0 0 -11221820 true "" "plot count simuls with [ color = red and timenow = Incubation_Period ] * ( Total_Population / 100 / count Simuls )"
 
 SLIDER
@@ -755,9 +807,9 @@ Case_Isolation
 
 BUTTON
 228
-222
+220
 292
-256
+254
 Go Once
 go
 NIL
@@ -997,7 +1049,7 @@ Superspreaders
 Superspreaders
 0
 100
-100.0
+10.0
 1
 1
 NIL
@@ -1024,7 +1076,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / Total_Population * 100
+numberInfected / Total_Population
 2
 1
 14
@@ -1136,7 +1188,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1421,7 +1473,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-100.0
+1.0
 1
 1
 NIL
@@ -1900,7 +1952,7 @@ SWITCH
 1090
 Link_Switch
 Link_Switch
-0
+1
 1
 -1000
 
@@ -2000,6 +2052,17 @@ MONITOR
 Potential contacts
 PotentialContacts
 0
+1
+11
+
+MONITOR
+999
+946
+1102
+992
+NIL
+numberInfected
+17
 1
 11
 
