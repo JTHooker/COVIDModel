@@ -570,7 +570,7 @@ To Unlock
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_Time_Avoid PTA - ( PTA / ( timeLockdownOff - ticks )) ]
 
-  if ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
+  if LockDown_Off = trueticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
   ;; set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ;; from above
 
@@ -974,7 +974,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-1
+0
 1
 -1000
 
@@ -1375,7 +1375,7 @@ INPUTBOX
 302
 567
 Total_Population
-500000.0
+2.5E7
 1
 0
 Number
@@ -1389,7 +1389,7 @@ Triggerday
 Triggerday
 0
 150
-37.0
+65.0
 1
 1
 NIL
@@ -1858,7 +1858,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-127.0
+155.0
 1
 1
 NIL
@@ -1991,7 +1991,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-13100.0
+65000.0
 5000
 1
 NIL
@@ -3032,7 +3032,6 @@ NetLogo 6.1.0
     <metric>count simuls with [ color = black and agerange = 75 ]</metric>
     <metric>count simuls with [ color = black and agerange = 85 ]</metric>
     <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
@@ -3045,6 +3044,7 @@ NetLogo 6.1.0
     <metric>DailyCases</metric>
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
