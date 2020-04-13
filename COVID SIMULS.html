@@ -38,6 +38,7 @@ globals [
   todayInfected
   cumulativeInfected
   scaledPopulation
+  MeanR
 
   ;; log transform illness period variables
   Illness_PeriodVariance
@@ -311,6 +312,7 @@ to go
   calculateYesterdayInfected
   calculateTodayInfected
   calculateScaledPopulation
+  calculateMeanR
 
   ask patches [ checkutilisation ]
   tick
@@ -692,6 +694,10 @@ end
 
 to resamplecompliance
   if ownCompliancewithIsolation > 100 [ set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ] ;; log transform of compliance with isolation
+end
+
+to calculateMeanr
+  set meanR (count simuls with [ color = red and timenow = int ownillnessperiod ] )
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1260,7 +1266,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1369,7 +1375,7 @@ INPUTBOX
 302
 567
 Total_Population
-2.5E7
+500000.0
 1
 0
 Number
@@ -1383,7 +1389,7 @@ Triggerday
 Triggerday
 0
 150
-65.0
+37.0
 1
 1
 NIL
@@ -1434,7 +1440,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = int ownIllnessPeriod ]"
+"R" 1.0 0 -16777216 true "" "plot MeanR"
 
 PLOT
 1160
@@ -1575,7 +1581,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -1852,7 +1858,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-70.0
+127.0
 1
 1
 NIL
@@ -1865,7 +1871,7 @@ SWITCH
 1025
 Lockdown_Off
 Lockdown_Off
-0
+1
 1
 -1000
 
@@ -1876,7 +1882,7 @@ SWITCH
 163
 Freewheel
 Freewheel
-0
+1
 1
 -1000
 
@@ -1985,7 +1991,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-65000.0
+13100.0
 5000
 1
 NIL
@@ -3026,7 +3032,6 @@ NetLogo 6.1.0
     <metric>count simuls with [ color = black and agerange = 75 ]</metric>
     <metric>count simuls with [ color = black and agerange = 85 ]</metric>
     <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
@@ -3039,6 +3044,7 @@ NetLogo 6.1.0
     <metric>DailyCases</metric>
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -3118,7 +3124,7 @@ NetLogo 6.1.0
       <value value="85"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
-      <value value="50"/>
+      <value value="35"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
@@ -3137,7 +3143,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimelockdownOff">
-      <value value="185"/>
+      <value value="155"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Diffusion_Adjustment">
       <value value="10"/>
@@ -3161,7 +3167,6 @@ NetLogo 6.1.0
     <metric>count simuls with [ color = black and agerange = 75 ]</metric>
     <metric>count simuls with [ color = black and agerange = 85 ]</metric>
     <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
     <metric>mean [ contacts ] of simuls / ticks</metric>
     <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
     <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
@@ -3174,6 +3179,7 @@ NetLogo 6.1.0
     <metric>DailyCases</metric>
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
     <enumeratedValueSet variable="Illness_period">
       <value value="15"/>
     </enumeratedValueSet>
@@ -3272,7 +3278,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimelockdownOff">
-      <value value="185"/>
+      <value value="127"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Diffusion_Adjustment">
       <value value="10"/>
