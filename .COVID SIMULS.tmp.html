@@ -599,7 +599,7 @@ to calculatePopulationScale
 end
 
 to checkICU
-  if color = red and RequireICU < ICU_Required and timenow >= ownIncubationPeriod [ set requireICU 1 ]
+  if color = red and RequireICU < ICU_Required and timenow >= ownInc [ set requireICU 1 ]
 end
 
 to CalculateICUBedsRequired
