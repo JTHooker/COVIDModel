@@ -39,6 +39,13 @@ globals [
   cumulativeInfected
   scaledPopulation
 
+  ;; log transform illness period variables
+  Illness_PeriodVariance
+  M
+  BetaillnessPd
+  S
+  SD
+
 
   DNA1
   DNA2
@@ -91,6 +98,8 @@ simuls-own [
   newAssociationstrength
   maxIllnessPeriod
 
+
+
 ]
 
 Packages-own [
@@ -117,6 +126,14 @@ to setup
 
   clear-all
   import-drawing "Background1.png"
+
+  ;; illness period estimation using ln transform
+  set Illness_Periodvariance se_Illnesspd
+  set BetaIllnessPd  ln ( 1 + ( illness_PeriodVariance / illness_period ^ 2))
+  set M ( ln illness_period ) - ( BetaillnessPd / 2)
+  set S sqrt BetaIllnessPd
+
+
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 5 set xcor 20 set ycor -20 ]
@@ -128,8 +145,12 @@ to setup
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
-        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set maxIllnessPeriod Illness_Period  ]
-    ]
+        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100
+
+        set maxIllnessPeriod ( exp random-normal M S )
+
+       ]]
+
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
 
 
@@ -155,7 +176,6 @@ to setup
   set days 0
   set Quarantine false
   set eliminationDate 0
-
   set Proportion_People_Avoid PPA
   set Proportion_Time_Avoid PTA
 
@@ -535,11 +555,11 @@ to setCaseFatalityRate
 end
 
 to countDailyCases
-  if Scalephase = 0 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) ]
-  if Scalephase = 1 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10 ]
-  if Scalephase = 2 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 100 ]
-  if Scalephase = 3 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 1000 ]
-  if Scalephase = 4 [ set dailyCases ( count simuls with [ color = red and timenow = 10 ]) * 10000 ]
+  if Scalephase = 0 [ set dailyCases ( count simuls with [ color = red and timenow = 8 ]) ]
+  if Scalephase = 1 [ set dailyCases ( count simuls with [ color = red and timenow = 8 ]) * 10 ]
+  if Scalephase = 2 [ set dailyCases ( count simuls with [ color = red and timenow = 8 ]) * 100 ]
+  if Scalephase = 3 [ set dailyCases ( count simuls with [ color = red and timenow = 8 ]) * 1000 ]
+  if Scalephase = 4 [ set dailyCases ( count simuls with [ color = red and timenow = 8 ]) * 10000 ]
 
 end
 
@@ -911,7 +931,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-0
+1
 1
 -1000
 
@@ -1134,7 +1154,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+85.0
 5
 1
 NIL
@@ -1149,7 +1169,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+85.0
 5
 1
 NIL
@@ -1203,7 +1223,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1377,7 +1397,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]"
+"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = int MaxIllnessPeriod ]"
 
 PLOT
 1160
@@ -2060,10 +2080,10 @@ Dynamic_Behaviour
 -1000
 
 MONITOR
-2145
-459
-2259
-504
+2142
+448
+2256
+493
 Potential contacts
 PotentialContacts
 0
@@ -2082,11 +2102,11 @@ numberInfected
 11
 
 PLOT
-2196
-550
-2396
-700
-plot 1
+2153
+593
+2353
+743
+Distribution of Illness pd
 NIL
 NIL
 10.0
@@ -2113,6 +2133,17 @@ Decay_limit
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+2156
+516
+2312
+577
+SE_Illnesspd
+1.5
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
