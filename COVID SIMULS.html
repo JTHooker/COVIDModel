@@ -53,6 +53,13 @@ globals [
   SInc
 
 
+  ;; log transform compliance period variables
+  Compliance_PeriodVariance
+  MComp
+  BetaCompliance
+  SComp
+
+
   DNA1
   DNA2
   DNA3
@@ -104,6 +111,7 @@ simuls-own [
   newAssociationstrength
   ownIllnessPeriod
   ownIncubationPeriod
+  ownComplianceWithIsolation
   ]
 
 Packages-own [
@@ -139,16 +147,16 @@ to setup
 
     ;; illness period estimation using ln transform
   set Incubation_Periodvariance se_Incubation
-  set BetaIncubationPd  ln ( 1 + ( incubation_PeriodVariance / illness_period ^ 2))
+  set BetaIncubationPd  ln ( 1 + ( incubation_PeriodVariance / incubation_period ^ 2))
   set MInc ( ln incubation_period ) - ( BetaincubationPd / 2)
   set SInc sqrt BetaIncubationPd
 
 
-
-
-
-
-
+      ;; illness period estimation using ln transform
+  set compliance_PeriodVariance se_Compliance
+  set BetaCompliance  ln ( 1 + ( compliance_PeriodVariance / compliance_with_isolation ^ 2))
+  set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
+  set SComp sqrt BetaCompliance
 
 
 
@@ -167,12 +175,11 @@ to setup
 
         set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
-
+        set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
 
        ]]
 
   ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod ]
-
 
 
   if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod ]]
@@ -190,7 +197,8 @@ to setup
 
   matchages
 
-  ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
+  ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday
+  resamplecompliance  ]
 
   set contact_radius 0
   set days 0
@@ -304,7 +312,6 @@ to go
   calculateTodayInfected
   calculateScaledPopulation
 
-
   ask patches [ checkutilisation ]
   tick
 
@@ -320,13 +327,13 @@ to move
   if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > int ownIncubationPeriod [
     set color red set timenow 0   ]
   if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
-  if color = red and Case_Isolation = false and Compliance_with_Isolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
+  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Quarantine = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
 to isolation
-  if Case_Isolation = true and color = red and Compliance_with_Isolation > random 100 and timenow > ownIncubationPeriod [
+  if Case_Isolation = true and color = red and ownCompliancewithIsolation > random 100 and timenow > ownIncubationPeriod [
     move-to patch-here set pace 0 ]
 end
 
@@ -448,8 +455,8 @@ to Cruiseship
 
         set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
-
-
+        set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) ;; log transform of compliance with isolation
+        reSampleCompliance
   ]]
 end
 
@@ -526,13 +533,13 @@ to scaleup
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
-        set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100 ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
-        set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set requireICU random 100 ]
  set contact_Radius Contact_Radius + (90 / 4)
@@ -683,6 +690,9 @@ to calculateScaledPopulation
   if scalephase = 4 [ set scaledPopulation Total_Population ]
 end
 
+to resamplecompliance
+  if ownCompliancewithIsolation > 100 [ set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ] ;; log transform of compliance with isolation
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -786,7 +796,7 @@ SWITCH
 168
 Spatial_Distance
 Spatial_Distance
-0
+1
 1
 -1000
 
@@ -863,7 +873,7 @@ SWITCH
 205
 Case_Isolation
 Case_Isolation
-0
+1
 1
 -1000
 
@@ -911,10 +921,10 @@ Deathcount
 14
 
 MONITOR
-965
-126
-1040
-171
+963
+133
+1053
+179
 Time Count
 ticks
 0
@@ -1011,10 +1021,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-963
-303
-1101
-360
+965
+310
+1120
+368
 # simuls
 count simuls * (Total_Population / population)
 0
@@ -1250,7 +1260,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-0
+1
 1
 -1000
 
@@ -1271,9 +1281,9 @@ HORIZONTAL
 
 MONITOR
 963
-241
-1102
-298
+249
+1118
+307
 Financial Reserves
 mean [ reserves ] of simuls
 1
@@ -1373,17 +1383,17 @@ Triggerday
 Triggerday
 0
 150
-20.0
+65.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-961
-438
-1116
-483
+965
+425
+1120
+470
 Close contacts per day
 AverageContacts
 2
@@ -1424,7 +1434,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = int MaxIllnessPeriod ]"
+"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = int ownIllnessPeriod ]"
 
 PLOT
 1160
@@ -1565,7 +1575,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -1614,8 +1624,8 @@ Cruise
 MONITOR
 963
 370
-1082
-419
+1116
+420
 Stimulus
 Sum [ value ] of packages * -1 * (Total_Population / Population )
 0
@@ -1651,10 +1661,10 @@ NIL
 1
 
 INPUTBOX
-965
-176
-1121
-237
+963
+183
+1118
+245
 Days_of_Cash_Reserves
 30.0
 1
@@ -1706,10 +1716,10 @@ Scale
 -1000
 
 MONITOR
-1046
-128
-1104
-173
+1059
+133
+1117
+178
 NIL
 Days
 17
@@ -1866,7 +1876,7 @@ SWITCH
 163
 Freewheel
 Freewheel
-1
+0
 1
 -1000
 
@@ -2129,10 +2139,10 @@ numberInfected
 11
 
 PLOT
-2305
-442
-2465
-563
+2306
+422
+2466
+543
 Distribution of Illness pd
 NIL
 NIL
@@ -2149,7 +2159,7 @@ PENS
 SLIDER
 2108
 951
-2281
+2263
 986
 Decay_limit
 Decay_limit
@@ -2184,15 +2194,15 @@ se_Incubation
 Number
 
 PLOT
-2305
-566
-2465
-687
+2308
+543
+2468
+664
 Dist_Incubation
 NIL
 NIL
-3.0
-8.0
+0.0
+10.0
 0.0
 10.0
 true
@@ -2200,6 +2210,35 @@ false
 "" ""
 PENS
 "default" 1.0 1 -16777216 true "" "histogram [ ownIncubationPeriod ] of simuls"
+
+INPUTBOX
+2140
+630
+2296
+691
+se_Compliance
+1.0
+1
+0
+Number
+
+PLOT
+2309
+665
+2469
+786
+Compliance
+NIL
+NIL
+80.0
+100.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ owncompliancewithisolation ] of simuls"
 
 @#$#@#$#@
 ## WHAT IS IT?
