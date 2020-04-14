@@ -570,7 +570,7 @@ To Unlock
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_Time_Avoid PTA - ( PTA / ( timeLockdownOff - ticks )) ]
 
-  if LockDown_Off = trueticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
+  if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
   ;; set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ;; from above
 
@@ -697,7 +697,7 @@ to resamplecompliance
 end
 
 to calculateMeanr
-  set meanR (count simuls with [ color = red and timenow = int ownillnessperiod ] )
+  ifelse any? simuls with [ color = red and timenow = int ownillnessperiod ] [ set meanR ( mean [ R ] of simuls with [ color = red and timenow = int ownillnessperiod ])] [ set MeanR 0 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -974,7 +974,7 @@ SWITCH
 349
 Quarantine
 Quarantine
-0
+1
 1
 -1000
 
@@ -1389,7 +1389,7 @@ Triggerday
 Triggerday
 0
 150
-65.0
+67.0
 1
 1
 NIL
@@ -1807,10 +1807,10 @@ PTA
 Number
 
 TEXTBOX
-345
-195
-520
-295
+346
+210
+522
+296
 Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
 12
 0.0
@@ -1858,7 +1858,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-155.0
+157.0
 1
 1
 NIL
@@ -2194,7 +2194,7 @@ INPUTBOX
 2295
 627
 se_Incubation
-2.0
+0.2
 1
 0
 Number
@@ -3014,7 +3014,7 @@ NetLogo 6.1.0
       <value value="185"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Lancet Paper Aus" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="Lancet Paper Aus" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>ticks = 300</exitCondition>
@@ -3118,13 +3118,13 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="65"/>
+      <value value="67"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
       <value value="85"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
-      <value value="35"/>
+      <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
@@ -3143,13 +3143,22 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimelockdownOff">
-      <value value="155"/>
+      <value value="157"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Diffusion_Adjustment">
       <value value="10"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="SE_Illnesspd">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_Incubation">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_compliance">
+      <value value="1"/>
+    </enumeratedValueSet>
   </experiment>
-  <experiment name="Lancet Paper NZ" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="Lancet Paper NZ" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>ticks = 300</exitCondition>
@@ -3253,10 +3262,10 @@ NetLogo 6.1.0
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
-      <value value="37"/>
+      <value value="34"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="85"/>
+      <value value="92.65"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InfectionRate">
       <value value="50"/>
@@ -3278,10 +3287,19 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimelockdownOff">
-      <value value="127"/>
+      <value value="61"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Diffusion_Adjustment">
       <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SE_Illnesspd">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_Incubation">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_compliance">
+      <value value="1"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
