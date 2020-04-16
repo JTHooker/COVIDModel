@@ -115,6 +115,7 @@ simuls-own [
   ownComplianceWithIsolation
   asymptom
   personalVirulence
+  tracked
   ]
 
 Packages-own [
@@ -282,7 +283,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU  ] ;
+  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU beentracked ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock movepackages ]
@@ -329,7 +330,6 @@ end
 
 to move
   if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-
   if any? other simuls-here with [ color = red and personalVirulence > random 100 ] and color = 85 [
     set color red set timenow 0   ]
   if any? other simuls-here with [ color = 85 ] and color = red and personalVirulence > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
@@ -339,7 +339,7 @@ to move
 end
 
 to isolation
-  if Case_Isolation = true and color = red and ownCompliancewithIsolation > random 100 and timenow > ownIncubationPeriod [
+  if Case_Isolation = true and color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [
     move-to patch-here set pace 0 ]
 end
 
@@ -720,6 +720,12 @@ to resetVirulence
   let over100virus simuls with [ personalvirulence > 100 ]
   ask over100virus [ set personalvirulence random 100 ]
 end
+
+to beenTracked
+ if tracked = 0 and timenow > 0 and color = red  [
+    if random-float 1 < track_and_trace_efficiency [ set tracked 1 ]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -1074,8 +1080,8 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 .5
-0.1
-.1
+0.25
+.05
 1
 NIL
 HORIZONTAL
@@ -1381,7 +1387,7 @@ INPUTBOX
 302
 567
 Total_Population
-1.1E7
+2.5E7
 1
 0
 Number
@@ -1723,7 +1729,7 @@ SWITCH
 984
 Scale
 Scale
-1
+0
 1
 -1000
 
