@@ -38,13 +38,27 @@ globals [
   todayInfected
   cumulativeInfected
   scaledPopulation
+  MeanR
 
   ;; log transform illness period variables
   Illness_PeriodVariance
   M
   BetaillnessPd
   S
-  SD
+
+
+  ;; log transform incubation period variables
+  Incubation_PeriodVariance
+  MInc
+  BetaIncubationPd
+  SInc
+
+
+  ;; log transform compliance period variables
+  Compliance_PeriodVariance
+  MComp
+  BetaCompliance
+  SComp
 
 
   DNA1
@@ -96,11 +110,12 @@ simuls-own [
   CareAttitude
   SelfCapacity
   newAssociationstrength
-  maxIllnessPeriod
-
-
-
-]
+  ownIllnessPeriod
+  ownIncubationPeriod
+  ownComplianceWithIsolation
+  asymptom
+  personalVirulence
+  ]
 
 Packages-own [
   value
@@ -133,6 +148,20 @@ to setup
   set M ( ln illness_period ) - ( BetaillnessPd / 2)
   set S sqrt BetaIllnessPd
 
+    ;; illness period estimation using ln transform
+  set Incubation_Periodvariance se_Incubation
+  set BetaIncubationPd  ln ( 1 + ( incubation_PeriodVariance / incubation_period ^ 2))
+  set MInc ( ln incubation_period ) - ( BetaincubationPd / 2)
+  set SInc sqrt BetaIncubationPd
+
+
+      ;; illness period estimation using ln transform
+  set compliance_PeriodVariance se_Compliance
+  set BetaCompliance  ln ( 1 + ( compliance_PeriodVariance / compliance_with_isolation ^ 2))
+  set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
+  set SComp sqrt BetaCompliance
+
+
 
   ask patches [ set pcolor black  ]
   ask n-of 1 patches [ sprout-medresources 1 ]
@@ -143,19 +172,23 @@ to setup
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
-        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100
+        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set personalVirulence random 100
 
-        set maxIllnessPeriod ( exp random-normal M S )
+        set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
+        set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
+
+        set asymptom random 100
+        adjustVirulence
 
        ]]
 
-  ask n-of (Current_Cases * (population / Total_Population)) simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]
+  ask n-of (Current_Cases ) simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod ]
 
 
-
-  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow Incubation_Period ]]
+  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod ]]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
   set fifteen int ( Population * .121 )
@@ -170,7 +203,8 @@ to setup
 
   matchages
 
-  ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday ]
+  ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday
+  resamplecompliance  ]
 
   set contact_radius 0
   set days 0
@@ -178,7 +212,7 @@ to setup
   set eliminationDate 0
   set Proportion_People_Avoid PPA
   set Proportion_Time_Avoid PTA
-
+  adjustGlobalVirulence
 
   reset-ticks
 end
@@ -283,7 +317,7 @@ to go
   calculateYesterdayInfected
   calculateTodayInfected
   calculateScaledPopulation
-
+  calculateMeanR
 
   ask patches [ checkutilisation ]
   tick
@@ -295,18 +329,18 @@ end
 
 to move
   if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks <= Incubation_period [
-    set color red set timenow Incubation_Period - ticks   ]
-  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and infectionRate > random 100 and ticks > Incubation_period [
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and personalVirulence > random 100 and ticks <= int ownIncubationPeriod [
+    set color red set timenow int ownIncubationPeriod - ticks   ]
+  if any? other simuls-here with [ color = red and timenow >= random-normal 4 1 ] and color = 85 and personalVirulence > random 100 and ticks > int ownIncubationPeriod [
     set color red set timenow 0   ]
-  if any? other simuls-here with [ color = 85 ] and color = red and infectionRate > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
-  if color = red and Case_Isolation = false and Compliance_with_Isolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
+  if any? other simuls-here with [ color = 85 ] and color = red and personalVirulence > random 100 [ set R R + 1 set GlobalR GlobalR + 1 ]
+  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]
   if color = red and Quarantine = false [ avoidICUs ]
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
 to isolation
-  if Case_Isolation = true and color = red and Compliance_with_Isolation > random 100 and timenow > IncubationPD [
+  if Case_Isolation = true and color = red and ownCompliancewithIsolation > random 100 and timenow > ownIncubationPeriod [
     move-to patch-here set pace 0 ]
 end
 
@@ -330,8 +364,8 @@ to superSpread
     ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of Diffusion_Adjustment Simuls with [ color = yellow ]  [move-to one-of patches with [ pcolor = black ]]]]]]
 
-  if count simuls with [ color = red and timenow < Incubation_Period ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
-    ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red and timenow < Incubation_Period ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red and timenow < ownIncubationPeriod ] >= Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
+    ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red and timenow < ownIncubationPeriod ] [move-to one-of patches with [ pcolor = black ]
     if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
         [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
 end
@@ -370,11 +404,13 @@ to createanxiety
 end
 
 to Globalanxiety
- if scalephase = 0 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population )  * media_Exposure ]
- if scalephase = 1 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10  * media_Exposure ]
- if scalephase = 2 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 100  * media_Exposure ]
- if scalephase = 3 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 1000  * media_Exposure ]
- if scalephase = 4 [  set anxietyFactor ((count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population ) * 10000  * media_Exposure ]
+ let anxiouscohort (count simuls with [ color = red ] + count simuls with [ color = black ] - count simuls with [ color = yellow ] ) / Total_Population
+
+ if scalephase = 0 [  set anxietyFactor anxiouscohort * media_Exposure ]
+ if scalephase = 1 [  set anxietyFactor anxiouscohort * 10  * media_Exposure ]
+ if scalephase = 2 [  set anxietyFactor anxiouscohort * 100  * media_Exposure ]
+ if scalephase = 3 [  set anxietyFactor anxiouscohort * 1000  * media_Exposure ]
+ if scalephase = 4 [  set anxietyFactor anxiouscohort * 10000  * media_Exposure ]
 end
 
 to gatherreseources
@@ -392,8 +428,10 @@ set heading heading + 5
 end
 
 to GlobalTreat
-  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? simuls with [ color = red and inICU = 0 ]
-    [ ask n-of ( count simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period ] * Track_and_Trace_Efficiency ) simuls with [ color = red and inICU = 0 and IncubationPd >= Incubation_Period] [
+  let eligiblesimuls simuls with [ color = red and inICU = 0 and ownIncubationPeriod >= Incubation_Period and asymptom >= AsymptomaticPercentage ]
+  if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? eligiblesimuls ;; only symptomatic cases are identified
+    [ ask n-of ( count eligiblesimuls  * Track_and_Trace_Efficiency )
+      eligiblesimuls [
       move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
 
@@ -411,7 +449,7 @@ end
 to TriggerActionIsolation
   ifelse PolicyTriggerOn = true and Freewheel = false  [
     if triggerday - ticks < 14 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true
-       set Proportion_People_Avoid 0 + (( PPA) / (triggerday - ticks)) set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
+       set Proportion_People_Avoid 0 + (( PPA ) / (triggerday - ticks)) set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
     ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ] [ set Spatial_Distance False set Case_Isolation False ]
   ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false ] ]
 end
@@ -424,7 +462,12 @@ to Cruiseship
   if mouse-down?  and cruise = true [
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
       set health ( 100 - Agerange ) resethealth set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
-        set income random-exponential Mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday set IncubationPd Incubation_Period
+        set income random-exponential Mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday
+
+        set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
+        set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) ;; log transform of compliance with isolation
+        reSampleCompliance
   ]]
 end
 
@@ -500,12 +543,14 @@ end
 to scaleup
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
-    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+    set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100 ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth
-    set timenow 0 set IncubationPd Incubation_Period set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+    set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+        set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set requireICU random 100 ]
  set contact_Radius Contact_Radius + (90 / 4)
@@ -534,7 +579,7 @@ To Unlock
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_Time_Avoid PTA - ( PTA / ( timeLockdownOff - ticks )) ]
 
-  if ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
+  if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
   ;; set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ;; from above
 
@@ -572,15 +617,15 @@ to calculatePopulationScale
 end
 
 to checkICU
-  if color = red and RequireICU < ICU_Required and timenow >= incubation_Period [ set requireICU 1 ]
+  if color = red and RequireICU < ICU_Required and timenow >= ownIncubationPeriod [ set requireICU 1 ]
 end
 
 to CalculateICUBedsRequired
   if scalephase = 0 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] )   ]
-    if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10 ]
-      if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 100]
-        if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 1000 ]
-          if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10000 ]
+  if scalephase = 1 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10 ]
+  if scalephase = 2 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 100]
+  if scalephase = 3 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 1000 ]
+  if scalephase = 4 [ set ICUBedsRequired count ( simuls with [ color = red and RequireICU = 1 ] ) * 10000 ]
 end
 
 to calculateScaledBedCapacity
@@ -656,6 +701,32 @@ to calculateScaledPopulation
   if scalephase = 4 [ set scaledPopulation Total_Population ]
 end
 
+to resamplecompliance
+  if ownCompliancewithIsolation > 100 [ set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ] ;; log transform of compliance with isolation
+end
+
+to calculateMeanr
+  ifelse any? simuls with [ color = red and timenow = int ownillnessperiod ] [ set meanR ( mean [ R ] of simuls with [ color = red and timenow = int ownillnessperiod ])] [ set MeanR 0 ]
+end
+
+to adjustVirulence
+  if asymptom <= asymptomaticPercentage [ set personalvirulence  personalVirulence  * .25 ]
+end
+
+to adjustGlobalVirulence
+  let meanV  mean [ personalvirulence ] of simuls
+
+ ask simuls [  ifelse asymptom <= asymptomaticPercentage [ set personalvirulence Global_Transmissability * .5  ] [ set personalvirulence Global_Transmissability * 1.5 ]
+  ]
+
+ resetVirulence
+
+end
+
+to resetVirulence
+  let over100virus simuls with [ personalvirulence > 100 ]
+  ask over100virus [ set personalvirulence mean [ int personalvirulence ] of simuls with [ asymptom > AsymptomaticPercentage ] ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -757,8 +828,8 @@ SWITCH
 135
 899
 168
-Spatial_Distance
-Spatial_Distance
+spatial_distance
+spatial_distance
 1
 1
 -1000
@@ -834,8 +905,8 @@ SWITCH
 172
 898
 205
-Case_Isolation
-Case_Isolation
+case_isolation
+case_isolation
 1
 1
 -1000
@@ -884,30 +955,15 @@ Deathcount
 14
 
 MONITOR
-965
-126
-1040
-171
+963
+133
+1053
+178
 Time Count
 ticks
 0
 1
 11
-
-SLIDER
-699
-392
-901
-425
-InfectionRate
-InfectionRate
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
 
 SLIDER
 699
@@ -929,8 +985,8 @@ SWITCH
 316
 899
 349
-Quarantine
-Quarantine
+quarantine
+quarantine
 1
 1
 -1000
@@ -984,10 +1040,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-963
-303
-1101
-360
+965
+310
+1120
+367
 # simuls
 count simuls * (Total_Population / population)
 0
@@ -1020,7 +1076,7 @@ SLIDER
 700
 282
 899
-317
+315
 Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
@@ -1221,9 +1277,9 @@ SWITCH
 585
 290
 618
-PolicyTriggerOn
-PolicyTriggerOn
-1
+policytriggeron
+policytriggeron
+0
 1
 -1000
 
@@ -1244,9 +1300,9 @@ HORIZONTAL
 
 MONITOR
 963
-241
-1102
-298
+249
+1118
+306
 Financial Reserves
 mean [ reserves ] of simuls
 1
@@ -1298,7 +1354,7 @@ Compliance_with_Isolation
 Compliance_with_Isolation
 0
 100
-95.0
+100.0
 5
 1
 NIL
@@ -1320,8 +1376,8 @@ INPUTBOX
 442
 302
 503
-Current_Cases
-5000.0
+current_cases
+1.0
 1
 0
 Number
@@ -1331,8 +1387,8 @@ INPUTBOX
 506
 302
 567
-Total_Population
-2.5E7
+total_population
+1.1E7
 1
 0
 Number
@@ -1346,17 +1402,17 @@ Triggerday
 Triggerday
 0
 150
-20.0
+72.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-961
-438
-1116
-483
+965
+425
+1120
+470
 Close contacts per day
 AverageContacts
 2
@@ -1397,7 +1453,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "Plot mean [ R ] of simuls with [ color = red and timenow = int MaxIllnessPeriod ]"
+"R" 1.0 0 -16777216 true "" "plot MeanR"
 
 PLOT
 1160
@@ -1567,8 +1623,8 @@ SWITCH
 752
 266
 785
-Stimulus
-Stimulus
+stimulus
+stimulus
 0
 1
 -1000
@@ -1578,8 +1634,8 @@ SWITCH
 795
 266
 828
-Cruise
-Cruise
+cruise
+cruise
 1
 1
 -1000
@@ -1587,7 +1643,7 @@ Cruise
 MONITOR
 963
 370
-1082
+1116
 419
 Stimulus
 Sum [ value ] of packages * -1 * (Total_Population / Population )
@@ -1624,11 +1680,11 @@ NIL
 1
 
 INPUTBOX
-965
-176
-1121
-237
-Days_of_Cash_Reserves
+963
+183
+1118
+245
+days_of_cash_reserves
 30.0
 1
 0
@@ -1672,17 +1728,17 @@ SWITCH
 951
 271
 984
-Scale
-Scale
-1
+scale
+scale
+0
 1
 -1000
 
 MONITOR
-1046
-128
-1104
-173
+1059
+133
+1117
+178
 NIL
 Days
 17
@@ -1726,7 +1782,7 @@ TEXTBOX
 15
 2195
 95
-COVID-19 Policy Options and Impact Model for Australia
+COVID-19 Policy Options and Impact Model for Australia and NZ
 60
 104.0
 1
@@ -1746,7 +1802,7 @@ INPUTBOX
 216
 609
 284
-PPA
+ppa
 85.0
 1
 0
@@ -1757,17 +1813,17 @@ INPUTBOX
 216
 700
 285
-PTA
+pta
 85.0
 1
 0
 Number
 
 TEXTBOX
-345
-195
-520
-295
+346
+210
+522
+296
 Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
 12
 0.0
@@ -1793,9 +1849,9 @@ PENS
 
 SLIDER
 700
-839
+858
 903
-872
+891
 WFH_Capacity
 WFH_Capacity
 0
@@ -1815,7 +1871,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-70.0
+162.0
 1
 1
 NIL
@@ -1826,9 +1882,9 @@ SWITCH
 992
 281
 1025
-Lockdown_Off
-Lockdown_Off
-0
+lockdown_off
+lockdown_off
+1
 1
 -1000
 
@@ -1837,8 +1893,8 @@ SWITCH
 130
 287
 163
-Freewheel
-Freewheel
+freewheel
+freewheel
 1
 1
 -1000
@@ -1866,9 +1922,9 @@ count simuls
 
 SLIDER
 700
-877
+898
 904
-910
+931
 ICU_Required
 ICU_Required
 0
@@ -1940,10 +1996,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-699
-799
-904
-832
+700
+819
+905
+852
 Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
@@ -1970,10 +2026,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1529
-1047
-1593
-1096
+1530
+1052
+1594
+1101
 Links
 count links / count simuls with [ color = red ]
 0
@@ -1981,33 +2037,22 @@ count links / count simuls with [ color = red ]
 12
 
 SWITCH
-1400
-1057
-1514
-1090
-Link_Switch
-Link_Switch
+1402
+1066
+1516
+1099
+link_switch
+link_switch
 1
 1
 -1000
-
-INPUTBOX
-1942
-775
-2097
-835
-InitialAssociationStrength
-0.0
-1
-0
-Number
 
 INPUTBOX
 1945
 842
 2100
 902
-MaxV
+maxv
 1.0
 1
 0
@@ -2018,7 +2063,7 @@ INPUTBOX
 912
 2100
 972
-MinV
+minv
 0.0
 1
 0
@@ -2029,7 +2074,7 @@ INPUTBOX
 977
 2102
 1037
-PHWarnings
+phwarnings
 0.8
 1
 0
@@ -2040,7 +2085,7 @@ INPUTBOX
 1044
 2104
 1104
-Saliency_of_Experience
+saliency_of_experience
 1.0
 1
 0
@@ -2051,7 +2096,7 @@ INPUTBOX
 774
 2259
 834
-Care_Attitude
+care_attitude
 0.5
 1
 0
@@ -2062,7 +2107,7 @@ INPUTBOX
 842
 2262
 902
-Self_Capacity
+self_capacity
 0.8
 1
 0
@@ -2073,8 +2118,8 @@ SWITCH
 912
 2262
 945
-Dynamic_Behaviour
-Dynamic_Behaviour
+dynamic_behaviour
+dynamic_behaviour
 1
 1
 -1000
@@ -2102,10 +2147,10 @@ numberInfected
 11
 
 PLOT
-2153
-593
-2353
-743
+2306
+422
+2466
+543
 Distribution of Illness pd
 NIL
 NIL
@@ -2117,13 +2162,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "histogram [ maxIllnessPeriod ] of simuls "
+"default" 1.0 1 -16777216 true "" "histogram [ ownIllnessPeriod ] of simuls "
 
 SLIDER
-2119
-973
-2292
-1008
+2108
+951
+2263
+984
 Decay_limit
 Decay_limit
 0
@@ -2135,15 +2180,136 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-2156
-516
-2312
-577
-SE_Illnesspd
-1.5
+2139
+503
+2295
+564
+se_illnesspd
+1.0
 1
 0
 Number
+
+INPUTBOX
+2139
+566
+2295
+627
+se_incubation
+0.2
+1
+0
+Number
+
+PLOT
+2308
+543
+2468
+664
+Dist_Incubation
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ ownIncubationPeriod ] of simuls"
+
+INPUTBOX
+2140
+630
+2296
+691
+se_compliance
+1.0
+1
+0
+Number
+
+PLOT
+2309
+665
+2469
+786
+Compliance
+NIL
+NIL
+80.0
+100.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ owncompliancewithisolation ] of simuls"
+
+INPUTBOX
+1942
+775
+2097
+835
+initialassociationstrength
+0.0
+1
+0
+Number
+
+SLIDER
+700
+392
+902
+425
+AsymptomaticPercentage
+AsymptomaticPercentage
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1245
+630
+1310
+675
+Virulence
+mean [ personalvirulence] of simuls
+1
+1
+11
+
+SLIDER
+700
+776
+906
+809
+Global_Transmissability
+Global_Transmissability
+0
+100
+47.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1320
+630
+1375
+675
+A V
+mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2550,635 +2716,194 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="Australia" repetitions="15" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
-    <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = blue ]</metric>
-    <metric>count simuls with [color = black ]</metric>
-    <metric>count simuls with [ color = yellow ]</metric>
-    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ timenow = Illness_period ]</metric>
-    <metric>mean [ contacts ] of simuls / ticks</metric>
-    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = 10 ] * (Total_Population / 1000 / Population )</metric>
-    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SpatialDistance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_Isolating">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Total_Population">
-      <value value="25000000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Current_Cases">
-      <value value="4300"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Media_Exposure">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Bed_Capacity">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
+    <timeLimit steps="300"/>
+    <metric>count turtles</metric>
+    <metric>ticks</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
+    <metric>Lockdown_Off</metric>
+    <enumeratedValueSet variable="maxv">
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="RestrictedMovement">
       <value value="0"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Superspreaders">
-      <value value="100"/>
+    <enumeratedValueSet variable="days_of_cash_reserves">
+      <value value="30"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
+    <enumeratedValueSet variable="Proportion_Time_Avoid">
+      <value value="85"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Send_to_Hospital">
+    <enumeratedValueSet variable="pta">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cruise">
       <value value="false"/>
-      <value value="true"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
+    <enumeratedValueSet variable="TimeLockDownOff">
+      <value value="162"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Incubation_Period">
-      <value value="5"/>
+    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
+      <value value="0.1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Case_Isolation">
+    <enumeratedValueSet variable="Treatment_Benefit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FearTrigger">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Diffusion_Adjustment">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="total_population">
+      <value value="11000000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Triggerday">
+      <value value="72"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lockdown_off">
       <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_incubation">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarantine">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="spatial_distance">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Global_Transmissability">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="minv">
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="ID_Rate">
-      <value value="0.1"/>
+    <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freewheel">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="self_capacity">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="dynamic_behaviour">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Compliance_with_Isolation">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Illness_period">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stimulus">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="WFH_Capacity">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Bed_Capacity">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ReInfectionRate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ppa">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_compliance">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity_of_illness">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ProductionRate">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="phwarnings">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="AsymptomaticPercentage">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Population">
+      <value value="2500"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mean_Individual_Income">
+      <value value="55000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="current_cases">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Available_Resources">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="saliency_of_experience">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Decay_limit">
       <value value="0.5"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="PolicyTriggerOn">
+    <enumeratedValueSet variable="scale">
       <value value="true"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="75"/>
-      <value value="85"/>
-      <value value="95"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="5000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Speed">
+    <enumeratedValueSet variable="se_illnesspd">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
-      <value value="0"/>
-      <value value="7"/>
-      <value value="14"/>
-      <value value="28"/>
-      <value value="150"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="InfectionRate">
-      <value value="35"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
-      <value value="70"/>
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Contact_Radius">
-      <value value="45"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Focused Policy" repetitions="1000" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>count simuls with [ color = red ] = 0</exitCondition>
-    <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = 85 ]</metric>
-    <metric>count simuls with [color = black ]</metric>
-    <metric>count simuls with [ color = yellow ]</metric>
-    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ timenow = Illness_period ]</metric>
-    <metric>mean [ contacts ] of simuls / ticks</metric>
-    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
-    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SpatialDistance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_Isolating">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Total_Population">
-      <value value="25000000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Current_Cases">
-      <value value="5000"/>
+    <enumeratedValueSet variable="ICU_Beds_in_Australia">
+      <value value="4200"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Media_Exposure">
       <value value="50"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Bed_Capacity">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RestrictedMovement">
+    <enumeratedValueSet variable="initialassociationstrength">
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Superspreaders">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Send_to_Hospital">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Incubation_Period">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Case_Isolation">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Initial">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ID_Rate">
-      <value value="0.15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="PolicyTriggerOn">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="75"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="5000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Speed">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
       <value value="10"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="75"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="InfectionRate">
-      <value value="35"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
+    <enumeratedValueSet variable="care_attitude">
+      <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Contact_Radius">
-      <value value="45"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Containment Policy Scale" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks = 300</exitCondition>
-    <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = 85 ]</metric>
-    <metric>count simuls with [color = black ]</metric>
-    <metric>count simuls with [ color = yellow ]</metric>
-    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
-    <metric>mean [ contacts ] of simuls / ticks</metric>
-    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
-    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
-    <metric>scalePhase</metric>
-    <metric>numberInfected</metric>
-    <metric>deathcount</metric>
-    <metric>casefatalityrate</metric>
-    <metric>ICUBedsRequired</metric>
-    <metric>DailyCases</metric>
-    <metric>CurrentInfections</metric>
-    <metric>EliminationDate</metric>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Spatial_Distance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Compliance_with_Isolation">
-      <value value="90"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Total_Population">
-      <value value="25000000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Current_Cases">
-      <value value="5000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Media_Exposure">
-      <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RestrictedMovement">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Superspreaders">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Quarantine">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
+    <enumeratedValueSet variable="link_switch">
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Incubation_Period">
       <value value="5"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Case_Isolation">
+    <enumeratedValueSet variable="case_isolation">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Initial">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="PolicyTriggerOn">
+    <enumeratedValueSet variable="policytriggeron">
       <value value="true"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="2500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
+    <enumeratedValueSet variable="ICU_Required">
+      <value value="5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Speed">
       <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
-      <value value="65"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="InfectionRate">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Contact_Radius">
-      <value value="45"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Scale">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Lockdown_Off">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Freewheel">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="TimelockdownOff">
-      <value value="185"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Lancet Paper Aus" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks = 300</exitCondition>
-    <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = 85 ]</metric>
-    <metric>count simuls with [color = black ]</metric>
-    <metric>count simuls with [ color = yellow ]</metric>
-    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
-    <metric>mean [ contacts ] of simuls / ticks</metric>
-    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
-    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
-    <metric>scalePhase</metric>
-    <metric>numberInfected</metric>
-    <metric>deathcount</metric>
-    <metric>casefatalityrate</metric>
-    <metric>ICUBedsRequired</metric>
-    <metric>DailyCases</metric>
-    <metric>CurrentInfections</metric>
-    <metric>EliminationDate</metric>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Spatial_Distance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Compliance_with_Isolation">
-      <value value="95"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Total_Population">
-      <value value="25000000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Current_Cases">
-      <value value="5000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Media_Exposure">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
-      <value value="65000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RestrictedMovement">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Superspreaders">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Quarantine">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Incubation_Period">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Case_Isolation">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Initial">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="PolicyTriggerOn">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="2500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Speed">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
-      <value value="65"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="InfectionRate">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Contact_Radius">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Scale">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Lockdown_Off">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Freewheel">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="TimelockdownOff">
-      <value value="185"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Diffusion_Adjustment">
-      <value value="10"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Lancet Paper NZ" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks = 300</exitCondition>
-    <metric>count simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = 85 ]</metric>
-    <metric>count simuls with [color = black ]</metric>
-    <metric>count simuls with [ color = yellow ]</metric>
-    <metric>count simuls with [ color = black and agerange = 5 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 15 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 25 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 35 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 45 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 55 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 65 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 75 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 85 ]</metric>
-    <metric>count simuls with [ color = black and agerange = 95 ]</metric>
-    <metric>mean [ R ] of simuls with [ color = red and timenow = Illness_period ]</metric>
-    <metric>mean [ contacts ] of simuls / ticks</metric>
-    <metric>mean [ timenow ] of simuls with [ color = red ]</metric>
-    <metric>count simuls with [ color = red and timenow = Incubation_Period ]</metric>
-    <metric>sum [ reserves ] of simuls with [ color != black ]</metric>
-    <metric>scalePhase</metric>
-    <metric>numberInfected</metric>
-    <metric>deathcount</metric>
-    <metric>casefatalityrate</metric>
-    <metric>ICUBedsRequired</metric>
-    <metric>DailyCases</metric>
-    <metric>CurrentInfections</metric>
-    <metric>EliminationDate</metric>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Spatial_Distance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Compliance_with_Isolation">
-      <value value="95"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Total_Population">
-      <value value="500000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Current_Cases">
-      <value value="5000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Media_Exposure">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
-      <value value="13100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RestrictedMovement">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Superspreaders">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Quarantine">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Incubation_Period">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Case_Isolation">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Initial">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="PolicyTriggerOn">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="2500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Speed">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
-      <value value="37"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_time_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="InfectionRate">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Contact_Radius">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Scale">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Lockdown_Off">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Freewheel">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="TimelockdownOff">
-      <value value="185"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Diffusion_Adjustment">
-      <value value="10"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
