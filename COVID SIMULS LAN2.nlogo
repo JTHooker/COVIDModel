@@ -714,8 +714,23 @@ to adjustVirulence
 end
 
 to adjustGlobalVirulence
-  if mean [ personalvirulence ] of simuls < Global_transmissability or mean [ personalVirulence ] of simuls with [ asymptom <= AsymptomaticPercentage ] / mean [ personalvirulence ] of simuls with [ asymptom > asymptomaticPercentage ] < .33
-  [ ask n-of 50 simuls [ set personalvirulence personalvirulence + 1 ] adjustGlobalvirulence resetVirulence ] ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+  if mean [ personalvirulence ] of simuls < Global_transmissability [ ask n-of 25 simuls [ set personalvirulence personalvirulence + 1  ] ]
+  if mean [ personalvirulence ] of simuls > Global_transmissability [ ask n-of 25 simuls [ set personalvirulence personalvirulence - 1  ] ]
+
+  if mean [ personalvirulence ] of simuls with [ asymptom > asymptomaticPercentage ] / mean [ personalVirulence ] of simuls with [ asymptom <= AsymptomaticPercentage ]  < .32
+    [ ask n-of 25 simuls with [ asymptom > AsymptomaticPercentage ] [ set personalvirulence personalvirulence + 1  ]
+      if mean [ personalvirulence ] of simuls with [ asymptom > asymptomaticPercentage ] / mean [ personalVirulence ] of simuls with [ asymptom <= AsymptomaticPercentage ] > .34
+  [ ask n-of 25 simuls with [ asymptom > AsymptomaticPercentage ] [ set personalvirulence personalvirulence - 1  ]
+
+
+  adjustGlobalvirulence resetVirulence ] ]
+
+ ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+
+
+  ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+
+ ;; [ ask n-of 50 simuls [ set personalvirulence random 100 ] adjustGlobalvirulence resetVirulence ] ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
 end
 
 to resetVirulence
@@ -2301,7 +2316,7 @@ MONITOR
 1374
 675
 A V
-mean [ personalvirulence ] of simuls with [ asymptom <= AsymptomaticPercentage ]
+mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
 1
 1
 11
