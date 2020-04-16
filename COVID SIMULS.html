@@ -711,16 +711,22 @@ to calculateMeanr
 end
 
 to adjustVirulence
-  if asymptom <= asymptomaticPercentage [ set personalvirulence  personalVirulence  * .33 ]
+  if asymptom <= asymptomaticPercentage [ set personalvirulence  personalVirulence  * .25 ]
 end
 
 to adjustGlobalVirulence
-    if mean [ personalvirulence ] of simuls < Global_transmissability  [ ask n-of 50 simuls with [ personalvirulence > AsymptomaticPercentage ]  [ set personalvirulence personalvirulence + 1 ] adjustGlobalvirulence resetVirulence ] ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+  if mean [ int personalvirulence ] of simuls <  Global_transmissability or ((mean [ personalvirulence ] of simuls with [ asymptom <= asymptomaticPercentage ] ) / ( mean [ personalvirulence ] of simuls with [ asymptom > asymptomaticPercentage ] ) < .32 )
+  [ ask n-of 25 simuls [ set personalvirulence personalvirulence + 1 ] adjustGlobalvirulence resetVirulence ] ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+
+ if mean [ int personalvirulence ] of simuls >  Global_transmissability or ((mean [ personalvirulence ] of simuls with [ asymptom <= asymptomaticPercentage ] ) / ( mean [ personalvirulence ] of simuls with [ asymptom > asymptomaticPercentage ] ) > .34 )
+  [ ask n-of 25 simuls [ set personalvirulence personalvirulence - 1 ] adjustGlobalvirulence resetVirulence ] ;; virulence of asymptomatic cases is 1/3 of that of symptomatic cases
+
+
 end
 
 to resetVirulence
   let over100virus simuls with [ personalvirulence > 100 ]
-  ask over100virus [ set personalvirulence random 100 ]
+  ask over100virus [ set personalvirulence random 100 + AsymptomaticPercentage ]
 end
 
 to beenTracked
@@ -1082,7 +1088,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 .5
-0.25
+0.1
 .05
 1
 NIL
@@ -1280,7 +1286,7 @@ SWITCH
 618
 PolicyTriggerOn
 PolicyTriggerOn
-1
+0
 1
 -1000
 
@@ -1403,7 +1409,7 @@ Triggerday
 Triggerday
 0
 150
-54.0
+72.0
 1
 1
 NIL
@@ -1885,7 +1891,7 @@ SWITCH
 1025
 Lockdown_Off
 Lockdown_Off
-1
+0
 1
 -1000
 
@@ -2269,17 +2275,17 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-33.0
+50.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1276
-636
-1341
-682
+1240
+632
+1305
+678
 Virulence
 mean [ personalvirulence] of simuls
 1
@@ -2300,6 +2306,17 @@ Global_Transmissability
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1312
+632
+1370
+678
+V A
+mean [ personalVirulence] of simuls with [ asymptom < AsymptomaticPercentage ]
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
