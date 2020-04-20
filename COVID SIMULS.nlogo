@@ -455,7 +455,7 @@ end
 to GlobalTreat
   let eligiblesimuls simuls with [ color = red and inICU = 0 and ownIncubationPeriod >= Incubation_Period and asymptom >= AsymptomaticPercentage ]
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? eligiblesimuls ;; only symptomatic cases are identified
-    [ ask n-of ( count eligiblesimuls  * Track_and_Trace_Efficiency )
+    [ ask n-of ( count eligiblesimuls * Track_and_Trace_Efficiency )
       eligiblesimuls [
       move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
@@ -2351,7 +2351,7 @@ SLIDER
 338
 456
 520
-491
+489
 Essential_Workers
 Essential_Workers
 0
