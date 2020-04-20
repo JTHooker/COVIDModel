@@ -117,6 +117,9 @@ simuls-own [
   personalVirulence
   tracked
   Asymptomaticflag
+  EssentialWorker
+  EssentialWorkerFlag
+  Own_WFH_Capacity
   ]
 
 Packages-own [
@@ -176,21 +179,23 @@ to setup
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
-        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 10
+        set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 100
 
         set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
         set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
 
         set asymptom random 100
+        set EssentialWorkerFlag 100
+        if agerange >= 18 and agerange < 70 [ set essentialWorkerFlag random 100 ]
         setASFlag
 
        ]]
 
-  ask n-of (Current_Cases ) simuls [  set color red set timenow int ownIncubationPeriod - 1 set personalVirulence Global_Transmissability move-to one-of patches with [ pcolor = black ] ]
+  ask n-of ( Current_Cases ) simuls [  set color red set timenow int ownIncubationPeriod - 1 move-to one-of patches with [ pcolor = black ] set timenow int ownIncubationPeriod - 1 set personalVirulence Global_Transmissability ]
 
 
-  if count simuls with [ color = red ] < 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod - 1 set personalVirulence Global_Transmissability ]
+  if count simuls with [ color = red ] <= 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod - 1 ]
  ]
 
   set five int ( Population * .126 ) ;; insert age range proportions here
@@ -285,7 +290,7 @@ end
 
 
 to go
-  ask simuls [ move avoid recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme ] ;
+  ask simuls [ move  recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock movepackages ]
@@ -323,6 +328,8 @@ to go
   calculateMeanR
   OSCase
   stopFade
+  seedCases
+  avoid
 
   ask patches [ checkutilisation ]
   tick
@@ -354,9 +361,17 @@ to isolation
 end
 
 to avoid
-  ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation
-  [ if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ] ]]
-  [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]
+  ask simuls [
+  (ifelse
+      Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 0 [
+        if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ]]]
+      ;; else...
+      Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 1 [
+        if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100  [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are an essential worker, you can only reduce your contacts whenn you are not at wor
+  ;;assuming 8 hours work, 8 hours rest, 8 hours recreation - rest doesn't count for anyome
+
+      [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ])
+  ]
 end
 
 to finished
@@ -729,15 +744,25 @@ to traceme
 end
 
 to OSCase
-  if policytriggeron = true [ ask simuls with [ color = red ]
-  [  if ticks < triggerday + 20 and timenow = 5 [ hatch 1 move-to one-of patches with [ pcolor = black ] ]
-    ]
-  ]
+  if policytriggeron = true [
+  if ticks < triggerday + sqrt 30 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ] ] ;; adds imported cases in the lead-up and immediate time after lockdown
+      ]
+
 end
 
 to stopfade
-  if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask simuls with [ color = red ] [ hatch 1 move-to one-of patches with [ pcolor = black ] ]]
+  if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
 end
+
+to EssentialWorkerID
+  ifelse EssentialWorker < Essential_Workers [ set EssentialWorkerFlag 1 ] [ set EssentialWorkerFlag 0 ]
+end
+
+to seedcases
+  if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+end
+
+ ;; essential workers do not have the same capacity to reduce contact as non-esssential
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -841,7 +866,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -918,7 +943,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1221,8 +1246,8 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
-5
+92.5
+.5
 1
 NIL
 HORIZONTAL
@@ -1236,8 +1261,8 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
-5
+92.5
+.5
 1
 NIL
 HORIZONTAL
@@ -1388,7 +1413,7 @@ INPUTBOX
 302
 503
 current_cases
-2.0
+1.0
 1
 0
 Number
@@ -1814,7 +1839,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+92.5
 1
 0
 Number
@@ -1825,7 +1850,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+92.5
 1
 0
 Number
@@ -1895,7 +1920,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-0
+1
 1
 -1000
 
@@ -2305,7 +2330,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-31.0
+30.0
 1
 1
 NIL
@@ -2321,6 +2346,66 @@ mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
 1
 1
 11
+
+SLIDER
+703
+693
+903
+726
+Essential_Workers
+Essential_Workers
+0
+100
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+702
+735
+905
+768
+OS_Import_Proportion
+OS_Import_Proportion
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+130
+1075
+303
+1108
+SeedTicks
+SeedTicks
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+336
+492
+515
+525
+Ess_W_Risk_Reduction
+Ess_W_Risk_Reduction
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
