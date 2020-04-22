@@ -120,6 +120,7 @@ simuls-own [
   EssentialWorker
   EssentialWorkerFlag
   Own_WFH_Capacity
+  hunted
   ]
 
 Packages-own [
@@ -290,7 +291,7 @@ end
 
 
 to go
-  ask simuls [ move  recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID ] ;
+  ask simuls [ move  recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID hunt ] ;
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock movepackages ]
@@ -358,6 +359,10 @@ to isolation
   if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [
     move-to patch-here set pace 0 ]
 
+    ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
+    ;; it enables the user to see how much difference an effective track and trace system might mack to spread
+
+
 end
 
 to avoid
@@ -384,15 +389,17 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [
-    ask n-of (count simuls with [ color = red ] / Diffusion_Adjustment) simuls with [ color = red ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red and tracked = 0 ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [
+    ask n-of (count simuls with [ color = red and tracked = 0  ] / Diffusion_Adjustment) simuls with [ color = red and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
 
-      if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of ( count simuls with [ color = yellow ] / Diffusion_Adjustment ) Simuls with [ color = yellow ] [move-to one-of patches with [ pcolor = black ]]]]]]
+    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of ( count simuls with [ color = yellow ] / Diffusion_Adjustment ) Simuls with [ color = yellow ] [move-to one-of patches with [ pcolor = black ]]]]]]
 
-  if count simuls with [ color = red and timenow < ownIncubationPeriod ] > Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
-    ask n-of (count simuls with [ color = red and timenow < ownIncubationPeriod ] / Diffusion_Adjustment) simuls with [ color = red and timenow < ownIncubationPeriod ] [move-to one-of patches with [ pcolor = black ]
-    if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
-        [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
+  if count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] > Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
+    ask n-of (count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] / Diffusion_Adjustment) simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
+
+
+  if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
+      [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
 end
 
 to recover
@@ -751,7 +758,9 @@ to OSCase
 end
 
 to stopfade
+ if freewheel = false [
   if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+  ]
 end
 
 to EssentialWorkerID
@@ -759,7 +768,17 @@ to EssentialWorkerID
 end
 
 to seedcases
-  if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+  if freewheel = false [
+    if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+  ]
+end
+
+to hunt
+ if link_switch = true [
+    if Track_and_Trace_Efficiency > random-float 1 and count my-in-links > 0 [ set hunted 1 ]
+  if hunted = 1 [ set tracked 1 ]
+  ]
+  if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
 
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
@@ -866,7 +885,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -894,7 +913,7 @@ Speed
 Speed
 0
 5
-0.8
+0.4
 .1
 1
 NIL
@@ -943,7 +962,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1023,7 +1042,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1116,8 +1135,8 @@ SLIDER
 Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
-.5
-0.25
+1
+0.5
 .05
 1
 NIL
@@ -1176,7 +1195,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+100.0
 1
 1
 NIL
@@ -1315,7 +1334,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1600,7 +1619,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-10.0
+25.0
 1
 1
 NIL
@@ -1766,7 +1785,7 @@ SWITCH
 984
 scale
 scale
-0
+1
 1
 -1000
 
@@ -2079,7 +2098,7 @@ SWITCH
 1099
 link_switch
 link_switch
-1
+0
 1
 -1000
 
