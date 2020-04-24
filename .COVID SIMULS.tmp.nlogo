@@ -85,71 +85,71 @@ breed [ medresources medresource ] ;; people living in the city
 breed [ packages package ]
 
 simuls-own [
-  timenow
-  health
-  inICU
-  anxiety
-  sensitivity
-  R
-  income
-  expenditure
-  reserves
-  agerange
-  contacts
-  IncubationPd
-  DailyRisk
-  RiskofDeath
-  Pace
-  PersonalTrust
-  WFHCap
-  RequireICU
-  NewV
-  saliencyMessage
-  saliencyExperience
-  vMax
-  vMin
-  CareAttitude
-  SelfCapacity
-  newAssociationstrength
-  ownIllnessPeriod
-  ownIncubationPeriod
-  ownComplianceWithIsolation
-  asymptom
-  personalVirulence
-  tracked
-  Asymptomaticflag
-  EssentialWorker
-  EssentialWorkerFlag
-  Own_WFH_Capacity
-  hunted
-  haveApp
-  wearsMask
+  timenow ;; the number of days since initial infection
+  health ;; baseline health of the individual
+  inICU ;; whether the person is in ICU or not
+  anxiety ;; person's level of anxiety aboutt he pandemic
+  sensitivity ;; person's sensitivity to news about the pandemic
+  R ;; the estimated RNaught of individuals
+  income ;; people's income from wage / salary
+  expenditure ;; people's expenditure
+  reserves ;; cash reserves available to the person
+  agerange ;; the age of the person in deciles
+  contacts ;; the number of contacts the person has made in the model
+  IncubationPd ;; the incubation perios of the illness ascribed to the person
+  DailyRisk ;; the risk of death of the person per day based on their agerange
+  RiskofDeath ;; the overall risk of deth for the person if they contract the illness based on their age
+  Pace ;; the speed that pthe person moves around the environment
+  PersonalTrust ;; the level of trust the person has in the Government
+  WFHCap ;; capacity of the person to work from home
+  RequireICU ;; a measure of whether the person needs ICU or not
+  NewV ;; the calculation of the association the person has between the their experiences in the world and their experiences of the illness - used in R-W implementation
+  saliencyMessage ;; saliency of the information coming to the person about COVID 19
+  saliencyExperience ;; The saliency of the person's experiences in the world
+  vMax ;; the maximum association the person can make between COVID-19 and their experience of the world
+  vMin ;; the minimum association the person can '' '' '' '' '' ''' '' '' ''' '' '' '' '' '' ''' '' ' ''
+  CareAttitude ;; the extent to which the person cares about protecting themselves and others from Covid
+  SelfCapacity ;; The capacity of the person to care about protecting themselves and others form COVID
+  newAssociationstrength ;;  a variable that is used in the calculation and carry-forward of NewV as above
+  ownIllnessPeriod ;; unique illness period associated with the individual
+  ownIncubationPeriod ;; unique incubation pd for the person - related to IncubationPd so can probably be cleaned up - IncubationPd is a legacy var as previously all incubation periods were identical
+  ownComplianceWithIsolation ;; unique variable associated with compliance to Isocation of cases if infected
+  asymptom ;; whether the person is asymptomatic or not
+  personalVirulence ;; the infectivity of the person
+  tracked ;; whether the person has been tracked by the health system
+  Asymptomaticflag ;; indicator identifying Asymptomatic cases
+  EssentialWorker ;; Variable used to determine whether the person is classified as an essential worker or not
+  EssentialWorkerFlag ;; indicator of whether the person is an essentialworker or not
+  Own_WFH_Capacity ;; Ability of the person to work from home
+  hunted ;; has the person been traced using the phoneApp
+  haveApp ;; for use in deterimining if the person has downloaded the app
+  wearsMask ;; for use in determining if the person wears a face mask
   ]
 
 Packages-own [
-  value
+  value ;; stimulus value
 ]
 
 
 patches-own [
-  utilisation
+  utilisation ;; indicator of whether any people are located on that patch of the environment or not
 ]
 
 medresources-own [
-  capacity
+  capacity ;; bed capacity of hospital system
 ]
 
 resources-own [
-  volume
+  volume ;; resources avaialable in resource pile
 ]
 
 
 to setup
-    ;;reset-ticks
-  rngs:init
+
+;;  rngs:init - for use in setting random nuber generator seeds
 
   clear-all
-  import-drawing "Background1.png"
+  import-drawing "Background1.png" ;; imports MSD image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -171,14 +171,20 @@ to setup
   set SComp sqrt BetaCompliance
 
 
-
+;; sets color of patches to black
   ask patches [ set pcolor black  ]
+
+ ;; setting up the hospital
   ask n-of 1 patches [ sprout-medresources 1 ]
   ask medresources [ set color white set shape "Health care" set size 5 set xcor 20 set ycor -20 ]
   calculateScaledBedCapacity
   ask medresources [ ask n-of Scaled_Bed_Capacity patches in-radius 5 [ set pcolor white ] ]
   ask n-of Available_Resources patches [ sprout-resources 1 ]
+
+ ;; sets up resources that people want to purchase
   ask resources [ set color white set shape "Bog Roll2" set size 5 set volume one-of [ 2.5 5 7.5 10 ]  resize set xcor -20 set ycor one-of [ -30 -10 10 30 ] resetlanding ]
+
+ ;; set up people in the environment and allocates characteristics to them
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
@@ -197,11 +203,15 @@ to setup
 
        ]]
 
+  ;; set up initial infected people
+
   ask n-of ( Current_Cases ) simuls [  set color red set timenow int ownIncubationPeriod - 1 move-to one-of patches with [ pcolor = black ] set timenow int ownIncubationPeriod - 1 set personalVirulence Global_Transmissability ]
 
 
   if count simuls with [ color = red ] <= 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod - 1 ]
  ]
+
+  ;; assigns death risks for people based on their age-range
 
   set five int ( Population * .126 ) ;; insert age range proportions here
   set fifteen int ( Population * .121 )
@@ -214,17 +224,17 @@ to setup
   set eightyfive int ( Population * .032 )
   set ninetyfive int ( Population * .008 )
 
-  matchages
+  matchages ;; assigns risk to age ranges (see below)
 
   ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk spend CalculateIncomePerday
-  resamplecompliance  ]
+  resamplecompliance  ] ;; assigns health based on age plus error, perfoms all other functions listed in the brackets - see details of each, below
 
-  set contact_radius 0
-  set days 0
+  set contact_radius 0 ;; sets contact radius of people
+  set days 0 ; used to count days since events - currently redundant
  ;; set Quarantine false
-  set eliminationDate 0
-  set Proportion_People_Avoid PPA
-  set Proportion_Time_Avoid PTA
+  set eliminationDate 0 ; used to identify the date of elimination where no current, unrecovered cases exist
+  set Proportion_People_Avoid PPA ;; used to set the proportion of people who are socially distancing
+  set Proportion_Time_Avoid PTA ;; used to preset the proportion of people who
 
   reset-ticks
 end
@@ -1075,7 +1085,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1298,7 +1308,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -1313,7 +1323,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -1367,7 +1377,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -2481,7 +2491,7 @@ SWITCH
 416
 tracking
 tracking
-1
+0
 1
 -1000
 
