@@ -124,6 +124,7 @@ simuls-own [
   hunted ;; has the person been traced using the phoneApp
   haveApp ;; for use in deterimining if the person has downloaded the app
   wearsMask ;; for use in determining if the person wears a face mask
+  householdUnit ;; the id of the household the person belongs to
   ]
 
 Packages-own [
@@ -187,7 +188,7 @@ to setup
  ;; set up people in the environment and allocates characteristics to them
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set householdUnit random 1000 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
         set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 100 set haveApp random 100
         set wearsMask random 100
@@ -234,7 +235,14 @@ to setup
  ;; set Quarantine false
   set eliminationDate 0 ; used to identify the date of elimination where no current, unrecovered cases exist
   set Proportion_People_Avoid PPA ;; used to set the proportion of people who are socially distancing
-  set Proportion_Time_Avoid PTA ;; used to preset the proportion of people who
+  set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
+
+  ;; setting households up
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ]
+  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ]
+  ask simuls with [ agerange < 19 [ set householdUnit r
+
+
 
   reset-ticks
 end
@@ -249,11 +257,11 @@ to matchages
   ask n-of int sixtyfive simuls with [ agerange > 55 ] [ set agerange 65 ]
   ask n-of int seventyfive simuls with [ agerange > 65 ] [ set agerange 75 ]
   ask n-of int eightyfive simuls with [ agerange > 75 ] [ set agerange 85 ]
- ;; ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ] ;;; fix this
+ ;; ask n-of int ninetyfive simuls with [ agerange > 85 ] [ set agerange 95 ] ;;; remaining people in the model are in their 90's as everying is set an agerange of 95 at initialisation
 end
 
 to setdeathrisk
-  if agerange = 5 [ set riskofDeath 0 ]
+  if agerange = 5 [ set riskofDeath 0 ] ;; risk of death associated with ageranges if they contract COVID-19
   if agerange = 15 [ set riskofDeath .002 ]
   if agerange = 25 [ set riskofDeath .002 ]
   if agerange = 35 [ set riskofDeath .002 ]
@@ -266,11 +274,11 @@ to setdeathrisk
 end
 
 to resetlanding
-  if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ]
+  if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ] ;; ensures that people don;t start on top of one another in the model
 end
 
 to resetlandingSimul
-  if any? other simuls-here [ move-to one-of patches with [ count simuls-here = 0 and pcolor = black ]]
+  if any? other simuls-here [ move-to one-of patches with [ count simuls-here = 0 and pcolor = black ]] ;; iterates / sorts people out to ensure they don't start on top of one another
 end
 
 to resetincome
