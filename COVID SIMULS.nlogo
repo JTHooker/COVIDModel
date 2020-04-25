@@ -240,7 +240,15 @@ to setup
   ;; setting households up
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ]
   ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ]
-  ask simuls with [ agerange < 19 ] [ set householdUnit random 600 ]
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ]
+
+  ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUNit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20)  and householdUNit <= 600 ] ]
+
+  resetHouseholdUnit
+  ;;
+
+
+
 
   reset-ticks
 end
@@ -306,6 +314,12 @@ end
 
 to calculatedailyrisk
   set dailyrisk ( riskofDeath / Illness_period )
+end
+
+to resethouseholdUnit
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ]
+  ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [ set householdUnit random 600 + 400 ] ]
+
 end
 
 
@@ -1314,7 +1328,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+85.0
 .5
 1
 NIL
@@ -1329,7 +1343,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+85.0
 .5
 1
 NIL
