@@ -201,6 +201,7 @@ to setup
         set EssentialWorkerFlag 100
         if agerange >= 18 and agerange < 70 [ set essentialWorkerFlag random 100 ]
         setASFlag
+        iterateAsymptomAge
 
        ]]
 
@@ -238,18 +239,14 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
 
   ;; setting households up
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ]
-  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ]
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ]
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
+  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household UNits that don;t include young children or teenagers
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ] ;; allocates up to two adults per household
+  ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20) and householdUnit <= 600 ] ]
+  ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
-  ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUNit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20)  and householdUNit <= 600 ] ]
-
-  resetHouseholdUnit
-  ;;
-
-
-
-
+  resetHouseholdUnit ;; iterates this process
+    ;;
   reset-ticks
 end
 
@@ -317,9 +314,19 @@ to calculatedailyrisk
 end
 
 to resethouseholdUnit
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ]
-  ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [ set householdUnit random 600 + 400 ] ]
+  if schoolsPolicy = true [
+    ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 95 > random 100 [
+    set householdUnit random 600 ] ] ;; allows for upo 5% of houses to be sharehouses / care facilities, etc.
+  ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [
+    set householdUnit [ householdUnit ] of one-of simuls with [ count other simuls with [ householdUnit = [ householdUnit ] of myself ] = 0  ]]];; allows for older people in group homes to make up to 7% of housing units
+  ]
+end
 
+to iterateAsymptomAge
+  if schoolsPolicy = true [
+    ask n-of ((count simuls with [ agerange < 19 ] ) * .95) simuls [ set asymptom random asymptomaticPercentage ] ;; places 95% of people under 18 into the asymptomatic category
+    ask n-of ((count simuls with [ agerange > 18 ] ) * .95) simuls [ set asymptom random (asymptomaticPercentage + (100 - AsymptomaticPercentage)) ]
+  ]
 end
 
 
@@ -443,16 +450,16 @@ to settime
 end
 
 to superSpread
-  if count simuls with [ color = red and tracked = 0 ] > 0 and Case_Isolation = false [  if Superspreaders > random 100 [
-    ask n-of (count simuls with [ color = red and tracked = 0  ] / Diffusion_Adjustment) simuls with [ color = red and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
+  if count simuls with [ color = red and tracked = 0 ] > 1 and Case_Isolation = false [  if Superspreaders > random 100 [
+    ask n-of int (count simuls with [ color = red and tracked = 0  ] / Diffusion_Adjustment ) simuls with [ color = red and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
 
-    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of ( count simuls with [ color = yellow ] / Diffusion_Adjustment ) Simuls with [ color = yellow ] [move-to one-of patches with [ pcolor = black ]]]]]]
+    if count simuls with [ color = yellow ] >= Diffusion_Adjustment [ ask n-of int ( count simuls with [ color = yellow ] / Diffusion_Adjustment ) Simuls with [ color = yellow ] [move-to one-of patches with [ pcolor = black ]]]]]]
 
   if count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] > Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
-    ask n-of (count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] / Diffusion_Adjustment) simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
+    ask n-of int (count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] / Diffusion_Adjustment ) simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] [move-to one-of patches with [ pcolor = black ]
 
 
-  if count simuls with [ color = yellow ] >= 0 [ ask n-of (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
+  if count simuls with [ color = yellow ] >= 1 [ ask n-of int (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
       [move-to one-of patches with [ pcolor = black ]]]]]] ;; this ensures that people with immunity also move to new areas, not just infected people
 end
 
@@ -1105,7 +1112,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1199,7 +1206,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.0
 .05
 1
 NIL
@@ -1397,7 +1404,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -2002,7 +2009,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-0
+1
 1
 -1000
 
@@ -2013,7 +2020,7 @@ SWITCH
 163
 freewheel
 freewheel
-1
+0
 1
 -1000
 
@@ -2511,7 +2518,7 @@ SWITCH
 416
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2544,6 +2551,28 @@ Mask_Efficacy
 1
 NIL
 HORIZONTAL
+
+SWITCH
+344
+169
+503
+202
+schoolsPolicy
+schoolsPolicy
+0
+1
+-1000
+
+MONITOR
+511
+156
+583
+201
+Household
+mean [ householdUnit ] of simuls
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
