@@ -324,8 +324,9 @@ end
 
 to iterateAsymptomAge
   if schoolsPolicy = true [
-    ask n-of ((count simuls with [ agerange < 19 ] ) * .95) simuls [ set asymptom random asymptomaticPercentage ] ;; places 95% of people under 18 into the asymptomatic category
-    ask n-of ((count simuls with [ agerange > 18 ] ) * .95) simuls [ set asymptom random (asymptomaticPercentage + (100 - AsymptomaticPercentage)) ]
+    ask n-of ((count simuls with [ agerange < 19 ] ) * .95) simuls with [ agerange <= 18 ] [ set asymptom random asymptomaticPercentage ] ;; places 95% of people under 18 into the asymptomatic category
+    ask n-of ((count simuls with [ agerange < 19 ] ) * .95) simuls with [ agerange > 18 ] [ set asymptom random (asymptomaticPercentage ) + (100 - AsymptomaticPercentage) ] ;; takes older people out of the asymptomatic category
+    ;and puts them in the symptomatic category whiile keeping total percentages consistent with slider
   ]
 end
 
@@ -1855,7 +1856,7 @@ SWITCH
 984
 scale
 scale
-0
+1
 1
 -1000
 
@@ -2559,20 +2560,38 @@ SWITCH
 202
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
 MONITOR
-511
-156
-583
-201
+509
+163
+581
+208
 Household
 mean [ householdUnit ] of simuls
 1
 1
 11
+
+PLOT
+2238
+123
+2518
+273
+Infections by age range
+NIL
+NIL
+0.0
+100.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "Histogram [ agerange ] of simuls with [ color = yellow  ]"
 
 @#$#@#$#@
 ## WHAT IS IT?
