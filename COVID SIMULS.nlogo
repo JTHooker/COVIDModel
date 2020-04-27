@@ -1122,7 +1122,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1216,7 +1216,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.1
+0.25
 .05
 1
 NIL
@@ -1345,7 +1345,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -1360,7 +1360,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -1414,7 +1414,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -1512,7 +1512,7 @@ INPUTBOX
 302
 503
 current_cases
-5.0
+2.0
 1
 0
 Number
@@ -1729,7 +1729,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2019,7 +2019,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2528,7 +2528,7 @@ SWITCH
 416
 tracking
 tracking
-1
+0
 1
 -1000
 
