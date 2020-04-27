@@ -248,6 +248,7 @@ to setup
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
   resetHouseholdUnit ;; iterates this process
+  set tracking false
     ;;
   reset-ticks
 end
@@ -441,10 +442,10 @@ ask simuls [
 
       [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ])]
 
-if schoolsPolicy = true [ ask simuls [
-     ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and studentFlag = 1 [
+  if freewheel = false and schoolsPolicy = true and ticks >= triggerday and policyTriggerOn = true [ ask simuls with [ studentFlag = 1 ] [
+     ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation  [
       if any? other simuls-here with [ essentialworkerflag != 1 or householdUnit != [ householdUnit ] of myself or studentFlag != 1 ]  [
-        if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100  [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are a student, you avoif everyone you can except for essential workers (i.e., teachers) and otherr students
+        if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100 [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are a student, you avoid everyone you can except for essential workers (i.e., teachers) and otherr students
    ;; and people from your own household
       [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]]
 ]
@@ -554,7 +555,7 @@ to TriggerActionIsolation
     if triggerday - ticks < 14 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true
        set Proportion_People_Avoid 0 + (( PPA ) / (triggerday - ticks)) set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 1 week out from implementation
     ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ] [ set Spatial_Distance False set Case_Isolation False ]
-  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false ] ]
+  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false set schoolsPolicy false ] ]
 end
 
 to spend
@@ -1345,7 +1346,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+85.0
 .5
 1
 NIL
@@ -1360,7 +1361,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+85.0
 .5
 1
 NIL
@@ -2429,7 +2430,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-32.2
+42.0
 1
 1
 NIL
@@ -2528,7 +2529,7 @@ SWITCH
 416
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -4063,7 +4064,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="32.2"/>
+      <value value="42"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
