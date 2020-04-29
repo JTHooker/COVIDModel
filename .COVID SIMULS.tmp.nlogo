@@ -148,7 +148,7 @@ resources-own [
 
 to setup
 
-  random-seed  100 ;; for use in setting random nuber generator seeds
+ ;; random-seed  100 ;; for use in setting random nuber generator seeds
 
   clear-all
   import-drawing "Background1.png" ;; imports MSD image
@@ -199,7 +199,7 @@ to setup
         set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
 
         set asymptom random 100
-        set EssentialWorkerFlag r100
+        set EssentialWorkerFlag random 100
         if agerange >= 18 and agerange < 70 [ set essentialWorkerFlag random 100 ]
         setASFlag
         iterateAsymptomAge
@@ -822,7 +822,7 @@ to setASFlag
 end
 
 to traceme
-  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency < random-float 1 [ set tracked 1 ] ]
+  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency  random-float 1 [ set tracked 1 ] ]
   if color != red [ set tracked 0 ]
 end
 
@@ -1517,7 +1517,7 @@ INPUTBOX
 302
 503
 current_cases
-2.0
+5.0
 1
 0
 Number
@@ -4230,7 +4230,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace" repetitions="15" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="450"/>
@@ -4371,7 +4371,7 @@ NetLogo 6.1.0
       <value value="55000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="current_cases">
-      <value value="2"/>
+      <value value="5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
