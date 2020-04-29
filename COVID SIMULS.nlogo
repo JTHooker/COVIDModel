@@ -4230,7 +4230,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace" repetitions="15" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="450"/>

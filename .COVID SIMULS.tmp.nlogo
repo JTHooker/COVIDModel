@@ -822,7 +822,7 @@ to setASFlag
 end
 
 to traceme
-  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency  random-float 1 [ set tracked 1 ] ]
+  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ]
   if color != red [ set tracked 0 ]
 end
 
@@ -4230,7 +4230,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace" repetitions="15" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="450"/>
