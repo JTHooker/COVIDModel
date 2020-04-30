@@ -432,7 +432,7 @@ to move ;; describes the circumstances under which people can move and infect on
 end
 
 to isolation
-  if  ownCompliancewithIsolation > random 100 and tracked = 1 [
+  if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
     move-to patch-here set pace 0 ]
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
@@ -4305,9 +4305,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Track_and_Trace_Efficiency">
       <value value="0.25"/>
-      <value value="0.3125"/>
-      <value value="0.375"/>
-      <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="App_Uptake">
       <value value="0"/>
@@ -4486,6 +4483,12 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="AssignAppEss">
       <value value="false"/>
       <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TTIncrease">
+      <value value="1"/>
+      <value value="1.33"/>
+      <value value="1.66"/>
+      <value value="2"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
