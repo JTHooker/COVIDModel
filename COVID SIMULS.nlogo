@@ -431,14 +431,6 @@ to move ;; describes the circumstances under which people can move and infect on
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
 
-to isolation
-  if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
-    move-to patch-here set pace 0 ]
-
-  ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
-  ;; it enables the user to see how much difference an effective track and trace system might mack to spread
-
-end
 
 to avoid ;; need to include school-aged kids in here, now
 ask simuls [
@@ -764,6 +756,19 @@ to calculateEliminationDate
   if ticks > 1 and count simuls with [ color = red ] = 0 and eliminationDate = 0 [ set eliminationDate ticks ]
 end
 
+
+;;;;; *****TRACKING AND TRACING FUNCTIONS*********;;;;;;;;;
+
+
+to isolation
+  if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
+    move-to patch-here set pace 0 ]
+
+  ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
+  ;; it enables the user to see how much difference an effective track and trace system might mack to spread
+
+end
+
 to assesslinks
   if link_switch = true [ ask simuls with [ color = red ] [ if any? other simuls-here [ create-red-links-to other simuls-here ] ]
   ask simuls with [ haveApp <= App_Uptake ] [ ask my-out-links [ set color blue ] ]
@@ -776,11 +781,18 @@ end
 
 to hunt ;; this specifically uses the app to trace people
  if link_switch = true [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and color = 85 and count my-in-links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-in-links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]
   if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
+
+to traceme
+  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
+end
+
+;;;;;;*********END OF TTI FUNCTIONS*******;;;;;;;;;;;;;
+
 
 to calculateCarefactor
   set newv ( ( saliencyMessage * SaliencyExperience ) * (( vmax - initialassociationstrength ) * ( Careattitude * selfCapacity )))   ;; experience can be fear ;; we can analyse who got infected - vulnerable communities
@@ -841,10 +853,6 @@ to setASFlag
   if asymptom <= asymptomaticPercentage [ set AsymptomaticFlag 1  ]
 end
 
-to traceme
-  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ]
-   if color != red [ set tracked 0 ]
-end
 
 to OSCase
   if policytriggeron = true [
@@ -2532,7 +2540,7 @@ App_Uptake
 App_Uptake
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -2654,7 +2662,7 @@ TTIncrease
 TTIncrease
 0
 5
-3.54
+2.0
 .01
 1
 NIL
@@ -4305,9 +4313,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="Track_and_Trace_Efficiency">
       <value value="0.25"/>
-      <value value="0.3125"/>
-      <value value="0.375"/>
-      <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="App_Uptake">
       <value value="0"/>
@@ -4486,6 +4491,12 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="AssignAppEss">
       <value value="false"/>
       <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TTIncrease">
+      <value value="1"/>
+      <value value="1.33"/>
+      <value value="1.66"/>
+      <value value="2"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
