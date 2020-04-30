@@ -784,13 +784,11 @@ to hunt ;; this specifically uses the app to trace people
     if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-in-links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]
-  if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
+
 end
 
 to traceme
   if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
-   if color != red [ set tracked 0 ]
-
 end
 
 ;;;;;;*********END OF TTI FUNCTIONS*******;;;;;;;;;;;;;
