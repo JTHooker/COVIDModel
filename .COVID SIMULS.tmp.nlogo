@@ -246,7 +246,7 @@ to setup
   ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household UNits that don;t include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ] ;; allocates up to two adults per household
   ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20) and householdUnit <= 600 ] set studentFlag 1  ] ;; Identifies students
-  ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
+ ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
   resetHouseholdUnit ;; iterates this process
  ;; set tracking false
@@ -429,8 +429,8 @@ to isolation
   if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [
     move-to patch-here set pace 0 ]
 
-    ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
-    ;; it enables the user to see how much difference an effective track and trace system might mack to spread
+  ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
+  ;; it enables the user to see how much difference an effective track and trace system might mack to spread
 
 end
 
@@ -449,9 +449,11 @@ ask simuls [
   if policyTriggerOn = true and freewheel = false and schoolsPolicy = true and ticks >= triggerday [ ask simuls with [ studentFlag = 1 ] [
      ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation  [
       if any? other simuls-here with [ essentialworkerflag != 1 or householdUnit != [ householdUnit ] of myself or studentFlag != 1 ]  [
-        if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100 [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are a student, you avoid everyone you can except for essential workers (i.e., teachers) and otherr students
+        if any? neighbors with [ utilisation = 0 ] and Ess_W_Risk_Reduction > random 100 [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are a student, you avoid everyone you can except for essential workers (i.e., teachers),  other students
    ;; and people from your own household
-      [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ]]
+   ;;   [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ] ;; just testing this to see if it creates more interaction among households and students
+    [ move-to one-of simuls with [ essentialworkerflag = 1 or householdUnit = [ householdUnit ] of myself or studentFlag = 1 ]]
+    ]
 ]
 
 end
@@ -757,9 +759,18 @@ to calculateEliminationDate
 end
 
 to assesslinks
-  if link_switch = true [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ]
+  ifelse link_switch = true [ ask simuls with [ color = red and haveApp = 1 ] [ create-links-to other simuls-here] ] [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ] ;; the person must be infected
+  ;;and must also have the app if the link switch is on, else it just links to everyone even if you don't have the app;; the person has to start linking from day zero but only accesses the links from the day of tracking
   ask links [ set color red ]
-  ask simuls with [ color != red ] [ ask my-out-links [ die ] ]
+  ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;;means that if you recover, the links die because they are no longer relevant
+end
+
+to hunt ;; this specifically uses the app to trace people
+ if link_switch = true [
+    if Track_and_Trace_Efficiency > random-float 1 and count my-in-links > 0 and haveApp < App_Uptake link-with     [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+  if hunted = 1 [ set tracked 1 ]
+  ]
+  if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
 
 to calculateCarefactor
@@ -847,14 +858,6 @@ to seedcases
   if freewheel = false [
     if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
   ]
-end
-
-to hunt ;; this specifically
- if link_switch = true [
-    if Track_and_Trace_Efficiency > random-float 1 and count my-in-links > 0 and haveApp < App_Uptake [ set hunted 1 ]
-  if hunted = 1 [ set tracked 1 ]
-  ]
-  if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
 
 to turnOnTracking
@@ -1127,7 +1130,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1221,7 +1224,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.5
+0.25
 .05
 1
 NIL
@@ -1419,7 +1422,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -1517,7 +1520,7 @@ INPUTBOX
 302
 503
 current_cases
-5.0
+2.0
 1
 0
 Number
@@ -1870,7 +1873,7 @@ SWITCH
 984
 scale
 scale
-1
+0
 1
 -1000
 
@@ -2024,7 +2027,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2183,7 +2186,7 @@ SWITCH
 1099
 link_switch
 link_switch
-0
+1
 1
 -1000
 
