@@ -432,7 +432,7 @@ to move ;; describes the circumstances under which people can move and infect on
 end
 
 to isolation
-  if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [
+  if  ownCompliancewithIsolation > random 100 and tracked = 1 [
     move-to patch-here set pace 0 ]
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
@@ -765,13 +765,12 @@ to calculateEliminationDate
 end
 
 to assesslinks
-  if link_switch = true [ ask simuls with [ color = red ] [ if any? other simuls-here [ create-red-links-to other simuls-here ]]
+  if link_switch = true [ ask simuls with [ color = red ] [ if any? other simuls-here [ create-red-links-to other simuls-here ] ]
   ask simuls with [ haveApp <= App_Uptake ] [ ask my-out-links [ set color blue ] ]
   ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; potentially redundant
 
-
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
-  ask simuls with [ color = yellow ] [ ask my-in-links [ die ]  ] ;; asks all links going to the recovered agent to die
+  ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
   ]
 end
 
@@ -2654,8 +2653,8 @@ SLIDER
 TTIncrease
 TTIncrease
 0
-2
-2.0
+5
+3.54
 .01
 1
 NIL
