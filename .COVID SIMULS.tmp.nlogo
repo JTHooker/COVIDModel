@@ -84,6 +84,9 @@ breed [ resources resource ]
 breed [ medresources medresource ] ;; people living in the city
 breed [ packages package ]
 
+directed-link-breed [red-links red-link]
+
+
 simuls-own [
   timenow ;; the number of days since initial infection
   health ;; baseline health of the individual
@@ -172,7 +175,7 @@ to setup
   set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
   set SComp sqrt BetaCompliance
 
-
+  ask red-links [ set color red ]
 ;; sets color of patches to black
   ask patches [ set pcolor black  ]
 
@@ -340,8 +343,11 @@ end
 
 to assignApptoEssential
   if AssignAppEss = true [
-    ask n-of ( count simuls with [ essentialWorkerFlag = 1 ] * eWAppUptake ) simuls with [ essentialWorkerFlag = 1 ] [ set haveApp (random App_Uptake)]]
+    ask n-of ( count simuls with [ essentialWorkerFlag = 1 ] * eWAppUptake ) simuls with [ essentialWorkerFlag = 1 ] [ set haveApp (random App_Uptake)]] ;; assigns the app to a proportion of essential workers determined by EWAppUptake
 end
+
+
+
 
 to go ;; these funtions get called each time-step
   ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID hunt ] ;
@@ -759,15 +765,19 @@ to calculateEliminationDate
 end
 
 to assesslinks
-  ifelse link_switch = true [ ask simuls with [ color = red and haveApp  1 ] [ create-links-to other simuls-here] ] [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ] ;; the person must be infected
-  ;;and must also have the app if the link switch is on, else it just links to everyone even if you don't have the app;; the person has to start linking from day zero but only accesses the links from the day of tracking
-  ask links [ set color red ]
-  ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;;means that if you recover, the links die because they are no longer relevant
+  if link_switch = true [ ask simuls with [ color = red ] [ if any? other simuls-here [ create-red-links-to other simuls-here ]]
+  ask simuls with [ haveApp <= App_Uptake ] [ ask my-out-links [ set color blue ] ]
+  ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; potentially redundant
+
+
+  ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
+  ask simuls with [ color = yellow ] [ ask my-in-links [ die ]  ] ;; asks all links going to the recovered agent to die
+  ]
 end
 
 to hunt ;; this specifically uses the app to trace people
  if link_switch = true [
-    if Track_and_Trace_Efficiency > random-float 1 and count my-in-links > 0 and haveApp < App_Uptake and link-with one-of simuls with [ tracked = 1 ] = true  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and color = 85 and count my-in-links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]
   if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
@@ -834,7 +844,7 @@ end
 
 to traceme
   if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ]
-  if color != red [ set tracked 0 ]
+   if color != red [ set tracked 0 ]
 end
 
 to OSCase
@@ -1520,7 +1530,7 @@ INPUTBOX
 302
 503
 current_cases
-2.0
+5.0
 1
 0
 Number
@@ -1835,9 +1845,9 @@ Number
 
 MONITOR
 1400
-987
+983
 1485
-1032
+1028
 Mean income
 mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != black ]
 0
@@ -1845,10 +1855,10 @@ mean [ income ] of simuls with [ agerange > 18 and agerange < 70 and color != bl
 11
 
 MONITOR
-1492
-987
-1592
-1032
+1493
+983
+1593
+1028
 Mean Expenses
 mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color != black ]
 0
@@ -2027,7 +2037,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-0
+1
 1
 -1000
 
@@ -2180,10 +2190,10 @@ count links / count simuls with [ color = red ]
 12
 
 SWITCH
-1402
-1066
-1516
-1099
+1400
+1035
+1514
+1068
 link_switch
 link_switch
 0
@@ -2523,7 +2533,7 @@ App_Uptake
 App_Uptake
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -2617,7 +2627,7 @@ SWITCH
 933
 AssignAppEss
 AssignAppEss
-0
+1
 1
 -1000
 
@@ -2635,6 +2645,32 @@ eWAppUptake
 1
 NIL
 HORIZONTAL
+
+SLIDER
+343
+132
+506
+167
+TTIncrease
+TTIncrease
+0
+2
+2.0
+.01
+1
+NIL
+HORIZONTAL
+
+MONITOR
+1400
+1070
+1516
+1116
+Link Proportion
+count links with [ color = blue ] / count links with [ color = red ]
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -4233,7 +4269,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace" repetitions="15" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="450"/>
