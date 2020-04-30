@@ -759,7 +759,7 @@ to calculateEliminationDate
 end
 
 to assesslinks
-  ifelse link_switch = true [ ask simuls with [ color = red and haveApp = 1 ] [ create-links-to other simuls-here] ] [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ] ;; the person must be infected
+  ifelse link_switch = true [ ask simuls with [ color = red and haveApp < App_Uptake ] [ create-links-to other simuls-here] ] [ ask simuls with [ color = red ] [ create-links-to other simuls-here] ] ;; the person must be infected
   ;;and must also have the app if the link switch is on, else it just links to everyone even if you don't have the app;; the person has to start linking from day zero but only accesses the links from the day of tracking
   ask links [ set color red ]
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;;means that if you recover, the links die because they are no longer relevant
@@ -1130,7 +1130,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1422,7 +1422,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1873,7 +1873,7 @@ SWITCH
 984
 scale
 scale
-0
+1
 1
 -1000
 
@@ -2186,7 +2186,7 @@ SWITCH
 1099
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2523,7 +2523,7 @@ App_Uptake
 App_Uptake
 0
 100
-60.0
+20.0
 1
 1
 NIL
