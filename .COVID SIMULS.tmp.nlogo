@@ -674,7 +674,7 @@ to scaledown
 end
 
 to scaledownhatch
-  if count simuls > Population [  ask n-of 10 simuls with [ color != red and color != black ] [ die ] ]
+  if count simuls > Population [  ask n-of (count simuls - 2500) simuls with [ color != red and color != black ] [ die ] ]
 end
 
 to forwardTime
@@ -777,11 +777,12 @@ to assesslinks
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
   ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
   ]
+
 end
 
 to hunt ;; this specifically uses the app to trace people
  if link_switch = true [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-in-links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my--links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]
 
@@ -789,6 +790,8 @@ end
 
 to traceme
   if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
+   if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
+
 end
 
 ;;;;;;*********END OF TTI FUNCTIONS*******;;;;;;;;;;;;;
@@ -1147,7 +1150,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1537,7 +1540,7 @@ INPUTBOX
 302
 503
 current_cases
-5.0
+0.0
 1
 0
 Number
@@ -1785,7 +1788,7 @@ SWITCH
 785
 stimulus
 stimulus
-0
+1
 1
 -1000
 
@@ -1796,7 +1799,7 @@ SWITCH
 828
 cruise
 cruise
-1
+0
 1
 -1000
 
@@ -1890,7 +1893,7 @@ SWITCH
 984
 scale
 scale
-1
+0
 1
 -1000
 
@@ -2055,7 +2058,7 @@ SWITCH
 163
 freewheel
 freewheel
-1
+0
 1
 -1000
 
@@ -2540,7 +2543,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -2662,7 +2665,7 @@ TTIncrease
 TTIncrease
 0
 5
-2.0
+4.0
 .01
 1
 NIL
@@ -4276,10 +4279,10 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace" repetitions="15" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace 20 40 60 uptake half time" repetitions="15" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="450"/>
+    <timeLimit steps="400"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -4493,9 +4496,6 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TTIncrease">
-      <value value="1"/>
-      <value value="1.33"/>
-      <value value="1.66"/>
       <value value="2"/>
     </enumeratedValueSet>
   </experiment>
