@@ -782,7 +782,7 @@ end
 
 to hunt ;; this specifically uses the app to trace people
  if link_switch = true [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my--links > 0 and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count  and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]
 
