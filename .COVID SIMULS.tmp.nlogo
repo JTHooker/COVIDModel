@@ -39,6 +39,8 @@ globals [
   cumulativeInfected
   scaledPopulation
   MeanR
+  EWInfections
+  StudentInfections
 
 
   ;; log transform illness period variables
@@ -346,9 +348,6 @@ to assignApptoEssential
     ask n-of ( count simuls with [ essentialWorkerFlag = 1 ] * eWAppUptake ) simuls with [ essentialWorkerFlag = 1 ] [ set haveApp (random App_Uptake)]] ;; assigns the app to a proportion of essential workers determined by EWAppUptake
 end
 
-
-
-
 to go ;; these funtions get called each time-step
   ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID hunt ] ;
   ask medresources [ allocatebed ]
@@ -391,6 +390,8 @@ to go ;; these funtions get called each time-step
   seedCases
   avoid
   turnOnTracking
+  countEWInfections
+  countSchoolInfections
   ask patches [ checkutilisation ]
   tick
 
@@ -781,10 +782,10 @@ to assesslinks
 end
 
 to hunt ;; this specifically uses the app to trace people
- if link_switch = true [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count  and haveApp <= App_Uptake and link-with one-of simuls with [ tracked = 1 ] != false  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+  if link_switch = true [ let trackedsimuls simuls with [ tracked = 1 ]
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links != 0 and haveApp <= App_Uptake and link-with one-of trackedsimuls = true  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
-  ]
+  ]  ;; and link-with one-of simuls with [ tracked = 1 ] = true
 
 end
 
@@ -883,10 +884,30 @@ end
 to turnOnTracking
   if freewheel != true [
   if policyTriggerOn = true and ticks >= triggerday [
-    set tracking true ]
+    set tracking true set link_switch true ]
   ;;if policyTriggerOn = false [ set tracking false ]
   ]
 end
+
+to countEWInfections
+   let EWInfects (count simuls with [ color = yellow and EssentialWorkerFlag = 1 ] )
+   if Scalephase = 0 [ set EWInfections EWInfects ]
+  if Scalephase = 1 [ set EWInfections EWInfects  * 10 ]
+  if Scalephase = 2 [ set EWInfections EWInfects  * 100 ]
+  if Scalephase = 3 [ set EWInfections EWInfects  * 1000 ]
+  if Scalephase = 4 [ set EWInfections EWInfects  * 10000 ]
+end
+
+
+to countSchoolInfections
+   let sInfects ( count simuls with [ color = yellow and StudentFlag = 1 ] )
+   if Scalephase = 0 [ set schoolInfections schoolInfects ]
+   if Scalephase = 1 [ set schoolInfections schoolInfects * 10 ]
+   if Scalephase = 2 [ set schoolInfections schoolInfects * 100 ]
+   if Scalephase = 3 [ set schoolInfections schoolInfects * 1000 ]
+   if Scalephase = 4 [ set schoolInfections schoolInfects * 10000 ]
+end
+
 
 
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
@@ -1150,7 +1171,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2058,7 +2079,7 @@ SWITCH
 163
 freewheel
 freewheel
-0
+1
 1
 -1000
 
@@ -2206,7 +2227,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2543,7 +2564,7 @@ App_Uptake
 App_Uptake
 0
 100
-50.0
+40.0
 1
 1
 NIL
@@ -2665,7 +2686,7 @@ TTIncrease
 TTIncrease
 0
 5
-4.0
+0.61
 .01
 1
 NIL
@@ -2678,6 +2699,28 @@ MONITOR
 1116
 Link Proportion
 count links with [ color = blue ] / count links with [ color = red ]
+1
+1
+11
+
+MONITOR
+2238
+280
+2370
+326
+EW Infection %
+EWInfections / 2500
+1
+1
+11
+
+MONITOR
+2239
+330
+2372
+376
+Student Infections %
+SchoolInfections / 2500
 1
 1
 11
@@ -4282,7 +4325,7 @@ NetLogo 6.1.0
   <experiment name="Australia Schools Track and Trace 20 40 60 uptake half time" repetitions="15" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="400"/>
+    <timeLimit steps="365"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -4293,6 +4336,8 @@ NetLogo 6.1.0
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
     <metric>MeanR</metric>
+    <metric>StudentInfections / total_Population</metric>
+    <metric>EWInfections / total_Population</metric>
     <enumeratedValueSet variable="maxv">
       <value value="1"/>
     </enumeratedValueSet>
@@ -4339,7 +4384,7 @@ NetLogo 6.1.0
       <value value="72"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="lockdown_off">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_incubation">
       <value value="0.2"/>
@@ -4429,7 +4474,7 @@ NetLogo 6.1.0
       <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="scale">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_illnesspd">
       <value value="1"/>
@@ -4466,6 +4511,7 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="policytriggeron">
       <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
       <value value="5"/>
@@ -4496,7 +4542,9 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TTIncrease">
+      <value value="1"/>
       <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
