@@ -443,7 +443,7 @@ ask simuls [
         if any? other simuls-here [ if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100  [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are an essential worker, you can only reduce your
       ;;contacts when you are not at work assuming 8 hours work, 8 hours rest, 8 hours recreation - rest doesn't count for anyone, hence it is set at 50 on the input slider
 
-      [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ])]
+      [ set heading heading + contact_Radius fd pace avoidICUs  ])]
 
   if policyTriggerOn = true and freewheel = false and schoolsPolicy = true and ticks >= triggerday [ ask simuls with [ studentFlag = 1 ] [
      ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation  [
@@ -763,7 +763,7 @@ end
 
 to isolation
   if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
-    move-to patch-here set pace 0 ]
+     move-to patch-here set pace 0 ]
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
   ;; it enables the user to see how much difference an effective track and trace system might mack to spread
@@ -782,10 +782,11 @@ to assesslinks
 end
 
 to hunt ;; this specifically uses the app to trace people
-  if link_switch = true [ let trackedsimuls simuls with [ tracked = 1 ]
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links != 0 and haveApp <= App_Uptake and link-with one-of trackedsimuls = true  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+  let trackedsimuls simuls with [ tracked = 1 ]
+  if link_switch = true [ ask simuls with [  count my-links > 0 ] [
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and haveApp <= App_Uptake and link-with one-of trackedsimuls = true  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
-  ]  ;; and link-with one-of simuls with [ tracked = 1 ] = true
+  ]]  ;; and link-with one-of simuls with [ tracked = 1 ] = true
 
 end
 
@@ -1014,7 +1015,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1091,7 +1092,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1171,7 +1172,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1394,7 +1395,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+83.11111111111111
 .5
 1
 NIL
@@ -1409,7 +1410,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+83.11111111111111
 .5
 1
 NIL
@@ -1748,7 +1749,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-10.0
+11.0
 1
 1
 NIL
@@ -1778,7 +1779,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
