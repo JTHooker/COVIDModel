@@ -254,7 +254,7 @@ to setup
  ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
   resetHouseholdUnit ;; iterates this process
- ;; set tracking false
+  set tracking false
     ;;
   reset-ticks
 end
@@ -900,12 +900,12 @@ end
 
 
 to countSchoolInfections
-   let sInfects ( count simuls with [ color = yellow and StudentFlag = 1 ] )
-   if Scalephase = 0 [ set schoolInfections schoolInfects ]
-   if Scalephase = 1 [ set schoolInfections schoolInfects * 10 ]
-   if Scalephase = 2 [ set schoolInfections schoolInfects * 100 ]
-   if Scalephase = 3 [ set schoolInfections schoolInfects * 1000 ]
-   if Scalephase = 4 [ set schoolInfections schoolInfects * 10000 ]
+   let studentInfects ( count simuls with [ color = yellow and StudentFlag = 1 ] )
+   if Scalephase = 0 [ set studentInfections studentInfects ]
+   if Scalephase = 1 [ set studentInfections studentInfects * 10 ]
+   if Scalephase = 2 [ set studentInfections studentInfects * 100 ]
+   if Scalephase = 3 [ set studentInfections studentInfects * 1000 ]
+   if Scalephase = 4 [ set studentInfections studentInfects * 10000 ]
 end
 
 
@@ -1463,7 +1463,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -1561,7 +1561,7 @@ INPUTBOX
 302
 503
 current_cases
-0.0
+5.0
 1
 0
 Number
@@ -1809,7 +1809,7 @@ SWITCH
 785
 stimulus
 stimulus
-1
+0
 1
 -1000
 
@@ -1820,7 +1820,7 @@ SWITCH
 828
 cruise
 cruise
-0
+1
 1
 -1000
 
@@ -2068,7 +2068,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2227,7 +2227,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2564,7 +2564,7 @@ App_Uptake
 App_Uptake
 0
 100
-40.0
+0.0
 1
 1
 NIL
@@ -2686,7 +2686,7 @@ TTIncrease
 TTIncrease
 0
 5
-0.61
+1.0
 .01
 1
 NIL
@@ -2720,7 +2720,7 @@ MONITOR
 2372
 376
 Student Infections %
-SchoolInfections / 2500
+studentInfections / 2500
 1
 1
 11
@@ -4510,7 +4510,6 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="policytriggeron">
-      <value value="false"/>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
