@@ -349,20 +349,21 @@ to assignApptoEssential
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed earn financialstress AccessPackage calculateIncomeperday checkICU traceme EssentialWorkerID hunt ] ;
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt ]
+  ; *current excluded functions for reducing processing resources** earn financialstress AccessPackage calculateIncomeperday
   ask medresources [ allocatebed ]
-  ask resources [ deplete replenish resize spin ]
-  ask packages [ absorbshock movepackages ]
+ ;; ask resources [ deplete replenish resize spin ]
+ ;; ask packages [ absorbshock movepackages ]
   finished
   CruiseShip
   GlobalTreat
   Globalanxiety
   SuperSpread
   CountInfected
-  CalculateDailyGrowth
+ ;; CalculateDailyGrowth
   TriggerActionIsolation
   DeployStimulus
-  setInitialReserves
+;;  setInitialReserves
   CalculateAverageContacts
   ScaleUp
   ;;ScaleDown
@@ -763,7 +764,7 @@ end
 
 to isolation
   if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
-     set pace 0 ]
+     move-to patch-here set pace 0 ]
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
   ;; it enables the user to see how much difference an effective track and trace system might mack to spread
@@ -771,7 +772,7 @@ to isolation
 end
 
 to assesslinks
-  if link_switch = true [ ask simuls with [ color = red ] [ if any? other simuls-here [ create-red-links-to other simuls-here ] ]
+  if link_switch = true a[ ask simuls with [ color = red and tracked = 1 ] [ if any? other simuls-here [ create-links-with other simuls-here ] ]
   ask simuls with [ haveApp <= App_Uptake ] [ ask my-out-links [ set color blue ] ]
   ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; potentially redundant
 
@@ -782,11 +783,10 @@ to assesslinks
 end
 
 to hunt ;; this specifically uses the app to trace people
-  let trackedsimuls simuls with [ tracked = 1 ]
-  if link_switch = true [ ask simuls with [  count my-links > 0 ] [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and haveApp <= App_Uptake and link-with one-of trackedsimuls = true  [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+  if link_switch = true [
+    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
-  ]]  ;; and link-with one-of simuls with [ tracked = 1 ] = true
+  ]  ;;
 
 end
 
@@ -1015,7 +1015,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1043,7 +1043,7 @@ Speed
 Speed
 0
 5
-0.8
+1.0
 .1
 1
 NIL
@@ -1092,7 +1092,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1395,7 +1395,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-8.5
+85.0
 .5
 1
 NIL
@@ -1410,7 +1410,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-8.5
+85.0
 .5
 1
 NIL
@@ -1749,7 +1749,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-11.0
+10.0
 1
 1
 NIL
@@ -1779,7 +1779,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -1957,7 +1957,7 @@ TEXTBOX
 660
 314
 709
-Days since approximately Jan 15 when first case appeared (Jan 25 reported)
+Days since approximately Jan 16 when first case appeared (Jan 26 reported)
 12
 15.0
 1
@@ -2069,7 +2069,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-0
+1
 1
 -1000
 
@@ -2228,7 +2228,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2565,7 +2565,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+40.0
 1
 1
 NIL
@@ -2578,7 +2578,7 @@ SWITCH
 416
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2656,7 +2656,7 @@ SWITCH
 503
 898
 631
-933
+931
 AssignAppEss
 AssignAppEss
 1
@@ -2667,7 +2667,7 @@ SLIDER
 503
 859
 631
-894
+892
 eWAppUptake
 eWAppUptake
 0
@@ -2682,7 +2682,7 @@ SLIDER
 343
 132
 506
-167
+165
 TTIncrease
 TTIncrease
 0
@@ -2697,7 +2697,7 @@ MONITOR
 1400
 1070
 1516
-1116
+1115
 Link Proportion
 count links with [ color = blue ] / count links with [ color = red ]
 1
@@ -2708,7 +2708,7 @@ MONITOR
 2238
 280
 2370
-326
+325
 EW Infection %
 EWInfections / 2500
 1
@@ -2719,7 +2719,7 @@ MONITOR
 2239
 330
 2372
-376
+375
 Student Infections %
 studentInfections / 2500
 1
@@ -4323,7 +4323,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Australia Schools Track and Trace 20 40 60 uptake half time" repetitions="15" runMetricsEveryStep="true">
+  <experiment name="Australia Schools Track and Trace 20 40 60 uptake half time" repetitions="30" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="365"/>
