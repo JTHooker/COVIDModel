@@ -131,6 +131,7 @@ simuls-own [
   wearsMask ;; for use in determining if the person wears a face mask
   householdUnit ;; the id of the household the person belongs to
   studentFlag ;; identifies if the person is a student or not
+  wearingMask ;; identifies if the person is wearing a mask or not
   ]
 
 Packages-own [
@@ -256,6 +257,8 @@ to setup
   resetHouseholdUnit ;; iterates this process
   set tracking false ;; ensures this is set to false each time the model starts
   set link_switch false ;; ensures this is set to false each timme the model starts
+  set schoolspolicy false ;; ensures that the schools settings don't begin before the policy trigger starts
+  set maskPolicy false ;; that the mask policy doesn't begin before the policy trigger starts
   reset-ticks
 end
 
@@ -349,7 +352,7 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday ] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -401,29 +404,29 @@ end
 to move ;; describes the circumstances under which people can move and infect one another
   if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearsMask < mask_Wearing ] and color = 85 and random 100 > random-normal Mask_Efficacy 10 [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearsMask < mask_Wearing ] and color = 85 and random 100 > random-normal Mask_Efficacy 10 [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 0  ] and color = 85  [
     set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearsMask > mask_Wearing ] and color = 85 [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearsMask > mask_Wearing ] and color = 85  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85  and random 100 >  Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearsMask < mask_Wearing and random 100 > random-normal Mask_Efficacy 10
-  [ set R R + 1 set GlobalR GlobalR + 1 ]
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearsMask < mask_Wearing and random 100 > random-normal Mask_Efficacy 10
-  [ set R R + 1 set GlobalR GlobalR + 1 ]
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
+  [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 1 and random 100 >  Mask_Efficacy
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearsMask > mask_Wearing
-  [ set R R + 1 set GlobalR GlobalR + 1 ]
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearsMask > mask_Wearing
-  [ set R R + 1 set GlobalR GlobalR + 1 ]
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 0
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
 
-  ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
+    ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
 
   if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move aroudn the environment
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
@@ -446,7 +449,7 @@ ask simuls [
 
       [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ])] ;; otherwise just move wherever you like
 
-  if policyTriggerOn = true and freewheel = false and schoolsPolicy = true and ticks >= triggerday [ ask simuls with [ studentFlag = 1 ] [ ;; same thing but specifically targets the movement of students if the schools policy is turned on - that is
+  if policyTriggerOn = true and freewheel = false and schoolsPolicy = true and ticks >= triggerday + SchoolReturnDate [ ask simuls with [ studentFlag = 1 ] [ ;; same thing but specifically targets the movement of students if the schools policy is turned on - that is
     ;;if students are expected to return to school
      ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation  [
       if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself or studentFlag != 1 ]  [ ;; students don't isolate from each other or their household unit
@@ -776,6 +779,12 @@ end
 
 ;;;;;;;;;;;;;; *****TRACKING AND TRACING FUNCTIONS*********;;;;;;;;;
 
+to traceme
+  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
+   if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
+
+end
+
 
 to isolation
   if color = red and ownCompliancewithIsolation > random 100 and tracked = 1 [ ;; tracks people and isolates them even if they are pre incubation period
@@ -786,10 +795,12 @@ to isolation
 
 end
 
-to assesslinks
-  if link_switch = true and any? simuls with [ color = red and tracked = 1 ] [ ask simuls with [ color = red and tracked = 1 ] [ if any? other simuls-here [ create-links-with other simuls-here ] ]
-  ask simuls with [ haveApp <= App_Uptake ] [ ask my-out-links [ set color blue ] ]
-  ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; potentially redundant
+to assesslinks ;; this represents the COVID-Safe or other tracing app function
+  if link_switch = true and any? simuls with [ color = red and tracked = 1 and haveApp <= App_Uptake ] [ ask simuls with [ color = red and tracked = 1 and haveApp <= App_Uptake ]
+    [ if any? other simuls-here [ create-links-with other simuls-here with [ haveapp <= App_Uptake ] ] ] ;; other person must also have the app installed
+    ;; asks tracked simuls who have the app to make links to other simuls who also have the app they are in contact with
+  ask simuls with [ haveApp <= App_Uptake and agerange > 10 ] [ ask my-out-links [ set color blue ] ] ;; Covid-safe app out-links  are set to blue
+  ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; in-links red but if there is an out and in-link it will be grey
 
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
   ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
@@ -805,11 +816,7 @@ to hunt ;; this specifically uses the app to trace people
 
 end
 
-to traceme
-  if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
-   if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 
-end
 
 ;;;;;;;;;;;;*********END OF TTI FUNCTIONS*******;;;;;;;;;;;;;
 
@@ -876,7 +883,8 @@ end
 
 to OSCase
   if policytriggeron = true [
-  if ticks < triggerday + sqrt 30 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ] ]
+  if ticks < triggerday + sqrt 30 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ]
+      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ] ]
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
 
@@ -884,7 +892,8 @@ end
 
 to stopfade
  if freewheel = false [
-  if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+  if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ]
+      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
     ;; prevents cases from dying out in the eraly stage of the trials when few numbers exist
   ]
 end
@@ -904,8 +913,9 @@ to turnOnTracking
   if freewheel != true [ ;; ensures that policies are enacted if their master switches are set to true at the time of the policy switch turning on
   if policyTriggerOn = true and ticks >= triggerday and schoolPolicyActive = true [
       set tracking true set link_switch true set SchoolsPolicy true ]
+
     if policyTriggerOn = true and ticks >= triggerday [
-      set tracking true set link_switch true  ]
+      set tracking true set link_switch true set maskPolicy true ]
   ]
 
 end
@@ -929,6 +939,11 @@ to countSchoolInfections ;; counts infections among school students
    if Scalephase = 4 [ set studentInfections studentInfects * 10000 ]
 end
 
+to checkMask
+  if maskPolicy = true [
+    ifelse wearsMask <= mask_Wearing [ set wearingMask 1 ] [ set wearingMask 0 ] ]
+
+end
 
 
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
@@ -1415,7 +1430,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+42.5
 .5
 1
 NIL
@@ -1430,7 +1445,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+42.5
 .5
 1
 NIL
@@ -2089,7 +2104,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2248,7 +2263,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2499,7 +2514,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-42.0
+40.0
 1
 1
 NIL
@@ -2598,20 +2613,20 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
 SLIDER
-339
-343
-512
-376
+461
+305
+573
+340
 Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -2620,13 +2635,13 @@ HORIZONTAL
 SLIDER
 338
 303
-511
-336
+456
+338
 Mask_Efficacy
 Mask_Efficacy
 0
 100
-0.0
+56.0
 1
 1
 NIL
@@ -2679,7 +2694,7 @@ SWITCH
 931
 AssignAppEss
 AssignAppEss
-0
+1
 1
 -1000
 
@@ -2707,7 +2722,7 @@ TTIncrease
 TTIncrease
 0
 5
-3.0
+1.0
 .01
 1
 NIL
@@ -2754,6 +2769,32 @@ SWITCH
 SchoolPolicyActive
 SchoolPolicyActive
 1
+1
+-1000
+
+SLIDER
+520
+420
+652
+455
+SchoolReturnDate
+SchoolReturnDate
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+340
+342
+450
+377
+MaskPolicy
+MaskPolicy
+0
 1
 -1000
 
@@ -4370,6 +4411,8 @@ NetLogo 6.1.0
     <metric>MeanR</metric>
     <metric>StudentInfections / total_Population</metric>
     <metric>EWInfections / total_Population</metric>
+    <metric>StudentInfections</metric>
+    <metric>EWInfections</metric>
     <enumeratedValueSet variable="maxv">
       <value value="1"/>
     </enumeratedValueSet>
@@ -4561,7 +4604,6 @@ NetLogo 6.1.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="schoolsPolicy">
       <value value="false"/>
-      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="link_switch">
       <value value="true"/>
@@ -4577,6 +4619,10 @@ NetLogo 6.1.0
       <value value="1"/>
       <value value="2"/>
       <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SchoolPolicyActive">
+      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
