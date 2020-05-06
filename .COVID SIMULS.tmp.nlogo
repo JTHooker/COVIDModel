@@ -205,8 +205,8 @@ to setup
         set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
 
         set asymptom random 100
-        set EssentialWorkerFlag random 100
-        if agerange >= 18 and agerange < 70 [ set essentialWorkerFlag random 100 ]
+        set essentialWorker random 100
+        if agerange >= 18 and agerange < 70 [ set essentialWorker random 100 ]
         setASFlag
         iterateAsymptomAge
         resetPersonalVirulence
@@ -410,15 +410,15 @@ to move ;; describes the circumstances under which people can move and infect on
   if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 0  ] and color = 85  [
     set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 >  Mask_Efficacy 10 [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85  and random 100 > random-normal Mask_Efficacy 10 [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85  and random 100 >  Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > random-normal Mask_Efficacy 10
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 1 and random 100 > random-normal Mask_Efficacy 10
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 1 and random 100 >  Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
 
   if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0
@@ -884,7 +884,7 @@ end
 to OSCase
   if policytriggeron = true [
   if ticks < triggerday + sqrt 30 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ]
-      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ] ]
+      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ] ]
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
 
@@ -893,7 +893,7 @@ end
 to stopfade
  if freewheel = false [
   if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ]
-      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; prevents cases from dying out in the eraly stage of the trials when few numbers exist
   ]
 end
@@ -904,7 +904,7 @@ end
 
 to seedcases
   if freewheel = false [
-    if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworkerflag 100 ]]
+    if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding
   ]
 end
@@ -1430,7 +1430,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -1445,7 +1445,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+0.0
 .5
 1
 NIL
@@ -2263,7 +2263,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2523,8 +2523,8 @@ HORIZONTAL
 MONITOR
 1320
 630
-1375
-675
+1376
+676
 A V
 mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
 1
@@ -2613,7 +2613,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2694,7 +2694,7 @@ SWITCH
 931
 AssignAppEss
 AssignAppEss
-1
+0
 1
 -1000
 
@@ -2722,7 +2722,7 @@ TTIncrease
 TTIncrease
 0
 5
-1.0
+3.0
 .01
 1
 NIL
@@ -2794,7 +2794,7 @@ SWITCH
 377
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -4409,8 +4409,6 @@ NetLogo 6.1.0
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
     <metric>MeanR</metric>
-    <metric>StudentInfections / total_Population</metric>
-    <metric>EWInfections / total_Population</metric>
     <metric>StudentInfections</metric>
     <metric>EWInfections</metric>
     <enumeratedValueSet variable="maxv">
@@ -4621,6 +4619,10 @@ NetLogo 6.1.0
       <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="SchoolPolicyActive">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maskPolicy">
       <value value="true"/>
       <value value="false"/>
     </enumeratedValueSet>
