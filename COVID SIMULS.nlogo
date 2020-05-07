@@ -464,7 +464,7 @@ end
 
 to finished
   if freewheel = true [ ;; stops the model if the following criteria are met - no more infected people in the simulation and it has run for at least 10 days
-    if ticks > 10 and count simuls with [ color = red ] = 0  [ stop ]
+    if ticks > 100 and count simuls with [ color = red ] = 0  [ stop ]
    ]
 end
 
@@ -939,7 +939,7 @@ to countSchoolInfections ;; counts infections among school students
    if Scalephase = 4 [ set studentInfections studentInfects * 10000 ]
 end
 
-to checkMask
+to checkMask ;; identifies people who waear a mask
   if maskPolicy = true [
     ifelse wearsMask <= mask_Wearing [ set wearingMask 1 ] [ set wearingMask 0 ] ]
 
@@ -2115,7 +2115,7 @@ SWITCH
 163
 freewheel
 freewheel
-1
+0
 1
 -1000
 
@@ -2524,7 +2524,7 @@ MONITOR
 1320
 630
 1376
-676
+675
 A V
 mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
 1
@@ -2621,7 +2621,7 @@ SLIDER
 461
 305
 573
-340
+338
 Mask_Wearing
 Mask_Wearing
 0
@@ -2636,7 +2636,7 @@ SLIDER
 338
 303
 456
-338
+336
 Mask_Efficacy
 Mask_Efficacy
 0
@@ -2651,7 +2651,7 @@ SWITCH
 342
 383
 464
-418
+416
 schoolsPolicy
 schoolsPolicy
 1
@@ -2765,7 +2765,7 @@ SWITCH
 469
 383
 621
-418
+416
 SchoolPolicyActive
 SchoolPolicyActive
 1
@@ -2776,7 +2776,7 @@ SLIDER
 520
 420
 652
-455
+453
 SchoolReturnDate
 SchoolReturnDate
 0
@@ -2791,10 +2791,10 @@ SWITCH
 340
 342
 450
-377
+375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
