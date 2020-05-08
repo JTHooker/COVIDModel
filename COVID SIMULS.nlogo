@@ -701,9 +701,9 @@ end
 To Unlock ;; reverses the initiation of social distancing and isolation policies over time. Recognises that the policies are interpreted and adherence is not binary.
   ;;Adherence to policies is associated with a negative exponential curve linked to the current day and the number of days until the policies are due to be relaxed at which point they are relaxed fully.
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_People_Avoid PPA - ( PPA / ( timeLockdownOff - ticks ))  ]
+    set Proportion_People_Avoid PPA - (( PPA * residualCaution ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - ( PTA / ( timeLockdownOff - ticks )) ]
+    set Proportion_Time_Avoid PTA - (( PTA * residualCaution ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
@@ -1430,7 +1430,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+42.5
 .5
 1
 NIL
@@ -1445,7 +1445,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+42.5
 .5
 1
 NIL
@@ -2115,7 +2115,7 @@ SWITCH
 163
 freewheel
 freewheel
-0
+1
 1
 -1000
 
@@ -2263,7 +2263,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2613,7 +2613,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2659,10 +2659,10 @@ schoolsPolicy
 -1000
 
 MONITOR
-509
-163
-581
-208
+511
+130
+583
+175
 Household
 mean [ householdUnit ] of simuls
 1
@@ -2797,6 +2797,21 @@ MaskPolicy
 0
 1
 -1000
+
+SLIDER
+529
+179
+702
+214
+ResidualCaution
+ResidualCaution
+0
+1
+0.5
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
