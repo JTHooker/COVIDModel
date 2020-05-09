@@ -259,6 +259,7 @@ to setup
   set link_switch false ;; ensures this is set to false each timme the model starts
   set schoolspolicy false ;; ensures that the schools settings don't begin before the policy trigger starts
   set maskPolicy false ;; that the mask policy doesn't begin before the policy trigger starts
+  set assignAppEss false ;; that the assigning the App to EssentialWorkers doesn't begin before the policy trigger starts
   reset-ticks
 end
 
@@ -703,7 +704,7 @@ To Unlock ;; reverses the initiation of social distancing and isolation policies
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_People_Avoid PPA - (( PPA * residualCaution ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - (( PTA * residualCaution ) / ( timeLockdownOff - ticks )) ]
+    set Proportion_Time_Avoid PTA - (( PTA * residualCaution ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
@@ -915,13 +916,13 @@ to turnOnTracking
       set tracking true set link_switch true set SchoolsPolicy true ]
 
     if policyTriggerOn = true and ticks >= triggerday [
-      set tracking true set link_switch true set maskPolicy true ]
+      set tracking true set link_switch true set maskPolicy true set assignAppEss true ]
   ]
 
 end
 
 to countEWInfections ;; counts infections among Essential workers
-  let EWInfects (count simuls with [ color = yellow and EssentialWorkerFlag = 1 ] )
+  let EWInfects (count simuls with [ color =  and EssentialWorkerFlag = 1 ] )
   if Scalephase = 0 [ set EWInfections EWInfects ]
   if Scalephase = 1 [ set EWInfections EWInfects  * 10 ]
   if Scalephase = 2 [ set EWInfections EWInfects  * 100 ]
@@ -1430,7 +1431,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-42.5
+85.0
 .5
 1
 NIL
@@ -1445,7 +1446,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-42.5
+85.0
 .5
 1
 NIL
@@ -2263,7 +2264,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2613,7 +2614,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2694,7 +2695,7 @@ SWITCH
 931
 AssignAppEss
 AssignAppEss
-0
+1
 1
 -1000
 
@@ -2794,7 +2795,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -4484,7 +4485,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="42"/>
+      <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
