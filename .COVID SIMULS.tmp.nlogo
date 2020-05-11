@@ -41,6 +41,7 @@ globals [
   MeanR
   EWInfections
   StudentInfections
+  meanDaysInfected
 
 
   ;; log transform illness period variables
@@ -397,6 +398,7 @@ to go ;; these funtions get called each time-step
   countEWInfections
   countSchoolInfections
   finished
+  calculateMeanDaysInfected
   ask patches [ checkutilisation ]
   tick
 
@@ -414,7 +416,7 @@ to move ;; describes the circumstances under which people can move and infect on
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85  and random 100 >  Mask_Efficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
   if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
@@ -892,7 +894,7 @@ to OSCase
 end
 
 to stopfade
- if freewheel = false [
+ if freewheel != true [
   if ticks < Triggerday and count simuls with [ color = red ] < 3 [ ask n-of 1 simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; prevents cases from dying out in the eraly stage of the trials when few numbers exist
@@ -904,7 +906,7 @@ to EssentialWorkerID
 end
 
 to seedcases
-  if freewheel = false [
+  if freewheel != true [
     if ticks <= seedticks and remainder (ticks) 7 = 0 [ ask n-of 1 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding
   ]
@@ -922,7 +924,7 @@ to turnOnTracking
 end
 
 to countEWInfections ;; counts infections among Essential workers
-  let EWInfects (count simuls with [ color =  and EssentialWorkerFlag = 1 ] )
+  let EWInfects (count simuls with [ color = red and EssentialWorkerFlag = 1 ] )
   if Scalephase = 0 [ set EWInfections EWInfects ]
   if Scalephase = 1 [ set EWInfections EWInfects  * 10 ]
   if Scalephase = 2 [ set EWInfections EWInfects  * 100 ]
@@ -932,7 +934,7 @@ end
 
 
 to countSchoolInfections ;; counts infections among school students
-   let studentInfects ( count simuls with [ color = yellow and StudentFlag = 1 ] )
+   let studentInfects ( count simuls with [ color = red and StudentFlag = 1 ] )
    if Scalephase = 0 [ set studentInfections studentInfects ]
    if Scalephase = 1 [ set studentInfections studentInfects * 10 ]
    if Scalephase = 2 [ set studentInfections studentInfects * 100 ]
@@ -946,6 +948,8 @@ to checkMask ;; identifies people who waear a mask
 
 end
 
+to calculateMeanDaysINfected
+  set mean
 
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 @#$#@#$#@
@@ -1079,7 +1083,7 @@ Speed
 Speed
 0
 5
-0.8
+1.0
 .1
 1
 NIL
@@ -1208,7 +1212,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1500,7 +1504,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1622,8 +1626,8 @@ SLIDER
 Triggerday
 Triggerday
 0
-150
-72.0
+1000
+1000.0
 1
 1
 NIL
@@ -1815,7 +1819,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
@@ -2515,7 +2519,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-42.0
+40.0
 1
 1
 NIL
@@ -2723,7 +2727,7 @@ TTIncrease
 TTIncrease
 0
 5
-3.0
+2.0
 .01
 1
 NIL
@@ -2803,7 +2807,7 @@ SLIDER
 529
 179
 702
-214
+212
 ResidualCaution
 ResidualCaution
 0
@@ -4454,7 +4458,6 @@ NetLogo 6.1.0
     <enumeratedValueSet variable="App_Uptake">
       <value value="0"/>
       <value value="20"/>
-      <value value="30"/>
       <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Treatment_Benefit">
@@ -4630,9 +4633,7 @@ NetLogo 6.1.0
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TTIncrease">
-      <value value="1"/>
       <value value="2"/>
-      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="SchoolPolicyActive">
       <value value="true"/>
