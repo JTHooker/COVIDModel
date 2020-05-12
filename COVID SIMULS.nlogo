@@ -243,7 +243,7 @@ to setup
 
   set contact_radius 0 ;; sets contact radius of people
   set days 0 ; used to count days since events - currently redundant
- ;; set Quarantine false
+  set Quarantine false
   set eliminationDate 0 ; used to identify the date of elimination where no current, unrecovered cases exist
   set Proportion_People_Avoid PPA ;; used to set the proportion of people who are socially distancing
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
@@ -405,7 +405,7 @@ to go ;; these funtions get called each time-step
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
-  if color != red and color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
+  if color != red and spatial_Distance = false or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
@@ -431,7 +431,7 @@ to move ;; describes the circumstances under which people can move and infect on
 
     ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
 
-  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move aroudn the environment
+  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
 end
@@ -918,7 +918,7 @@ to turnOnTracking
       set tracking true set link_switch true set SchoolsPolicy true ]
 
     if policyTriggerOn = true and ticks >= triggerday [
-      set tracking true set link_switch true set maskPolicy true set assignAppEss true ]
+      set tracking true set link_switch true  ]
   ]
 
 end
@@ -1056,7 +1056,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1133,7 +1133,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1436,7 +1436,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-83.3
+42.5
 .5
 1
 NIL
@@ -1451,7 +1451,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-83.3
+42.5
 .5
 1
 NIL
@@ -1603,7 +1603,7 @@ INPUTBOX
 302
 503
 current_cases
-5.0
+100.20484536351337
 1
 0
 Number
@@ -1820,7 +1820,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2520,7 +2520,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-40.0
+60.0
 1
 1
 NIL
@@ -2700,7 +2700,7 @@ SWITCH
 931
 AssignAppEss
 AssignAppEss
-0
+1
 1
 -1000
 
@@ -2800,7 +2800,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -4646,9 +4646,10 @@ NetLogo 6.1.0
     </enumeratedValueSet>
   </experiment>
   <experiment name="Wuhan" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
+    <setup>setup
+set current_cases current_cases + random-normal 20 10</setup>
     <go>go</go>
-    <timeLimit steps="365"/>
+    <timeLimit steps="180"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -4716,7 +4717,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="40"/>
+      <value value="60"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
@@ -4782,7 +4783,7 @@ NetLogo 6.1.0
       <value value="55000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="current_cases">
-      <value value="5"/>
+      <value value="86"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
