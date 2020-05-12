@@ -250,7 +250,7 @@ to setup
 
   ;; setting households up
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
-  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household UNits that don;t include young children or teenagers
+  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household Units that don;t include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ] ;; allocates up to two adults per household
   ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20) and householdUnit <= 600 ] set studentFlag 1  ] ;; Identifies students
  ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
@@ -405,7 +405,7 @@ to go ;; these funtions get called each time-step
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
-  if color != red  or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
+  if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
@@ -704,9 +704,9 @@ end
 To Unlock ;; reverses the initiation of social distancing and isolation policies over time. Recognises that the policies are interpreted and adherence is not binary.
   ;;Adherence to policies is associated with a negative exponential curve linked to the current day and the number of days until the policies are due to be relaxed at which point they are relaxed fully.
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_People_Avoid PPA - (( PPA * residualCaution ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+    set Proportion_People_Avoid PPA - (( PPA * residualCautionPPA ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - (( PTA * residualCaution ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+    set Proportion_Time_Avoid PTA - (( PTA * residualCautionPTA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
@@ -1056,7 +1056,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1084,7 +1084,7 @@ Speed
 Speed
 0
 5
-0.8
+1.0
 .1
 1
 NIL
@@ -1133,7 +1133,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1603,7 +1603,7 @@ INPUTBOX
 302
 503
 current_cases
-100.20484536351337
+86.0
 1
 0
 Number
@@ -1820,7 +1820,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2606,7 +2606,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+25.0
 1
 1
 NIL
@@ -2665,10 +2665,10 @@ schoolsPolicy
 -1000
 
 MONITOR
-511
-130
-583
-175
+451
+168
+523
+213
 Household
 mean [ householdUnit ] of simuls
 1
@@ -2809,12 +2809,27 @@ SLIDER
 179
 702
 212
-ResidualCaution
-ResidualCaution
+ResidualCautionPPA
+ResidualCautionPPA
 0
 1
-0.5
+0.25
+.05
 1
+NIL
+HORIZONTAL
+
+SLIDER
+525
+136
+698
+171
+ResidualCautionPTA
+ResidualCautionPTA
+0
+1
+0.25
+.05
 1
 NIL
 HORIZONTAL
