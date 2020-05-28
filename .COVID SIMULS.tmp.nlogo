@@ -157,8 +157,8 @@ resources-own [
 
 
 to setup
-
- ;; random-seed  100 ;; for use in setting random nuber generator seeds
+  rngs:init
+   ;; random-seed  100 ;; for use in setting random nuber generator seeds
 
   clear-all
   import-drawing "Background1.png" ;; imports MSD image
@@ -184,10 +184,10 @@ to setup
 
 
 ;to-report newvar [ #alpha #beta ]
-  let XX random-gamma #alpha 6
-  let YY random-gamma #beta 1
-  report XX / (XX + YY)
-end
+;  let XX random-gamma #alpha 6
+;  let YY random-gamma #beta 1
+;  report XX / (XX + YY)
+;end
 
 
 
@@ -1087,7 +1087,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1164,7 +1164,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1244,7 +1244,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1467,7 +1467,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-17.0
+85.0
 .5
 1
 NIL
@@ -1482,7 +1482,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-17.0
+85.0
 .5
 1
 NIL
@@ -2300,7 +2300,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2624,7 +2624,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
