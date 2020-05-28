@@ -44,6 +44,7 @@ globals [
   meanDaysInfected
 
 
+
   ;; log transform illness period variables
   Illness_PeriodVariance
   M
@@ -133,6 +134,7 @@ simuls-own [
   householdUnit ;; the id of the household the person belongs to
   studentFlag ;; identifies if the person is a student or not
   wearingMask ;; identifies if the person is wearing a mask or not
+  currentVirulence ;; current virulence of the person on the day of their infection
   ]
 
 Packages-own [
@@ -142,6 +144,7 @@ Packages-own [
 
 patches-own [
   utilisation ;; indicator of whether any people are located on that patch of the environment or not
+  destination ;; indicator of whether this location is a place that people might gather
 ]
 
 medresources-own [
@@ -179,9 +182,24 @@ to setup
   set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
   set SComp sqrt BetaCompliance
 
+
+;to-report newvar [ #alpha #beta ]
+  let XX random-gamma #alpha 6
+  let YY random-gamma #beta 1
+  report XX / (XX + YY)
+end
+
+
+
+
+
+
+
+
   ask red-links [ set color red ]
 ;; sets color of patches to black
   ask patches [ set pcolor black  ]
+  ask n-of 10 patches with [ pcolor = black ] [ set destination 1 ]
 
  ;; setting up the hospital
   ask n-of 1 patches [ sprout-medresources 1 ]
@@ -247,6 +265,8 @@ to setup
   set eliminationDate 0 ; used to identify the date of elimination where no current, unrecovered cases exist
   set Proportion_People_Avoid PPA ;; used to set the proportion of people who are socially distancing
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
+  set spatial_distance false
+  set case_isolation false
 
   ;; setting households up
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
@@ -354,7 +374,7 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence ] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -399,6 +419,7 @@ to go ;; these funtions get called each time-step
   countSchoolInfections
   finished
   calculateMeanDaysInfected
+ ;; visitDestination
   ask patches [ checkutilisation ]
   tick
 
@@ -407,33 +428,33 @@ end
 to move ;; describes the circumstances under which people can move and infect one another
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 0  ] and color = 85  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85  [
     set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and personalVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 1 and random 100 >  Mask_Efficacy
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( personalVirulence / 3 ) > random 100 and wearingMask = 0
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 0
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and personalVirulence  > random 100 and wearingMask = 0
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
 
     ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
 
   if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
-  if color = black [ move-to one-of MedResources ] ;; hidden from remaining simuls
+  if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
 end
 
 
@@ -441,14 +462,14 @@ to avoid ;; these are the circustances under which people will interact
 ask simuls [
   (ifelse
       Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 0 [
-        if any? other simuls-here [
-          if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ]]]
+        if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself ]
+        [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ]]]
       ;; so, if the social distancing policies are on and you are distancing at this time and you are not part of an age-isolated group and you are not an essentialworker, then if there is anyone near you, move away if you can.
       ;; else...
       Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 1 [
         if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself ]
         [ if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100  [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are an essential worker, you can only reduce your
-      ;;contacts when you are not at work assuming 8 hours work, 8 hours rest, 8 hours recreation - rest doesn't count for anyone, hence it is set at 50 on the input slider. People don;t isolate from others in their household unit
+      ;;contacts when you are not at work assuming 8 hours work, 8 hours rest, 8 hours recreation - rest doesn't count for anyone, hence it is set at 50 on the input slider. People don't isolate from others in their household unit
 
       [ set heading heading + contact_Radius fd pace avoidICUs move-to patch-here ])] ;; otherwise just move wherever you like
 
@@ -563,7 +584,7 @@ to GlobalTreat ;; send people to quarantine if they have been identified
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? eligiblesimuls ;; only symptomatic cases are identified
     [ ask n-of ( count eligiblesimuls * Track_and_Trace_Efficiency )
       eligiblesimuls [
-      move-to one-of patches with [ pcolor = white ] set inICU 1  set tracked 1 ]]
+      move-to one-of patches with [ pcolor = white ] set inICU 1 set tracked 1 ]]
 end
 
 to treat
@@ -576,11 +597,11 @@ to PossiblyDie
 end
 
 to TriggerActionIsolation ;; sets the date for social isolation and case isolation
-  ifelse PolicyTriggerOn = true and Freewheel = false  [
+  if PolicyTriggerOn = true and Freewheel = false  [
     if triggerday - ticks < 14 and triggerday - ticks > 0 and Freewheel = false [ set Spatial_Distance true set case_Isolation true set Quarantine true ;; the 14 relates to 14 days. Could be an input but unlikely to change so hard-coded
        set Proportion_People_Avoid 0 + (( PPA ) / (triggerday - ticks)) set Proportion_Time_Avoid 0 + (( PTA) / (triggerday - ticks)) ] ;;ramps up the avoidance 14 days out from implementation
-    ifelse ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ] [ set Spatial_Distance False set Case_Isolation False ]
-  ] [ if freewheel = false [ set Spatial_Distance false set Case_Isolation false set Quarantine false set schoolsPolicy false ] ]
+     if ticks >= triggerday and Freewheel = false [ set Spatial_Distance true set Case_Isolation true set Quarantine true ]
+  ]
 end
 
 to spend
@@ -668,7 +689,7 @@ to CalculateAverageContacts ;; calculates average contacts for simuls and averag
 end
 
 to scaleup ;; this function scales up the simulation over 5 phases at base 10 to enable a small and large-scale understanding of dynamics. It enables the fine-grained analysis in early stages
-  ;; that more closely resemble diffusion across a population similar to assumptions in SEIR models but as it scales up, recognises taht there are geographic constraints of movement of populations
+  ;; that more closely resembles diffusion across a population similar to assumptions in SEIR models but as it scales up, recognises taht there are geographic constraints of movement of populations
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
@@ -694,7 +715,7 @@ to scaledown ;; preverses the procedure above after the peak of the epidemic
 end
 
 to scaledownhatch ;; removes excess simuls fromt the scaled-down view
-  if count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color != red and color != black ] [ die ] ]
+  if count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow or color = 85 ] [ die ] ]
 end
 
 to forwardTime
@@ -704,10 +725,10 @@ end
 To Unlock ;; reverses the initiation of social distancing and isolation policies over time. Recognises that the policies are interpreted and adherence is not binary.
   ;;Adherence to policies is associated with a negative exponential curve linked to the current day and the number of days until the policies are due to be relaxed at which point they are relaxed fully.
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_People_Avoid PPA - (( PPA * residualCautionPPA ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+    set Proportion_People_Avoid PPA - (( PPA * (1 - residualCautionPPA) ) / ( timeLockdownOff - ticks ))  ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - (( PTA * residualCautionPTA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
-  if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
+    set Proportion_Time_Avoid PTA - (( PTA * (1 - residualCautionPTA) ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+ ;; if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
 
@@ -722,7 +743,7 @@ to setCaseFatalityRate ;; calculates death rate per infected person over the cou
 end
 
 to countDailyCases ;; sets the day for reporting new cases at 6 days after initial infection, scales up at the population scales
-  let casestoday count simuls with [ color = red and timenow = 6 ]
+  let casestoday count simuls with [ color = red and timenow = Case_Reporting_Delay ]
 
   if Scalephase = 0 [ set dailyCases casestoday ]
   if Scalephase = 1 [ set dailyCases casestoday * 10 ]
@@ -886,8 +907,8 @@ end
 
 to OSCase
   if policytriggeron = true [
-  if ticks < triggerday + sqrt 30 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ]
-      [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ] ]
+  if ticks < triggerday + 14 and OS_Import_Proportion > random 100 [ ask n-of 1 simuls with [ color = 85 ]
+      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 ] ]
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
 
@@ -948,10 +969,20 @@ to checkMask ;; identifies people who waear a mask
 
 end
 
-to calculateMeanDaysINfected
+to calculateMeanDaysInfected
   if any? simuls with [ color = red ] [ set meanDaysInfected ( mean [ timenow ] of simuls with [ color = red ] )]
 end
 
+to updatepersonalvirulence ;; creates a triangular distribution of virulence that peaks at the end of the incubation period
+  if color = red and timenow <= ownIncubationPeriod [ set currentVirulence ( personalVirulence * ( timenow / ownIncubationPeriod )) ]
+  if color = red and timenow > ownIncubationPeriod [ set currentVirulence ( personalVirulence  * ( ( ownIllnessPeriod - timenow ) / ( ownIllnessPeriod - ownIncubationPeriod ))) ]
+end
+
+;to visitDestination
+;  ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
+;    if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
+;  ]]
+;end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1213,7 +1244,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1366,7 +1397,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+100.0
 1
 1
 NIL
@@ -1393,7 +1424,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / count simuls
+numberInfected / 2500
 2
 1
 14
@@ -1436,7 +1467,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+17.0
 .5
 1
 NIL
@@ -1451,7 +1482,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+17.0
 .5
 1
 NIL
@@ -1603,7 +1634,7 @@ INPUTBOX
 302
 503
 current_cases
-86.0
+5.0
 1
 0
 Number
@@ -1614,7 +1645,7 @@ INPUTBOX
 302
 567
 total_population
-1.1E7
+2.5E7
 1
 0
 Number
@@ -1628,7 +1659,7 @@ Triggerday
 Triggerday
 0
 1000
-53.0
+72.0
 1
 1
 NIL
@@ -1708,7 +1739,7 @@ Incubation_Period
 Incubation_Period
 0
 10
-5.0
+6.0
 1
 1
 NIL
@@ -1748,9 +1779,9 @@ true
 false
 "" "\n"
 PENS
-"Current Cases" 1.0 1 -7858858 true "" "plot currentInfections"
-"Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected"
-"ICU Beds Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
+"Current Cases" 1.0 1 -7858858 true "" "plot currentInfections "
+"Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected "
+"ICU Beds Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired "
 
 MONITOR
 335
@@ -1790,7 +1821,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-10.0
+100.0
 1
 1
 NIL
@@ -1851,7 +1882,7 @@ SWITCH
 785
 stimulus
 stimulus
-0
+1
 1
 -1000
 
@@ -2189,7 +2220,7 @@ true
 "" ""
 PENS
 "Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
-"Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_in_Australia - ICUBedsRequired"
+"Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_in_Australia - ICUBedsRequired "
 
 SLIDER
 1027
@@ -2269,7 +2300,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2339,17 +2370,6 @@ self_capacity
 0
 Number
 
-SWITCH
-2107
-912
-2262
-945
-dynamic_behaviour
-dynamic_behaviour
-1
-1
--1000
-
 MONITOR
 2142
 448
@@ -2389,21 +2409,6 @@ false
 "" ""
 PENS
 "default" 1.0 1 -16777216 true "" "histogram [ ownIllnessPeriod ] of simuls "
-
-SLIDER
-2108
-951
-2263
-984
-Decay_limit
-Decay_limit
-0
-1
-0.5
-1
-1
-NIL
-HORIZONTAL
 
 INPUTBOX
 2139
@@ -2520,7 +2525,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-60.0
+85.0
 1
 1
 NIL
@@ -2619,7 +2624,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2691,7 +2696,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "Histogram [ agerange ] of simuls with [ color = yellow  ]"
+"default" 1.0 1 -16777216 true "" "Histogram [ agerange ] of simuls with [ color != 85  ]"
 
 SWITCH
 503
@@ -2713,7 +2718,7 @@ eWAppUptake
 eWAppUptake
 0
 1
-1.0
+0.5
 .01
 1
 NIL
@@ -2805,15 +2810,15 @@ MaskPolicy
 -1000
 
 SLIDER
-529
-179
-702
-212
+523
+136
+696
+169
 ResidualCautionPPA
 ResidualCautionPPA
 0
 1
-0.25
+0.2
 .05
 1
 NIL
@@ -2821,18 +2826,235 @@ HORIZONTAL
 
 SLIDER
 525
-136
+172
 698
-171
+205
 ResidualCautionPTA
 ResidualCautionPTA
 0
 1
-0.25
+0.2
 .05
 1
 NIL
 HORIZONTAL
+
+SLIDER
+2109
+911
+2265
+944
+Case_Reporting_Delay
+Case_Reporting_Delay
+0
+20
+6.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+2112
+952
+2478
+1102
+R Distribution
+NIL
+NIL
+0.0
+15.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [ R ] of simuls with [ color != 85 ] "
+
+MONITOR
+2283
+809
+2341
+855
+R Sum
+sum [ r ] of simuls with [ color != 85 ]
+1
+1
+11
+
+MONITOR
+2445
+810
+2495
+856
+>3
+sum [ r ] of simuls with [ color != 85  and R = 3]
+17
+1
+11
+
+MONITOR
+2392
+810
+2442
+856
+=2
+sum [ r ] of simuls with [ color != 85  and R = 2]
+17
+1
+11
+
+MONITOR
+2496
+810
+2546
+856
+=4
+sum [ r ] of simuls with [ color != 85  and R = 4]
+17
+1
+11
+
+MONITOR
+2340
+809
+2390
+855
+=1
+sum [ r ] of simuls with [ color != 85  and R = 1]
+17
+1
+11
+
+MONITOR
+2548
+810
+2598
+856
+>4
+sum [ r ] of simuls with [ color != 85  and R > 4]
+17
+1
+11
+
+MONITOR
+2446
+858
+2496
+904
+C3
+count simuls with [ color != 85 and R = 3]
+17
+1
+11
+
+MONITOR
+2392
+858
+2442
+904
+C2
+count simuls with [ color != 85 and R = 2]
+17
+1
+11
+
+MONITOR
+2499
+859
+2549
+905
+c4
+count simuls with [ color != 85 and R = 4]
+17
+1
+11
+
+MONITOR
+2550
+859
+2600
+905
+C>4
+count simuls with [ color != 85 and R > 4 ]
+17
+1
+11
+
+MONITOR
+2339
+858
+2389
+904
+C1
+count simuls with [ color != 85 and R = 1]
+17
+1
+11
+
+MONITOR
+2283
+858
+2333
+904
+C0
+count simuls with [ color != 85 and R = 0]
+17
+1
+11
+
+SLIDER
+2378
+282
+2551
+317
+Visit_Frequency
+Visit_Frequency
+0
+100
+7.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+2379
+319
+2552
+354
+Visit_Radius
+Visit_Radius
+0
+10
+4.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+2510
+925
+2568
+971
+%>3
+count simuls with [ color != 85 and R > 2] / count simuls with [ color != 85 and R > 0 ] * 100
+2
+1
+11
+
+MONITOR
+2509
+743
+2567
+789
+% R
+sum [ R ] of simuls with [ color != 85 and R > 2] / sum [ R ] of simuls with [ color != 85 and R > 0 ] * 100
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
