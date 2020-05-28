@@ -176,11 +176,11 @@ to setup
   set SInc sqrt BetaIncubationPd
 
 
-      ;; illness period estimation using ln transform
-  set compliance_PeriodVariance se_Compliance
-  set BetaCompliance  ln ( 1 + ( compliance_PeriodVariance / compliance_with_isolation ^ 2))
-  set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
-  set SComp sqrt BetaCompliance
+   ;; illness period estimation using beta distribution transform
+;  set compliance_PeriodVariance se_Compliance
+;  set BetaCompliance  ln ( 1 + ( compliance_PeriodVariance / compliance_with_isolation ^ 2))
+;  set MComp ( ln compliance_with_isolation ) - ( BetaCompliance / 2)
+;  set SComp sqrt BetaCompliance
 
 
 ;to-report newvar [ #alpha #beta ]
@@ -221,7 +221,17 @@ to setup
 
         set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
-        set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
+        ;;set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
+
+
+        rngs:init ;; replacing previous log transform with beta distribution
+        let stream_id random-float 999
+        let seed random-float 999
+        rngs:set-seed stream_id seed
+        let dist rngs:rnd-beta  stream_id 28 2
+        set ownComplianceWithIsolation dist
+
+
 
         set asymptom random 100
         set essentialWorker random 100
@@ -428,24 +438,24 @@ end
 to move ;; describes the circumstances under which people can move and infect one another
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 0 ] and color = 85  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85  [
     set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > Mask_Efficacy  [
     set color red set timenow 0 traceme ] ;; accounts for a 56% reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 and random 100 > Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
   if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  Mask_Efficacy
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence / 3 ) > random 100 and wearingMask = 0
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
   if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
@@ -580,11 +590,11 @@ to Globalanxiety  ;;
 end
 
 to GlobalTreat ;; send people to quarantine if they have been identified
-  let eligiblesimuls simuls with [ color = red and inICU = 0 and ownIncubationPeriod >= Incubation_Period and asymptom >= AsymptomaticPercentage ]
+  let eligiblesimuls simuls with [ color = red and inICU = 0 and ownIncubationPeriod >= Incubation_Period and asymptom >= AsymptomaticPercentage and tracked = 1 ]
   if (count simuls with [ InICU = 1 ]) < (count patches with [ pcolor = white ]) and Quarantine = true and any? eligiblesimuls ;; only symptomatic cases are identified
     [ ask n-of ( count eligiblesimuls * Track_and_Trace_Efficiency )
       eligiblesimuls [
-      move-to one-of patches with [ pcolor = white ] set inICU 1 set tracked 1 ]]
+      move-to one-of patches with [ pcolor = white ] set inICU 1 ]]
 end
 
 to treat
@@ -1087,7 +1097,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1164,7 +1174,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1244,7 +1254,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1467,7 +1477,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-17.0
+85.0
 .5
 1
 NIL
@@ -1482,7 +1492,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-17.0
+85.0
 .5
 1
 NIL
@@ -1739,8 +1749,8 @@ Incubation_Period
 Incubation_Period
 0
 10
-6.0
-1
+5.1
+.1
 1
 NIL
 HORIZONTAL
@@ -1851,7 +1861,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2300,7 +2310,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2396,7 +2406,7 @@ PLOT
 2306
 422
 2466
-543
+544
 Distribution of Illness pd
 NIL
 NIL
@@ -2624,7 +2634,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -3055,6 +3065,21 @@ sum [ R ] of simuls with [ color != 85 and R > 2] / sum [ R ] of simuls with [ c
 2
 1
 11
+
+SLIDER
+703
+695
+905
+730
+Asymptomatic_Trans
+Asymptomatic_Trans
+0
+1
+0.33
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
