@@ -737,7 +737,7 @@ To Unlock ;; reverses the initiation of social distancing and isolation policies
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_People_Avoid PPA - (( PPA - residualCautionPPA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - (( PTA - residualCautionPTA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+    set Proportion_Time_Avoid PTA - (( PTA  residualCautionPTA) ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
  ;; if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
