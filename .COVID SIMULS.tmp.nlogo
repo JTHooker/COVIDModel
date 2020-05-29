@@ -737,7 +737,7 @@ To Unlock ;; reverses the initiation of social distancing and isolation policies
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
     set Proportion_People_Avoid PPA - (( PPA - residualCautionPPA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
   if PolicyTriggerOn = true and LockDown_Off = true and ticks >= Triggerday and ( timeLockdownOff - ticks ) > 0   [
-    set Proportion_Time_Avoid PTA - (( PTA  residualCautionPTA) ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
+    set Proportion_Time_Avoid PTA - (( PTA - residualCautionPTA ) / ( timeLockdownOff - ticks )) ] ;; the residual caution variable leaves people with a sense that they should still avoid to some extent
  ;; if LockDown_Off = true and ticks >= timeLockDownOff [ set Case_Isolation false set Spatial_Distance false ]
 
 end
@@ -1097,7 +1097,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1174,7 +1174,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1254,7 +1254,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1477,7 +1477,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-20.0
+85.0
 .5
 1
 NIL
@@ -1492,7 +1492,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-17.0
+85.0
 .5
 1
 NIL
@@ -2310,7 +2310,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2634,7 +2634,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2842,9 +2842,9 @@ SLIDER
 ResidualCautionPTA
 ResidualCautionPTA
 0
+100
+20.0
 1
-0.2
-.05
 1
 NIL
 HORIZONTAL
