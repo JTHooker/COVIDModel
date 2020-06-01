@@ -919,10 +919,10 @@ end
 to OSCase
   if policytriggeron = true [
     if ticks <= triggerday and OS_Import_Switch = true and ( count simuls with [ color = red and Imported = 1 ] / count simuls with [ color = red and imported = 0 ])  < OS_Import_Proportion  [ ask n-of 1 simuls with [ color = 85 ]
-      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ]
+      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; contributes additional cases as a result of OS imports prior to lockdown
 
     if ticks > triggerday and OS_Import_Switch = true and ( count simuls with [ color = red and Imported = 1 ] / count simuls with [ color = red and imported = 0 ])  < OS_Import_Proportion  [ ask n-of 1 simuls with [ color = 85 ]
-      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ]
+      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ] ;; contributes additional cases as a result of OS imports after lockdown but ensures they are tracked byt the health system
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
