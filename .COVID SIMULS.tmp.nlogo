@@ -704,12 +704,12 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
   ;; that more closely resembles diffusion across a population similar to assumptions in SEIR models but as it scales up, recognises taht there are geographic constraints of movement of populations
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 250 and scalePhase >= 0 and scalePhase < 4 and count simuls * 1000 < Total_Population and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 resethealth
-    set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+    set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set imported 0 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([ income ] of one-of other simuls ) calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100 ] ;;
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
-      set ageRange ([ageRange ] of one-of simuls) resethealth
+      set ageRange ([ageRange ] of one-of simuls) resethealth set imported 0
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc )  set ownComplianceWithIsolation ( exp random-normal Mcomp SComp ) resamplecompliance ;; log transform of compliance with isolation
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
@@ -924,14 +924,16 @@ to OSCase
     let ratio ( totalimported  / (totallocal + totalimported) )
 
     if ticks <= triggerday and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
-      ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
+      ask n-of ( count simuls with [ color = red ] * .10 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; contributes additional cases as a result of OS imports prior to lockdown
 
-    if ticks <= triggerday and OS_Import_Switch = true and random 100 > ( OS_Import_Proportion * 100 ) [
-    ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
+    if ticks <= triggerday and OS_Import_Switch = true  [
+    ask n-of 2 simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; creates steady stream of OS cases at beginning of pandemic
 
-
+    if ticks > triggerday and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
+      ask n-of ( count simuls with [ color = red ] * .1 ) simuls with [ color = 85 ]
+      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ] ;; contributes additional cases as a result of OS imports after lockdown
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
@@ -1491,7 +1493,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+85.0
 .5
 1
 NIL
@@ -1506,7 +1508,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+85.0
 .5
 1
 NIL
@@ -1669,7 +1671,7 @@ INPUTBOX
 302
 567
 total_population
-5000000.0
+2.5E7
 1
 0
 Number
@@ -1683,7 +1685,7 @@ Triggerday
 Triggerday
 0
 1000
-39.0
+72.0
 1
 1
 NIL
@@ -1845,7 +1847,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-14.0
+10.0
 1
 1
 NIL
@@ -2084,7 +2086,7 @@ INPUTBOX
 609
 284
 ppa
-89.0
+85.0
 1
 0
 Number
@@ -2095,7 +2097,7 @@ INPUTBOX
 700
 285
 pta
-89.0
+85.0
 1
 0
 Number
@@ -2152,7 +2154,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-99.0
+132.0
 1
 1
 NIL
@@ -2549,7 +2551,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-45.0
+15.0
 1
 1
 NIL
@@ -2575,7 +2577,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3100,19 +3102,19 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.4
+0.6
 .01
 1
 NIL
 HORIZONTAL
 
 MONITOR
-2140
-702
-2212
-747
+1000
+889
+1072
+934
 OS %
-count simuls with [ color = red and imported = 1 ] / count simuls with [ color != 85 ] * 100
+( count simuls with [  imported = 1 ] / count simuls with [ color != 85 ]) * 100
 2
 1
 11
@@ -3592,7 +3594,7 @@ NetLogo 6.1.1
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="33"/>
+      <value value="35"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
@@ -4028,7 +4030,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="33"/>
+      <value value="35"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
