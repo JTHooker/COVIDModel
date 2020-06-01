@@ -1113,7 +1113,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1190,7 +1190,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1493,7 +1493,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+89.0
 .5
 1
 NIL
@@ -1508,7 +1508,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+89.0
 .5
 1
 NIL
@@ -1671,7 +1671,7 @@ INPUTBOX
 302
 567
 total_population
-2.5E7
+5000000.0
 1
 0
 Number
@@ -1685,7 +1685,7 @@ Triggerday
 Triggerday
 0
 1000
-72.0
+39.0
 1
 1
 NIL
@@ -1877,7 +1877,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2086,7 +2086,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+89.0
 1
 0
 Number
@@ -2097,7 +2097,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+89.0
 1
 0
 Number
@@ -2154,7 +2154,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-132.0
+99.0
 1
 1
 NIL
@@ -2551,7 +2551,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-15.0
+30.0
 1
 1
 NIL
@@ -2577,7 +2577,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -2635,7 +2635,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -3102,7 +3102,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.4
 .01
 1
 NIL
@@ -3594,7 +3594,7 @@ NetLogo 6.1.1
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="35"/>
+      <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
@@ -4030,7 +4030,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="35"/>
+      <value value="30"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
