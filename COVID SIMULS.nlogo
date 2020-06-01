@@ -931,6 +931,9 @@ to OSCase
     ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; creates steady stream of OS cases at beginning of pandemic
 
+    if ticks > triggerday and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
+      ask n-of ( count simuls with [ color = red ] * .01 ) simuls with [ color = 85 ]
+      [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ] ;; contributes additional cases as a result of OS imports after lockdown
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
@@ -1490,7 +1493,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+89.0
 .5
 1
 NIL
@@ -1505,7 +1508,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+89.0
 .5
 1
 NIL
@@ -1668,7 +1671,7 @@ INPUTBOX
 302
 567
 total_population
-2.5E7
+5000000.0
 1
 0
 Number
@@ -1682,7 +1685,7 @@ Triggerday
 Triggerday
 0
 1000
-72.0
+39.0
 1
 1
 NIL
@@ -1844,7 +1847,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-10.0
+14.0
 1
 1
 NIL
@@ -2083,7 +2086,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+89.0
 1
 0
 Number
@@ -2094,7 +2097,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+89.0
 1
 0
 Number
@@ -2151,7 +2154,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-132.0
+99.0
 1
 1
 NIL
@@ -2407,7 +2410,7 @@ PotentialContacts
 MONITOR
 999
 946
-1102
+1101
 991
 NIL
 numberInfected
@@ -2548,7 +2551,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-33.0
+45.0
 1
 1
 NIL
@@ -2574,7 +2577,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3099,11 +3102,22 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.4
 .01
 1
 NIL
 HORIZONTAL
+
+MONITOR
+2140
+702
+2212
+747
+OS %
+count simuls with [ color = red and imported = 1 ] / count simuls with [ color != 85 ] * 100
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -3505,7 +3519,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -3580,7 +3594,7 @@ NetLogo 6.1.0
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="50"/>
+      <value value="33"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
@@ -4016,7 +4030,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="50"/>
+      <value value="33"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
