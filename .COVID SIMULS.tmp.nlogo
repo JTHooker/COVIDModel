@@ -923,11 +923,11 @@ to OSCase
     let totalimported count simuls with [ imported = 1 ]
     let ratio ( totalimported  / (totallocal + totalimported) )
 
-    if ticks <= triggerday and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
+    if ticks <= triggerday  and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
       ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; contributes additional cases as a result of OS imports prior to lockdown
 
-    if ticks <= triggerday and OS_Import_Switch = true and random 100 > ( OS_Import_Proportion * 100 ) [
+    if ticks <= triggerday + 14 and OS_Import_Switch = true and random 100 > ( OS_Import_Proportion * 100 ) [
     ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; creates steady stream of OS cases at beginning of pandemic
 
@@ -1874,7 +1874,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2548,7 +2548,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-33.0
+35.0
 1
 1
 NIL
