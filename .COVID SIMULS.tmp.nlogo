@@ -4066,7 +4066,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_incubation">
-      <value value="2.25"/>
+      <value value="1.22"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="quarantine">
       <value value="true"/>
@@ -4112,6 +4112,9 @@ set current_cases current_cases + random-normal 20 10</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ppa">
       <value value="89"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_compliance">
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
