@@ -754,8 +754,8 @@ to setCaseFatalityRate ;; calculates death rate per infected person over the cou
 
 end
 
-to countDailyCases ;; sets the day for reporting new cases at 6 days after initial infection, scales up at the population scales
-  let casestoday count simuls with [ color = red and timenow = Case_Reporting_Delay ]
+to countDailyCases ;; sets the day for reporting new cases at 6 (adjustable) days after initial infection, scales up as the population scales
+  let casestoday count simuls with [ color = red and int timenow = Case_Reporting_Delay ]
 
   if Scalephase = 0 [ set dailyCases casestoday ]
   if Scalephase = 1 [ set dailyCases casestoday * 10 ]
@@ -793,7 +793,7 @@ to calculateScaledBedCapacity ;; scales the number of patches in the environment
 end
 
 to calculateCurrentInfections ;; calculates the number of infected people in the population
-  let infectedsimuls count simuls with [ color = red ]
+   let infectedsimuls count simuls with [ color = red ]
 
    if Scalephase = 0 [ set currentInfections infectedsimuls ]
    if Scalephase = 1 [ set currentInfections infectedsimuls * 10 ]
@@ -928,11 +928,11 @@ to OSCase
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; contributes additional cases as a result of OS imports prior to lockdown
 
     if ticks <= triggerday and OS_Import_Switch = true  [
-    ask n-of 3 simuls with [ color = 85 ]
+    ask n-of 1 simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; creates steady stream of OS cases at beginning of pandemic
 
     if ticks > triggerday and OS_Import_Switch = true and ratio < OS_Import_Post_Proportion [
-      ask n-of ( count simuls with [ color = red ] * .10 ) simuls with [ color = 85 ]
+      ask n-of ( count simuls with [ color = red ] * .05 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ] ;; contributes additional cases as a result of OS imports after lockdown
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
@@ -1834,9 +1834,9 @@ NIL
 10.0
 true
 false
-"" "if Scalephase = 1 [ plot count simuls with [ color = red and timenow = 10 ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and timenow = 10 ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and timenow = 10 ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and timenow = 10 ] * 10000 ]"
+"" "if Scalephase = 1 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10000 ]"
 PENS
-"New Cases" 1.0 1 -5298144 true "" "plot count simuls with [ color = red and timenow = 10 ] "
+"New Cases" 1.0 1 -5298144 true "" "plot count simuls with [ color = red and timenow = Case_Reporting_Delay ] "
 
 SLIDER
 700
@@ -3086,7 +3086,7 @@ SWITCH
 506
 696
 686
-731
+729
 OS_Import_Switch
 OS_Import_Switch
 0
@@ -3123,7 +3123,7 @@ SLIDER
 506
 736
 694
-771
+769
 OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
@@ -3133,6 +3133,39 @@ OS_Import_Post_Proportion
 1
 NIL
 HORIZONTAL
+
+MONITOR
+998
+998
+1106
+1044
+NIL
+currentinfections
+17
+1
+11
+
+MONITOR
+1078
+890
+1153
+936
+Illness time
+mean [ timenow ] of simuls with [ color = red ]
+1
+1
+11
+
+MONITOR
+56
+868
+177
+914
+NIL
+cumulativeInfected
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
