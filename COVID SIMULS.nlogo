@@ -928,10 +928,10 @@ to OSCase
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; contributes additional cases as a result of OS imports prior to lockdown
 
     if ticks <= triggerday and OS_Import_Switch = true  [
-    ask n-of 2 simuls with [ color = 85 ]
+    ask n-of 3 simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 ] ] ;; creates steady stream of OS cases at beginning of pandemic
 
-    if ticks > triggerday and OS_Import_Switch = true and ratio < OS_Import_Proportion  [
+    if ticks > triggerday and OS_Import_Switch = true and ratio < OS_Import_Post_Proportion [
       ask n-of ( count simuls with [ color = red ] * .10 ) simuls with [ color = 85 ]
       [ set color red set timenow int ownIncubationPeriod - random-normal 1 .5 set Essentialworker random 100 set imported 1 set tracked 1 ] ] ;; contributes additional cases as a result of OS imports after lockdown
 
@@ -1113,7 +1113,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1190,7 +1190,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -2551,7 +2551,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-30.0
+15.0
 1
 1
 NIL
@@ -2635,7 +2635,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -3083,10 +3083,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-529
-733
-682
-766
+506
+696
+686
+731
 OS_Import_Switch
 OS_Import_Switch
 0
@@ -3102,7 +3102,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.4
+0.7
 .01
 1
 NIL
@@ -3118,6 +3118,21 @@ OS %
 2
 1
 11
+
+SLIDER
+506
+736
+694
+771
+OS_Import_Post_Proportion
+OS_Import_Post_Proportion
+0
+1
+0.45
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -3731,6 +3746,9 @@ NetLogo 6.1.1
     <enumeratedValueSet variable="OS_Import_Proportion">
       <value value="0.6"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Post_Proportion">
+      <value value="0.6"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="Wuhan" repetitions="100" runMetricsEveryStep="true">
     <setup>setup
@@ -4030,7 +4048,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="30"/>
+      <value value="15"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="minv">
       <value value="0"/>
@@ -4165,7 +4183,10 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="0.33"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="OS_Import_Proportion">
-      <value value="0.4"/>
+      <value value="0.7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Post_Proportion">
+      <value value="0.45"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
