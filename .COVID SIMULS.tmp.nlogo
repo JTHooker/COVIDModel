@@ -928,7 +928,7 @@ to calculateScaledPopulation ;; calculates the scaled population for working wit
 end
 
 to calculateMeanr
-  ifelse any? simuls with [ color = red and timenow = int ownillnessperiod ] [ set meanR ( mean [ R ] of simuls with [ color = red and timenow = int ownillnessperiod ])] [ set MeanR 0 ] ;; calculates mean Reff for the population
+  ifelse any? simuls with [ color = red and timenow = int ownillnessperiod ] [ set meanR ( mean [ R ] of simuls with [ color = red and timenow = int ownillnessperiod ])] [ set MeanR "" ] ;; calculates mean Reff for the population
 end
 
 to setASFlag
@@ -1160,7 +1160,7 @@ Speed
 Speed
 0
 5
-1.0
+0.8
 .1
 1
 NIL
@@ -1442,7 +1442,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+55.0
 1
 1
 NIL
@@ -1512,7 +1512,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+97.0
 .5
 1
 NIL
@@ -1527,7 +1527,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+98.0
 .5
 1
 NIL
@@ -1679,7 +1679,7 @@ INPUTBOX
 302
 503
 current_cases
-2.0
+107.70325433016288
 1
 0
 Number
@@ -1690,7 +1690,7 @@ INPUTBOX
 302
 567
 total_population
-2.5E7
+1.1E7
 1
 0
 Number
@@ -1704,7 +1704,7 @@ Triggerday
 Triggerday
 0
 1000
-72.0
+0.0
 1
 1
 NIL
@@ -1740,10 +1740,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-952
-690
-1151
-832
+955
+682
+1149
+829
 R0
 Time
 R
@@ -1755,7 +1755,7 @@ true
 false
 "" ""
 PENS
-"R" 1.0 0 -16777216 true "" "plot MeanR"
+"R" 1.0 0 -16777216 true "" "if count simuls with [ timenow = int ownIllnessPeriod ] > 0 [ plot MeanR ]"
 
 PLOT
 1160
@@ -1784,7 +1784,7 @@ Incubation_Period
 Incubation_Period
 0
 10
-4.7
+5.1
 .1
 1
 NIL
@@ -1866,7 +1866,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-10.0
+55.0
 1
 1
 NIL
@@ -1896,7 +1896,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+90.0
 1
 1
 NIL
@@ -2070,11 +2070,11 @@ count simuls with [ shape = \"star\" ] / count simuls
 12
 
 TEXTBOX
-142
+102
 660
-314
-709
-Days since approximately Jan 16 when first case appeared (Jan 26 reported)
+317
+723
+Days since approximately Jan 16 or Feb 16 for NZ when first case appeared (Jan 26 reported)
 12
 15.0
 1
@@ -2105,7 +2105,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+97.0
 1
 0
 Number
@@ -2116,7 +2116,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+98.0
 1
 0
 Number
@@ -2173,7 +2173,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-132.0
+129.0
 1
 1
 NIL
@@ -2186,7 +2186,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2461,7 +2461,7 @@ INPUTBOX
 2295
 564
 se_illnesspd
-4.0
+1.0
 1
 0
 Number
@@ -2559,7 +2559,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-72.0
+80.0
 1
 1
 NIL
@@ -2630,7 +2630,7 @@ App_Uptake
 App_Uptake
 0
 100
-25.0
+0.0
 1
 1
 NIL
@@ -2737,7 +2737,7 @@ eWAppUptake
 eWAppUptake
 0
 1
-0.5
+1.0
 .01
 1
 NIL
@@ -3084,7 +3084,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.35
+0.33
 .01
 1
 NIL
@@ -3097,7 +3097,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-0
+1
 1
 -1000
 
@@ -3110,7 +3110,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.0
 .01
 1
 NIL
@@ -3779,9 +3779,12 @@ NetLogo 6.1.1
   </experiment>
   <experiment name="Wuhan" repetitions="100" runMetricsEveryStep="true">
     <setup>setup
-set current_cases current_cases + random-normal 20 10</setup>
+set current_cases current_cases + random-normal 20 10
+set AsymptomaticPercentage AsymptomaticPercentage + random 10 - random 10
+set PPA random 100
+set PTA random 100</setup>
     <go>go</go>
-    <timeLimit steps="180"/>
+    <timeLimit steps="300"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -3794,6 +3797,9 @@ set current_cases current_cases + random-normal 20 10</setup>
     <metric>MeanR</metric>
     <metric>StudentInfections</metric>
     <metric>EWInfections</metric>
+    <metric>count simuls with [ Asymptomaticflag = 1 ]</metric>
+    <metric>PPA</metric>
+    <metric>PTA</metric>
     <enumeratedValueSet variable="maxv">
       <value value="1"/>
     </enumeratedValueSet>
@@ -3835,12 +3841,13 @@ set current_cases current_cases + random-normal 20 10</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
       <value value="53"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="lockdown_off">
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_incubation">
-      <value value="0.2"/>
+      <value value="2.25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="quarantine">
       <value value="false"/>
@@ -3866,14 +3873,11 @@ set current_cases current_cases + random-normal 20 10</setup>
     <enumeratedValueSet variable="self_capacity">
       <value value="0.8"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="dynamic_behaviour">
-      <value value="false"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="Compliance_with_Isolation">
       <value value="95"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Illness_period">
-      <value value="15"/>
+      <value value="20.8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="true"/>
@@ -3890,9 +3894,6 @@ set current_cases current_cases + random-normal 20 10</setup>
     <enumeratedValueSet variable="ppa">
       <value value="85"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="se_compliance">
-      <value value="1"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -3906,7 +3907,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="0.8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AsymptomaticPercentage">
-      <value value="50"/>
+      <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="2500"/>
@@ -3923,14 +3924,11 @@ set current_cases current_cases + random-normal 20 10</setup>
     <enumeratedValueSet variable="saliency_of_experience">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Decay_limit">
-      <value value="0.5"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="scale">
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_illnesspd">
-      <value value="1"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Beds_in_Australia">
       <value value="4200"/>
@@ -3957,7 +3955,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Incubation_Period">
-      <value value="5"/>
+      <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="case_isolation">
       <value value="false"/>
@@ -4066,7 +4064,7 @@ set current_cases current_cases + random-normal 20 10</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_incubation">
-      <value value="1.22"/>
+      <value value="2.25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="quarantine">
       <value value="true"/>
@@ -4112,9 +4110,6 @@ set current_cases current_cases + random-normal 20 10</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ppa">
       <value value="89"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="se_compliance">
-      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
