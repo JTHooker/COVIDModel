@@ -136,6 +136,7 @@ simuls-own [
   wearingMask ;; identifies if the person is wearing a mask or not
   currentVirulence ;; current virulence of the person on the day of their infection
   Imported ;; identifies imported cases
+  adultsInHousehold ;; counts how many adults in a household for peole under 70
   ]
 
 Packages-own [
@@ -191,16 +192,10 @@ to setup
 ;end
 
 
-
-
-
-
-
-
   ask red-links [ set color red ]
 ;; sets color of patches to black
   ask patches [ set pcolor black  ]
-  ask n-of 10 patches with [ pcolor = black ] [ set destination 1 ]
+  ask n-of 10 patches with [ pcolor = black ] [ set destination 1 ] ;; a beta function for testing locating many people in one place at a single time
 
  ;; setting up the hospital
   ask n-of 1 patches [ sprout-medresources 1 ]
@@ -279,11 +274,16 @@ to setup
   set case_isolation false
 
   ;; setting households up
+
+
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
-  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household Units that don;t include young children or teenagers
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [ set householdUnit random 600 ] ] ;; allocates up to two adults per household
-  ask simuls with [ agerange < 19 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ agerange > ([ agerange ] of myself + 20) and householdUnit <= 600 ] set studentFlag 1  ] ;; Identifies students
- ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
+  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
+    set householdUnit random 600 ] ]  ;; allocates up to two adults per household
+  ask simuls with [ agerange < 19 and studentFlag != 1 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ] ;; Identifies students
+
+
+  ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
   resetHouseholdUnit ;; iterates this process
   set tracking false ;; ensures this is set to false each time the model starts
@@ -649,11 +649,12 @@ to countcontacts
 end
 
 to death ;; calculates death for individuals and adds them to a total for the population
-   if scalephase = 0 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
-   if scalephase = 1 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
-   if scalephase = 2 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
-   if scalephase = 3 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
-   if scalephase = 4 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
+  let deceased simuls with [ scalephase = 0 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1 ]
+   if deceased = true [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
+   if deceased = true  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
+   if deceased = true  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
+   if deceased = true  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
+   if deceased = true  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
 end
 
 to respeed
@@ -1034,7 +1035,7 @@ GRAPHICS-WINDOW
 328
 124
 946
-942
+943
 -1
 -1
 10.0
@@ -1276,7 +1277,7 @@ ReInfectionRate
 ReInfectionRate
 0
 100
-0.0
+5.0
 1
 1
 NIL
@@ -1469,7 +1470,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / 2500
+numberInfected / Total_Population * 100
 2
 1
 14
@@ -1512,7 +1513,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-21.0
+85.0
 .5
 1
 NIL
@@ -1527,7 +1528,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-82.0
+85.0
 .5
 1
 NIL
@@ -1581,7 +1582,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1656,7 +1657,7 @@ Compliance_with_Isolation
 Compliance_with_Isolation
 0
 100
-100.0
+95.0
 5
 1
 NIL
@@ -1679,7 +1680,7 @@ INPUTBOX
 302
 503
 current_cases
-50.0
+2.0
 1
 0
 Number
@@ -1690,7 +1691,7 @@ INPUTBOX
 302
 567
 total_population
-1.1E7
+2.5E7
 1
 0
 Number
@@ -1704,7 +1705,7 @@ Triggerday
 Triggerday
 0
 1000
-176.0
+1000.0
 1
 1
 NIL
@@ -1740,10 +1741,10 @@ PENS
 "Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 
 PLOT
-957
-677
-1357
-836
+951
+678
+1161
+838
 R0
 Time
 R
@@ -1866,7 +1867,7 @@ Diffusion_Adjustment
 Diffusion_Adjustment
 1
 100
-9.0
+10.0
 1
 1
 NIL
@@ -2105,7 +2106,7 @@ INPUTBOX
 609
 284
 ppa
-21.0
+85.0
 1
 0
 Number
@@ -2116,7 +2117,7 @@ INPUTBOX
 700
 285
 pta
-82.0
+85.0
 1
 0
 Number
@@ -2158,7 +2159,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-32.5
+33.0
 .1
 1
 NIL
@@ -2173,7 +2174,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-113.0
+132.0
 1
 1
 NIL
@@ -2231,7 +2232,7 @@ ICU_Required
 ICU_Required
 0
 100
-8.0
+5.0
 1
 1
 NIL
@@ -2533,7 +2534,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-22.0
+20.0
 1
 1
 NIL
@@ -2559,7 +2560,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-60.0
+50.0
 1
 1
 NIL
@@ -2737,7 +2738,7 @@ eWAppUptake
 eWAppUptake
 0
 1
-0.63
+0.0
 .01
 1
 NIL
@@ -3097,7 +3098,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-1
+0
 1
 -1000
 
@@ -3136,7 +3137,7 @@ OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
 1
-0.69
+0.6
 .01
 1
 NIL
@@ -3163,6 +3164,17 @@ mean [ timenow ] of simuls with [ color = red ]
 1
 1
 11
+
+MONITOR
+898
+1035
+1003
+1096
+ICU Beds
+ICUBedsRequired
+0
+1
+15
 
 @#$#@#$#@
 ## WHAT IS IT?
