@@ -1908,7 +1908,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-67.5
+0.0
 1
 1
 NIL
