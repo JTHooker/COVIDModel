@@ -1,6 +1,4 @@
-extensions [ rngs profiler ]
-
-
+extensions [ rngs profiler r ]
 
 globals [
 
@@ -728,11 +726,11 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
 
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth set imported 0
-    set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
+     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc )
        ;; log transform of compliance with isolation
       set income ([income ] of one-of other simuls) resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
-      resetlandingSimul set riskofdeath .01 set requireICU random 100
+      resetlandingSimul set riskofdeath [ riskOfDeath ] of one-of simuls with [ agerange = ([ agerange ] of myself )] set requireICU random 100
 
 
         rngs:init ;; replacing previous log transform with beta distribution
@@ -1030,7 +1028,7 @@ to updatepersonalvirulence ;; creates a triangular distribution of virulence tha
 end
 
 to profilerstop
-  if ticks = 10  [
+  if ticks = 25  [
   profiler:stop          ;; stop profiling
   print profiler:report  ;; view the results
     profiler:reset  ]       ;; clear the data
@@ -1288,7 +1286,7 @@ ReInfectionRate
 ReInfectionRate
 0
 100
-5.0
+0.0
 1
 1
 NIL
@@ -1481,7 +1479,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / Total_Population * 100
+numberInfected / 2500 ;;Total_Population * 100
 2
 1
 14
@@ -1581,7 +1579,7 @@ MONITOR
 1014
 675
 R0
-mean [ R ] of simuls with [ color = red and timenow = Illness_Period ]
+mean [ R ] of simuls with [ color = red and timenow = int Illness_Period ]
 2
 1
 11
@@ -1716,7 +1714,7 @@ Triggerday
 Triggerday
 0
 1000
-1000.0
+72.0
 1
 1
 NIL
@@ -1908,7 +1906,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-67.5
+45.0
 1
 1
 NIL
@@ -2243,7 +2241,7 @@ ICU_Required
 ICU_Required
 0
 100
-5.0
+44.0
 1
 1
 NIL
@@ -2571,7 +2569,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-50.0
+31.0
 1
 1
 NIL
