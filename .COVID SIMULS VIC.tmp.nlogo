@@ -1323,7 +1323,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1713,7 +1713,7 @@ INPUTBOX
 302
 503
 current_cases
-1200.0
+2.0
 1
 0
 Number
@@ -1724,7 +1724,7 @@ INPUTBOX
 302
 567
 total_population
-6400000.0
+2.5E7
 1
 0
 Number
@@ -1738,7 +1738,7 @@ Triggerday
 Triggerday
 0
 1000
-1.0
+72.0
 1
 1
 NIL
@@ -2207,7 +2207,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-43.0
+102.0
 1
 1
 NIL
@@ -2379,7 +2379,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2677,7 +2677,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2871,7 +2871,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -2886,7 +2886,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -3131,7 +3131,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-1
+0
 1
 -1000
 
@@ -5402,6 +5402,8 @@ set PTA random 100</setup>
     <metric>CurrentInfections</metric>
     <metric>EliminationDate</metric>
     <metric>MeanR</metric>
+    <metric>mean [ reserves] of simuls with [ color != black ]</metric>
+    <metric>sum [ reserves] of simuls with [ color != black ]  / Initialreserves</metric>
     <enumeratedValueSet variable="OS_Import_Switch">
       <value value="true"/>
     </enumeratedValueSet>
