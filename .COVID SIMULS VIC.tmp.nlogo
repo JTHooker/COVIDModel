@@ -1,3 +1,9 @@
+;; This version of the model has been speifically designed to estimate issues associated with Victoria's second wave of infections, beginning in early July
+;; The intent of the model is for it to be used as a guide for considering differences in potential patterns of infection under various policy futures
+;; As with any model, it's results should be interpreted with caution and placed alongside other evidence when interpreting results
+
+
+
 extensions [ rngs profiler ]
 
 globals [
@@ -388,7 +394,7 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn financialstress ] ;;
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence ] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -843,7 +849,6 @@ end
 
 to movepackages
   set heading heading + 5 - 5 fd .5 ;; makes stimulus packages drift in the environment
-
 end
 
 to calculateEliminationDate
@@ -856,7 +861,6 @@ end
 to traceme
   if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
    if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
-
 end
 
 
@@ -866,7 +870,6 @@ to isolation
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
   ;; it enables the user to see how much difference an effective track and trace system might mack to spread
-
 end
 
 to assesslinks ;; this represents the COVID-Safe or other tracing app function
@@ -879,7 +882,6 @@ to assesslinks ;; this represents the COVID-Safe or other tracing app function
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
   ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
   ]
-
 end
 
 to hunt ;; this specifically uses the app to trace people
@@ -887,7 +889,6 @@ to hunt ;; this specifically uses the app to trace people
     if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]  ;;
-
 end
 
 
@@ -971,7 +972,6 @@ to OSCase
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
-
 end
 
 to stopfade
@@ -990,9 +990,7 @@ to seedCases
     if ticks <= seedticks and scalephase = 0 [ ask n-of 150 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 1 [ ask n-of 15 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 2 [ ask n-of 2 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-
-
-    ;; creates a steady stream of cases into the model in early stages for seedin
+    ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact dure to errors and lags in real-
 end
 
 to turnOnTracking
@@ -1323,7 +1321,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1713,7 +1711,7 @@ INPUTBOX
 302
 503
 current_cases
-2.0
+1200.0
 1
 0
 Number
@@ -1724,7 +1722,7 @@ INPUTBOX
 302
 567
 total_population
-2.5E7
+6400000.0
 1
 0
 Number
@@ -1738,7 +1736,7 @@ Triggerday
 Triggerday
 0
 1000
-72.0
+1.0
 1
 1
 NIL
@@ -2207,7 +2205,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-102.0
+43.0
 1
 1
 NIL
@@ -2379,7 +2377,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2634,7 +2632,7 @@ SeedTicks
 SeedTicks
 0
 100
-0.0
+7.0
 1
 1
 NIL
@@ -2677,7 +2675,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2871,7 +2869,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-20.0
+85.0
 1
 1
 NIL
@@ -2886,7 +2884,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-20.0
+85.0
 1
 1
 NIL
@@ -3131,7 +3129,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-0
+1
 1
 -1000
 
@@ -3609,7 +3607,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -5386,219 +5384,6 @@ set PTA random 100</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="schoolpolicyactive">
       <value value="false"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Australia Financial" repetitions="1000" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="300"/>
-    <metric>count turtles</metric>
-    <metric>ticks</metric>
-    <metric>numberInfected</metric>
-    <metric>deathcount</metric>
-    <metric>casefatalityrate</metric>
-    <metric>ICUBedsRequired</metric>
-    <metric>DailyCases</metric>
-    <metric>CurrentInfections</metric>
-    <metric>EliminationDate</metric>
-    <metric>MeanR</metric>
-    <metric>mean [ reserves] of simuls with [ color != black ]</metric>
-    <metric>sum [ reserves] of simuls with [ color != black ]  / Initialreserves</metric>
-    <enumeratedValueSet variable="OS_Import_Switch">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="maxv">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="RestrictedMovement">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="days_of_cash_reserves">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_Time_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="pta">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="cruise">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="TimeLockDownOff">
-      <value value="102"/>
-      <value value="117"/>
-      <value value="132"/>
-      <value value="159"/>
-      <value value="184"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
-      <value value="0.25"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Treatment_Benefit">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="FearTrigger">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Diffusion_Adjustment">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="total_population">
-      <value value="25000000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Triggerday">
-      <value value="72"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="lockdown_off">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="se_incubation">
-      <value value="2.25"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="quarantine">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="spatial_distance">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Global_Transmissability">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="minv">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Initial">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Proportion_People_Avoid">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="freewheel">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="self_capacity">
-      <value value="0.8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Compliance_with_Isolation">
-      <value value="95"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Illness_period">
-      <value value="20.8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="stimulus">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="WFH_Capacity">
-      <value value="33"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Bed_Capacity">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ReInfectionRate">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ppa">
-      <value value="85"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Age_Isolation">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity_of_illness">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ProductionRate">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="phwarnings">
-      <value value="0.8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="AsymptomaticPercentage">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Population">
-      <value value="2500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mean_Individual_Income">
-      <value value="55000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="current_cases">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Available_Resources">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="saliency_of_experience">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="scale">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="se_illnesspd">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ICU_Beds_in_Australia">
-      <value value="4200"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Media_Exposure">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initialassociationstrength">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Superspreaders">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="care_attitude">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Contact_Radius">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
-      <value value="65000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="link_switch">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Incubation_Period">
-      <value value="5.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="case_isolation">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="policytriggeron">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ICU_Required">
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Speed">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Ess_W_Risk_reduction">
-      <value value="50"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Essential_Workers">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="tracking">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ResidualCautionPPA">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="ResidualCautionPTA">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Asymptomatic_Trans">
-      <value value="0.33"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="OS_Import_Proportion">
-      <value value="0.6"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="OS_Import_Post_Proportion">
-      <value value="0.6"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

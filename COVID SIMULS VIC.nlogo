@@ -1,3 +1,9 @@
+;; This version of the model has been speifically designed to estimate issues associated with Victoria's second wave of infections, beginning in early July
+;; The intent of the model is for it to be used as a guide for considering differences in potential patterns of infection under various policy futures
+;; As with any model, it's results should be interpreted with caution and placed alongside other evidence when interpreting results
+
+
+
 extensions [ rngs profiler ]
 
 globals [
@@ -843,7 +849,6 @@ end
 
 to movepackages
   set heading heading + 5 - 5 fd .5 ;; makes stimulus packages drift in the environment
-
 end
 
 to calculateEliminationDate
@@ -856,7 +861,6 @@ end
 to traceme
   if tracked != 1 and tracking = true [  if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
    if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
-
 end
 
 
@@ -866,7 +870,6 @@ to isolation
 
   ;; this function should enable the observer to track-down contacts of the infected person if that person is either infected or susceptible.
   ;; it enables the user to see how much difference an effective track and trace system might mack to spread
-
 end
 
 to assesslinks ;; this represents the COVID-Safe or other tracing app function
@@ -879,7 +882,6 @@ to assesslinks ;; this represents the COVID-Safe or other tracing app function
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
   ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
   ]
-
 end
 
 to hunt ;; this specifically uses the app to trace people
@@ -887,7 +889,6 @@ to hunt ;; this specifically uses the app to trace people
     if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
   if hunted = 1 [ set tracked 1 ]
   ]  ;;
-
 end
 
 
@@ -971,7 +972,6 @@ to OSCase
 
     ;; adds imported cases in the lead-up and immediate time after lockdown
       ]
-
 end
 
 to stopfade
@@ -990,9 +990,7 @@ to seedCases
     if ticks <= seedticks and scalephase = 0 [ ask n-of 150 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 1 [ ask n-of 15 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 2 [ ask n-of 2 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-
-
-    ;; creates a steady stream of cases into the model in early stages for seedin
+    ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
 to turnOnTracking
@@ -1003,7 +1001,6 @@ to turnOnTracking
     if policyTriggerOn = true and ticks >= triggerday [
       set tracking true   ] ;; set link_switch true
   ]
-
 end
 
 to countEWInfections ;; counts infections among Essential workers
@@ -1166,7 +1163,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1243,7 +1240,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1323,7 +1320,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
