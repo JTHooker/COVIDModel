@@ -386,7 +386,7 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence ] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn financialstress ] ;; spend
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -617,10 +617,6 @@ to TriggerActionIsolation ;; sets the date for social isolation and case isolati
   ]
 end
 
-to spend
-  ifelse agerange < 18 [ set reserves reserves ] [ set reserves (income * random-normal Days_of_Cash_Reserves (Days_of_Cash_Reserves / 5) ) / 365 ];; allocates cash reserves of average of 3 weeks with tails
-end
-
 to Cruiseship
   if mouse-down? and cruise = true [ ;; lets loose a set of new infected people into the environment
     create-simuls random 50 [ setxy mouse-xcor mouse-ycor set size 2 set shape "dot" set color red set agerange one-of [ 0 10 20 30 40 50 60 70 80 90 ]
@@ -666,6 +662,10 @@ end
 
 to checkutilisation
   ifelse any? simuls-here [ set utilisation 1 ] [ set utilisation 0 ] ;; records which patches are being occupied by simuls
+end
+
+to spend
+  ifelse agerange < 18 [ set reserves reserves ] [ set reserves (income * random-normal Days_of_Cash_Reserves (Days_of_Cash_Reserves / 5) ) / 365 ];; allocates cash reserves of average of 3 weeks with tails
 end
 
 to earn ;; people can earn money if they come into contact with other people who have money
@@ -1299,7 +1299,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1906,7 +1906,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2653,7 +2653,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -3585,7 +3585,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
