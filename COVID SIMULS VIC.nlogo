@@ -143,6 +143,7 @@ simuls-own [
   currentVirulence ;; current virulence of the person on the day of their infection
   Imported ;; identifies imported cases
   adultsInHousehold ;; counts how many adults in a household for peole under 70
+  homeLocation ;; this is where these people live
   ]
 
 Packages-own [
@@ -219,7 +220,7 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set householdUnit random 1000 set agerange 95 resethealth set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
-        set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ] resetlandingSimul
+        set income random-exponential mean_Individual_Income resetincome calculateincomeperday calculateexpenditureperday move-to one-of patches with [ pcolor = black  ]
         set riskofdeath .01 set personalTrust random-normal 75 10 resettrust set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 10 set haveApp random 100
         set wearsMask random 100
 
@@ -232,7 +233,7 @@ to setup
         let stream_id random-float 999
         let seed random-float 999
         rngs:set-seed stream_id seed
-        let dist rngs:rnd-beta  stream_id 28 2
+        let dist rngs:rnd-beta  stream_id 30 10
         set ownComplianceWithIsolation dist
 
 
@@ -247,13 +248,14 @@ to setup
         set ppa 85
         set pta 85
 
+
        ]]
 
   ;; set up initial infected people
 
-  set scalephase 2
+  set scalephase InitialScale
 
-  ask n-of ( Current_Cases ) simuls [  set color red set timenow random int ( ownillnessperiod ) move-to one-of patches with [ pcolor = black ]
+  ask n-of ( Current_Cases ) simuls [  set color red set timenow random int ( ownillnessperiod )
      set personalVirulence Global_Transmissability  ]
 
   if count simuls with [ color = red ] <= 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIncubationPeriod - 1 ]
@@ -289,7 +291,8 @@ to setup
 
 
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
-  ask simuls with [ agerange > 60 ] [ set householdUnit random 400 + 600 ] ;; allocated older adults to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 60 and agerange <= 80 ] [ set householdUnit random 200 + 600 ] ;; allocated older adults to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 80 ] [ set householdUnit random 300 + 600 ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
     set householdUnit random 600 ] ]  ;; allocates up to two adults per household
   ask simuls with [ agerange < 19 and studentFlag != 1 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ] ;; Identifies students
@@ -298,6 +301,8 @@ to setup
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
   resetHouseholdUnit ;; iterates this process
+  ask simuls [ resetlandingSimul ]
+
   ;;set tracking false ;; ensures this is set to false each time the model starts
   ;;set link_switch false ;; ensures this is set to false each timme the model starts
   ;;set schoolspolicy false ;; ensures that the schools settings don't begin before the policy trigger starts
@@ -325,19 +330,32 @@ to setdeathrisk
   if agerange = 25 [ set riskofDeath .002 ]
   if agerange = 35 [ set riskofDeath .002 ]
   if agerange = 45 [ set riskofDeath .004 ]
-  if agerange = 55 [ set riskofDeath .013 ]
-  if agerange = 65 [ set riskofDeath .036 ]
-  if agerange = 75 [ set riskofDeath .08  ]
-  if agerange = 85 [ set riskofDeath .148 ]
-  if agerange = 95 [ set riskofDeath .148 ]
+  if agerange = 55 [ set riskofDeath .004 ]
+  if agerange = 65 [ set riskofDeath .03]
+  if agerange = 75 [ set riskofDeath .03  ]
+  if agerange = 85 [ set riskofDeath .223 ]
+  if agerange = 95 [ set riskofDeath .223 ] ;; updated from department of health July 15
 end
 
 to resetlanding
   if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ] ;; ensures that people don;t start on top of one another in the model
 end
 
+
+to resethouseholdUnit ;; allocates children to households
+  if schoolsPolicy = true [
+    ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 95 > random 100 [
+    set householdUnit random 600 ] ] ;; allows for upo 5% of houses to be sharehouses / care facilities, etc.
+  ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [
+    set householdUnit [ householdUnit ] of one-of simuls with [ count other simuls with [ householdUnit = [ householdUnit ] of myself ] = 0  ]]];; allows for older people in group homes to make up to 7% of housing units
+  ]
+end
+
 to resetlandingSimul
-  if any? other simuls-here [ move-to one-of patches with [ count simuls-here = 0 and pcolor = black ]] ;; iterates / sorts people out to ensure they don't start on top of one another
+  move-to one-of simuls with [ householdUnit = [ houseHoldUnit ] of myself ] ;; for some reason, this isn't working... NEED TO FIX
+  set homeLocation patch-here
+  ;; if any? other simuls-here with [ householdUnit != [ householdUnit] of myself ] [
+  ;; iterates / sorts people into households
 end
 
 to resetincome
@@ -371,15 +389,6 @@ end
 to resetPersonalVirulence ;; ensures that personalVirulence is within bounds
   if personalVirulence > 100 [ set personalVirulence random-normal global_Transmissability 10 ]
   if personalVirulence < 0 [ set personalVirulence random-normal global_Transmissability 10 ]
-end
-
-to resethouseholdUnit ;; allocates children to households
-  if schoolsPolicy = true [
-    ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 95 > random 100 [
-    set householdUnit random 600 ] ] ;; allows for upo 5% of houses to be sharehouses / care facilities, etc.
-  ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [
-    set householdUnit [ householdUnit ] of one-of simuls with [ count other simuls with [ householdUnit = [ householdUnit ] of myself ] = 0  ]]];; allows for older people in group homes to make up to 7% of housing units
-  ]
 end
 
 to iterateAsymptomAge ;;
@@ -451,6 +460,10 @@ to go ;; these funtions get called each time-step
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
+
+  ifelse remainder ticks 2 = 0 [
+
+
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
@@ -480,6 +493,9 @@ to move ;; describes the circumstances under which people can move and infect on
   if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
+
+  ] [
+    move-to homeLocation]
 end
 
 
@@ -1178,7 +1194,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1206,7 +1222,7 @@ Speed
 Speed
 0
 5
-1.0
+5.0
 .1
 1
 NIL
@@ -1255,7 +1271,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1335,7 +1351,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1515,7 +1531,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / 2500 ;;Total_Population * 100
+numberInfected / Total_Population * 100
 2
 1
 14
@@ -1558,7 +1574,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-30.0
+85.0
 .5
 1
 NIL
@@ -1573,7 +1589,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-30.0
+85.0
 .5
 1
 NIL
@@ -1627,7 +1643,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1725,7 +1741,7 @@ INPUTBOX
 302
 503
 current_cases
-341.0
+10.0
 1
 0
 Number
@@ -1942,7 +1958,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2126,11 +2142,11 @@ Days since approximately Jan 16 or Feb 16 for NZ when first case appeared (Jan 2
 1
 
 TEXTBOX
-350
+578
 15
-2195
+2057
 95
-COVID-19 Policy Options and Impact Model for Australia and NZ
+COVID-19 Policy Options and Impact Model for Victoria
 60
 104.0
 1
@@ -2151,7 +2167,7 @@ INPUTBOX
 609
 284
 ppa
-30.0
+85.0
 1
 0
 Number
@@ -2162,7 +2178,7 @@ INPUTBOX
 700
 285
 pta
-30.0
+85.0
 1
 0
 Number
@@ -2337,7 +2353,7 @@ ICU_Beds_in_Australia
 ICU_Beds_in_Australia
 0
 20000
-4200.0
+7000.0
 50
 1
 NIL
@@ -2391,7 +2407,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2605,7 +2621,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-15.0
+100.0
 1
 1
 NIL
@@ -2646,7 +2662,7 @@ SeedTicks
 SeedTicks
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -2717,7 +2733,7 @@ Mask_Efficacy
 Mask_Efficacy
 0
 100
-69.1448033644162
+75.0
 1
 1
 NIL
@@ -2870,7 +2886,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -2883,7 +2899,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -2898,7 +2914,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -2924,18 +2940,19 @@ PLOT
 952
 2478
 1102
-R Distribution
+R and Compliance Distributions 
 NIL
 NIL
 0.0
-15.0
+100.0
 0.0
 10.0
 true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "histogram [ R ] of simuls with [ color != 85 ] "
+"default" 1.0 1 -16777216 true "" "histogram [ R * 100 ] of simuls with [ color != 85 ] "
+"Compliance" 1.0 0 -7500403 true "" "histogram [ ownCompliancewithIsolation * 100 ] of simuls "
 
 MONITOR
 2283
@@ -3156,7 +3173,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.0
 .01
 1
 NIL
@@ -3228,9 +3245,19 @@ SWITCH
 380
 Complacency
 Complacency
-0
+1
 1
 -1000
+
+CHOOSER
+1270
+763
+1363
+808
+InitialScale
+InitialScale
+0 1 2 3 4
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -5189,7 +5216,7 @@ set PTA random 100</setup>
       <value value="false"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Victoria LE" repetitions="1000" runMetricsEveryStep="true">
+  <experiment name="Victoria LE Grattan 1" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup
 set mask_Efficacy Mask_Efficacy + random-normal 0 5</setup>
     <go>go</go>
@@ -5322,7 +5349,7 @@ set mask_Efficacy Mask_Efficacy + random-normal 0 5</setup>
       <value value="55000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="current_cases">
-      <value value="341"/>
+      <value value="63"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
@@ -5424,7 +5451,7 @@ set mask_Efficacy Mask_Efficacy + random-normal 0 5</setup>
       <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="scalephase">
-      <value value="1"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="schoolreturndate">
       <value value="0"/>

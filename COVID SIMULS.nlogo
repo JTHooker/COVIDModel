@@ -18,8 +18,6 @@ globals [
   eightyfive
   ninetyfive
   InitialReserves
-  AverageContacts
-  AverageFinancialContacts
   ScalePhase
   Days
   GlobalR
@@ -42,7 +40,8 @@ globals [
   EWInfections
   StudentInfections
   meanDaysInfected
-
+  AverageContacts
+  AverageFinancialContacts
 
 
   ;; log transform illness period variables
@@ -137,6 +136,9 @@ simuls-own [
   currentVirulence ;; current virulence of the person on the day of their infection
   Imported ;; identifies imported cases
   adultsInHousehold ;; counts how many adults in a household for peole under 70
+  financialcontacts ;; financial contacts here this week
+  myweek ;; count of prior 7 days
+
   ]
 
 Packages-own [
@@ -432,7 +434,7 @@ to go ;; these funtions get called each time-step
   finished
   calculateMeanDaysInfected
   profilerstop
- ;; visitDestination
+  ;; visitDestination
   ask patches [ checkutilisation ]
   tick
 
@@ -645,6 +647,8 @@ end
 to countcontacts
   if any? other simuls-here with [ color != black ] [ ;; calculates the number of contacts for simuls
     set contacts ( contacts + count other simuls-here ) ]
+  if any? other simuls-here with [ color != black and reserves > 0 ] [ set myweek ticks set financialcontacts 1 ]
+  if ticks - myweek > 7 [ set financialcontacts 0 ]
 end
 
 to death ;; calculates death for individuals and adds them to a total for the population
@@ -668,16 +672,15 @@ to spend
   ifelse agerange < 18 [ set reserves reserves ] [ set reserves (income * random-normal Days_of_Cash_Reserves (Days_of_Cash_Reserves / 5) ) / 365 ];; allocates cash reserves of average of 3 weeks with tails
 end
 
-to earn ;; people can earn money if they come into contact with other people who have money
-  if ticks > 1 [
+to earn ;; people can earn money if they come into contact with other people who have money, yo
+  if ticks > 7 and remainder ticks 7 = 0 [
   if agerange < 18 [ set reserves reserves ]
   if agerange >= 70 [ set reserves reserves ]
-  ifelse ticks > 0 and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70 [
-      set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts) - (( expenditure / 365) / 7 ) ) ]
-    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true and AverageFinancialContacts > 0 and color != black and any? other simuls-here with [ reserves > 0 ] and agerange >= 18 and agerange < 70
-      [ set reserves reserves + ((income  / 365 ) / 5 * (1 / AverageFinancialContacts)) -
-      (( expenditure / 365) / 7 ) ] [
-      set reserves reserves - (( expenditure / 365) / 7) * .5 ]  ] ;;; adjust here
+  ifelse agerange >= 18 and agerange < 70 and FinancialContacts = 1 and spatial_Distance = false [
+      set reserves reserves + ((income / 48 ) - ( expenditure / 52 ) ) ]
+    [ ifelse WFHCap < random WFH_Capacity and Spatial_Distance = true and FinancialContacts = 1 and color != black and agerange >= 18 and agerange < 70
+      [ set reserves reserves + ((income  / 48 ) - (( expenditure / 52) * Ex_Adjust ))  ] [
+      set reserves ( reserves - (( expenditure / 52 ) * Ex_Adjust )) ]  ] ;;; adjust here
   ]
 end
 
@@ -700,11 +703,11 @@ to AccessPackage
 end
 
 to setInitialReserves
-  if ticks = 1  [ set InitialReserves sum [ reserves ] of simuls ] ;; calculates total cash reserves in the population
+  if ticks = 1  [ set InitialReserves sum [ reserves ] of simuls with  [ color != black and agerange >= 18 and agerange <= 70  ] ] ;; calculates total cash reserves in the population
 end
 
 to CalculateAverageContacts ;; calculates average contacts for simuls and average financial contacts, which are contacts with people who have positive cash reserves
-  if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and reserves > 0 and color != black ] / ticks ]
+  ;;if ticks = 10 [ set AverageFinancialContacts ((mean [ contacts ] of simuls with [ agerange >= 18 and agerange < 70 and reserves > 0 and color != black  ]) / (count simuls with [ agerange >= 18 and agerange < 70 ] / ((count simuls ) / 10 )))]
   if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black ] / ticks ]
 end
 
@@ -1033,6 +1036,7 @@ to profilerstop
   print profiler:report  ;; view the results
     profiler:reset  ]       ;; clear the data
 end
+
 ;to visitDestination
 ;  ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
 ;    if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
@@ -1142,7 +1146,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1170,7 +1174,7 @@ Speed
 Speed
 0
 5
-1.3
+1.0
 .1
 1
 NIL
@@ -1219,7 +1223,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1522,7 +1526,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+20.0
 .5
 1
 NIL
@@ -1537,7 +1541,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+20.0
 .5
 1
 NIL
@@ -1591,7 +1595,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -1928,7 +1932,7 @@ true
 false
 "" ""
 PENS
-"Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
+"Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves ] of simuls with  [ color != black and agerange >= 18 and agerange < 70  ] "
 
 SWITCH
 162
@@ -1969,7 +1973,7 @@ MONITOR
 1514
 907
 Growth
-sum [ reserves] of simuls with [ color != black ]  / Initialreserves
+sum [ reserves ] of simuls with  [ color != black and agerange >= 18 and agerange <= 70  ]   / Initialreserves
 2
 1
 14
@@ -2183,7 +2187,7 @@ TimeLockDownOff
 TimeLockDownOff
 0
 300
-132.0
+162.0
 1
 1
 NIL
@@ -2196,7 +2200,7 @@ SWITCH
 1025
 lockdown_off
 lockdown_off
-1
+0
 1
 -1000
 
@@ -2241,7 +2245,7 @@ ICU_Required
 ICU_Required
 0
 100
-44.0
+5.0
 1
 1
 NIL
@@ -2569,7 +2573,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-50.0
+15.0
 1
 1
 NIL
@@ -2595,7 +2599,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-0.0
+30.0
 1
 1
 NIL
@@ -3120,7 +3124,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.0
+0.6
 .01
 1
 NIL
@@ -3184,6 +3188,32 @@ ICUBedsRequired
 0
 1
 15
+
+MONITOR
+1092
+426
+1148
+472
+AFCs
+AverageFinancialContacts
+2
+1
+11
+
+SLIDER
+1745
+876
+1918
+911
+Ex_Adjust
+Ex_Adjust
+0
+1
+0.42
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -4669,6 +4699,219 @@ set PTA random 100</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="OS_Import_Switch">
       <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Australia Financial" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="300"/>
+    <metric>count turtles</metric>
+    <metric>ticks</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
+    <metric>mean [ reserves ] of simuls</metric>
+    <enumeratedValueSet variable="OS_Import_Switch">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maxv">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RestrictedMovement">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="days_of_cash_reserves">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_Time_Avoid">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pta">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cruise">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TimeLockDownOff">
+      <value value="132"/>
+      <value value="102"/>
+      <value value="162"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
+      <value value="0.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Treatment_Benefit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FearTrigger">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Diffusion_Adjustment">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="total_population">
+      <value value="25000000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Triggerday">
+      <value value="72"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lockdown_off">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_incubation">
+      <value value="2.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarantine">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="spatial_distance">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Global_Transmissability">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="minv">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Initial">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freewheel">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="self_capacity">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Compliance_with_Isolation">
+      <value value="95"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Illness_period">
+      <value value="20.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stimulus">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="WFH_Capacity">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Bed_Capacity">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ReInfectionRate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ppa">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity_of_illness">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ProductionRate">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="phwarnings">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="AsymptomaticPercentage">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Population">
+      <value value="2500"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mean_Individual_Income">
+      <value value="55000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="current_cases">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Available_Resources">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="saliency_of_experience">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scale">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_illnesspd">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Beds_in_Australia">
+      <value value="4200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Media_Exposure">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initialassociationstrength">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Superspreaders">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="care_attitude">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Contact_Radius">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
+      <value value="65000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_switch">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Incubation_Period">
+      <value value="5.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="case_isolation">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="policytriggeron">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Required">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Speed">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Ess_W_Risk_reduction">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Essential_Workers">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="tracking">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPPA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPTA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Asymptomatic_Trans">
+      <value value="0.33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Proportion">
+      <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Post_Proportion">
+      <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Ex_Adjust">
+      <value value="0.42"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
