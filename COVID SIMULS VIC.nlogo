@@ -204,7 +204,7 @@ to setup
   ask red-links [ set color red ]
 ;; sets color of patches to black
   ask patches [ set pcolor black  ]
-  ask n-of 10 patches with [ pcolor = black ] [ set destination 1 ] ;; a beta function for testing locating many people in one place at a single time
+  ask n-of 100 patches with [ pcolor = black ] [ set destination 1 ] ;; a beta function for testing locating many people in one place at a single time
 
  ;; setting up the hospital
   ask n-of 1 patches [ sprout-medresources 1 ]
@@ -290,12 +290,12 @@ to setup
   ;; setting households up
 
 
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ set householdUnit random 600 ] ;; allocates adults to a household unit range
-  ask simuls with [ agerange > 60 and agerange <= 80 ] [ set householdUnit random 200 + 600 ] ;; allocated older adults to household Units that don't include young children or teenagers
-  ask simuls with [ agerange > 80 ] [ set householdUnit random 300 + 600 ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
-    set householdUnit random 600 ] ]  ;; allocates up to two adults per household
-  ask simuls with [ agerange < 19 and studentFlag != 1 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ] ;; Identifies students
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ set householdUnit random 600 ] ] ;; allocates adults to a household unit range
+  ask simuls with [ agerange > 60 and agerange <= 80 ] [ if 95 > random 100 [ set householdUnit random 200 + 600 ] ] ;; allocated older adults to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 300 + 600 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
+    set householdUnit random 600 ] ] ]  ;; allocates up to two adults per household
+  ask simuls with [ agerange < 19 and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ]] ;; Identifies students
 
 
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
@@ -453,7 +453,7 @@ to go ;; these funtions get called each time-step
   profilerstop
   traceadjust
  ;;linearbehdecrease
- ;; visitDestination
+  visitDestination
   ask patches [ checkutilisation ]
  tick
 
@@ -1085,11 +1085,11 @@ end
 ;end
 
 
-;to visitDestination
-;  ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
-;    if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
-;  ]]
-;end
+to visitDestination
+  ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
+    if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
+  ]]
+end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1445,7 +1445,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.2
 .05
 1
 NIL
@@ -1958,7 +1958,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2705,7 +2705,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2718,7 +2718,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+0.0
 1
 1
 NIL
@@ -2733,7 +2733,7 @@ Mask_Efficacy
 Mask_Efficacy
 0
 100
-75.0
+0.0
 1
 1
 NIL
