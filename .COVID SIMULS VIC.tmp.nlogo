@@ -2944,7 +2944,7 @@ R and Compliance Distributions
 NIL
 NIL
 0.0
-100.0
+10.0
 0.0
 10.0
 true
@@ -2952,7 +2952,7 @@ false
 "" ""
 PENS
 "default" 1.0 1 -16777216 true "" "histogram [ R ] of simuls with [ color != 85 ] "
-"Compliance" 1.0 0 -7500403 true "" "histogram [ ownCompliancewithIsolation * 10 ] of simuls "
+"Compliance" 1.0 0 -2674135 true "" "histogram [ ownCompliancewithIsolation * 10 ] of simuls "
 
 MONITOR
 2283
@@ -3258,6 +3258,16 @@ InitialScale
 InitialScale
 0 1 2 3 4
 2
+
+CHOOSER
+506
+776
+694
+822
+Stage
+Stage
+0 1 2 3 4
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
