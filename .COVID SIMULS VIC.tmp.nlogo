@@ -1086,9 +1086,9 @@ end
 
 
 to visitDestination
-  ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
+  if visit_Frequency > 0 [ ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
     if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
-  ]]
+  ]]]
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 @#$#@#$#@
@@ -1222,7 +1222,7 @@ Speed
 Speed
 0
 5
-5.0
+1.0
 .1
 1
 NIL
@@ -1258,7 +1258,7 @@ Illness_period
 Illness_period
 0
 25
-20.8
+20.2
 .1
 1
 NIL
@@ -1741,7 +1741,7 @@ INPUTBOX
 302
 503
 current_cases
-10.0
+70.0
 1
 0
 Number
@@ -1752,7 +1752,7 @@ INPUTBOX
 302
 567
 total_population
-6400000.0
+2.5E7
 1
 0
 Number
@@ -2951,8 +2951,8 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "histogram [ R * 100 ] of simuls with [ color != 85 ] "
-"Compliance" 1.0 0 -7500403 true "" "histogram [ ownCompliancewithIsolation * 100 ] of simuls "
+"default" 1.0 1 -16777216 true "" "histogram [ R ] of simuls with [ color != 85 ] "
+"Compliance" 1.0 0 -7500403 true "" "histogram [ ownCompliancewithIsolation * 10 ] of simuls "
 
 MONITOR
 2283
@@ -3095,7 +3095,7 @@ Visit_Frequency
 Visit_Frequency
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -3257,7 +3257,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4
-0
+2
 
 @#$#@#$#@
 ## WHAT IS IT?
