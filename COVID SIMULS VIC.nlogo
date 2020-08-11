@@ -49,6 +49,8 @@ globals [
   StudentInfections
   meanDaysInfected
   lasttransday
+  lastPeriod
+  casesinperiod
 
 
   ;; log transform illness period variables
@@ -456,14 +458,16 @@ to go ;; these funtions get called each time-step
  ;;linearbehdecrease
   visitDestination
   CovidPolicyTriggers
+  calculateCasesInLastPeriod
   ask patches [ checkutilisation ]
  tick
 
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
+  let randombinary random 1
 
-  ifelse remainder ticks 2 = 0 [
+  ifelse remainder randombinary 1 = 0 [
 
 
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
@@ -1094,6 +1098,7 @@ to visitDestination
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 
+
 to setupstages
   if stage = 0 [ set speed 5 set pta 0 set ppa 0 set policytriggeron false set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0
@@ -1117,8 +1122,23 @@ to setupstages
 
 end
 
+to calculateCasesInLastPeriod
+  let prior0 todayinfected
+  let prior1  prior0
+  let prior2  prior1
+  let prior3  prior2
+  let prior4  prior3
+  let prior5  prior4
+  let prior6  prior5
+
+  set casesinperiod ((prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6) / 7)
+end
+
 
 to COVIDPolicyTriggers
+
+
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1251,7 +1271,7 @@ Speed
 Speed
 0
 5
-3.0
+5.0
 .1
 1
 NIL
@@ -1380,7 +1400,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1474,7 +1494,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.2
+0.1
 .05
 1
 NIL
@@ -1603,7 +1623,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-25.0
+0.0
 .5
 1
 NIL
@@ -1618,7 +1638,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-25.0
+0.0
 .5
 1
 NIL
@@ -1672,7 +1692,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1987,7 +2007,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
@@ -2196,7 +2216,7 @@ INPUTBOX
 609
 284
 ppa
-25.0
+0.0
 1
 0
 Number
@@ -2207,7 +2227,7 @@ INPUTBOX
 700
 285
 pta
-25.0
+0.0
 1
 0
 Number
@@ -2436,7 +2456,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2676,7 +2696,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -2721,7 +2741,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -2747,7 +2767,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-25.0
+0.0
 1
 1
 NIL
@@ -2915,7 +2935,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -2928,7 +2948,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -2943,7 +2963,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -2965,10 +2985,10 @@ NIL
 HORIZONTAL
 
 PLOT
-2112
-952
-2478
-1102
+2113
+953
+2368
+1103
 R and Compliance Distributions 
 NIL
 NIL
@@ -3274,7 +3294,7 @@ SWITCH
 380
 Complacency
 Complacency
-1
+0
 1
 -1000
 
@@ -3296,7 +3316,25 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+0
+
+PLOT
+2378
+981
+2578
+1102
+New cases in last week
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot casesinperiod"
 
 @#$#@#$#@
 ## WHAT IS IT?
