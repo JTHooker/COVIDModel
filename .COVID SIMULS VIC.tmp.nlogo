@@ -465,9 +465,9 @@ to go ;; these funtions get called each time-step
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
-  let randombinary random 2
+  let randombinary random 1
 
-  ifelse remainder randombinary =  [
+  ifelse remainder randombinary 1 = 0 [
 
 
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
@@ -791,7 +791,8 @@ to scaledown ;; preverses the procedure above after the peak of the epidemic
 end
 
 to scaledownhatch ;; removes excess simuls fromt the scaled-down view
-  if count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow or color = 85 ] [ die ] ]
+  ifelse count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow ] [ die ] ] [ ask simuls with [ color = yellow ] [ die ] ]
+  if count simuls > Population [ ask n-of ( count simuls - Population ) simuls with [ color = 85 ] [ die ] ]
 end
 
 to forwardTime
@@ -1100,23 +1101,23 @@ end
 
 
 to setupstages
-  if stage = 0 [ set speed 5 set pta 0 set ppa 0 set policytriggeron false set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 0 [ set speed 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 1 [ set speed 4 set pta 15 set ppa 15 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 75 set maskPolicy true set mask_efficacy 75 set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
+  if stage = 1 [ set speed 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_efficacy 75 set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 2 [ set speed 3 set pta 25 set ppa 25 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 2 [ set speed 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_efficacy 75 set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
     set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 3 [ set speed 2 set pta 80 set ppa 80 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 3 [ set speed 2 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_efficacy 75 set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
     set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 4 [ set speed 1 set pta 90 set ppa 90 set policytriggeron true set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 4 [ set speed 1 set pta 90 set ppa 90 set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true set mask_efficacy 75 set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
     set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
@@ -1124,21 +1125,53 @@ end
 
 to calculateCasesInLastPeriod
   let prior0 todayinfected
-  let prior1  prior0
-  let prior2  prior1
-  let prior3  prior2
-  let prior4  prior3
-  let prior5  prior4
-  let prior6  prior5
+  let prior1	prior0
+  let prior2	prior1
+  let prior3	prior2
+  let prior4	prior3
+  let prior5	prior4
+  let prior6	prior5
+  let prior7	prior6
+  let prior8	prior7
+  let prior9	prior8
+  let prior10	prior9
+  let prior11	prior10
+  let prior12	prior11
+  let prior13	prior12
+  let prior14	prior13
+  let prior15	prior14
+  let prior16	prior15
+  let prior17	prior16
+  let prior18	prior17
+  let prior19	prior18
+  let prior20	prior19
+  let prior21	prior20
+  let prior22	prior21
+  let prior23	prior22
+  let prior24	prior23
+  let prior25	prior24
+  let prior26	prior25
+  let prior27	prior26
 
-  set casesinperiod ((prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6) / 7)
+
+set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior 7 + prior9 + prior10
+    + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior 17 + prior18 + prior19 + prior20
+    + prior21 + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
+
 end
 
 
 to COVIDPolicyTriggers
-
-
-
+  if selfgovern = true [
+    if casesinperiod >= zerotoone [ set stage 1 ]
+    if casesinperiod >= onetotwo [ set stage 2 ]
+    if casesinperiod >= twotothree [ set stage 3 ]
+    if casesinperiod >= threetofour [ set stage 4 ]
+    if stage = 4 and casesinperiod < threetofour [ set stage 3 ]
+    if stage = 3 and casesinperiod < twotothree [ set stage 2 ]
+    if stage = 3 and casesinperiod < onetotwo [ set stage 1 ]
+    if stage = 2 and casesinperiod < zerotoone [ set stage 0 ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1243,7 +1276,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1271,7 +1304,7 @@ Speed
 Speed
 0
 5
-5.0
+1.0
 .1
 1
 NIL
@@ -1320,7 +1353,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1623,7 +1656,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+89.0
 .5
 1
 NIL
@@ -1638,7 +1671,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+89.0
 .5
 1
 NIL
@@ -1692,7 +1725,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -1723,10 +1756,10 @@ mean [ reserves ] of simuls
 14
 
 PLOT
-1399
-393
-1919
-608
+1398
+390
+1918
+511
 Estimated count of deceased across age ranges
 NIL
 NIL
@@ -1790,7 +1823,7 @@ INPUTBOX
 302
 503
 current_cases
-70.0
+5.0
 1
 0
 Number
@@ -1992,7 +2025,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-0.0
+70.0
 1
 1
 NIL
@@ -2007,7 +2040,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+67.5
 1
 1
 NIL
@@ -2216,7 +2249,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+89.0
 1
 0
 Number
@@ -2227,7 +2260,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+89.0
 1
 0
 Number
@@ -2456,7 +2489,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2670,7 +2703,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-100.0
+30.0
 1
 1
 NIL
@@ -2696,7 +2729,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+15.0
 1
 1
 NIL
@@ -2741,7 +2774,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -2767,7 +2800,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+95.0
 1
 1
 NIL
@@ -2795,7 +2828,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
@@ -2909,7 +2942,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -2935,7 +2968,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -2948,7 +2981,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+80.0
 1
 1
 NIL
@@ -2963,7 +2996,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+80.0
 1
 1
 NIL
@@ -3222,7 +3255,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.0
 .01
 1
 NIL
@@ -3306,7 +3339,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4
-2
+0
 
 CHOOSER
 506
@@ -3316,7 +3349,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+1
 
 PLOT
 2378
@@ -3335,6 +3368,90 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot casesinperiod"
+
+INPUTBOX
+42
+278
+122
+339
+zerotoone
+0.0
+1
+0
+Number
+
+INPUTBOX
+42
+340
+122
+401
+onetotwo
+10.0
+1
+0
+Number
+
+INPUTBOX
+42
+403
+124
+464
+twotothree
+700.0
+1
+0
+Number
+
+INPUTBOX
+42
+465
+124
+526
+threetofour
+1400.0
+1
+0
+Number
+
+SWITCH
+506
+658
+618
+693
+SelfGovern
+SelfGovern
+0
+1
+-1000
+
+PLOT
+1396
+498
+1921
+619
+Stages
+NIL
+NIL
+0.0
+10.0
+0.0
+4.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -5298144 true "" "plot stage"
+
+MONITOR
+2373
+923
+2469
+969
+NIL
+casesinperiod
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
