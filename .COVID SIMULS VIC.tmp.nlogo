@@ -245,8 +245,8 @@ to setup
         iterateAsymptomAge
         resetPersonalVirulence
         assignApptoEssential
-        set ppa 85
-        set pta 85
+        ;;set ppa 85
+        ;; set pta 85
 
 
        ]]
@@ -410,6 +410,7 @@ to go ;; these funtions get called each time-step
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
   ask packages [ absorbshock movepackages ]
+  setupstages
   finished
   CruiseShip
   GlobalTreat
@@ -1091,6 +1092,33 @@ to visitDestination
   ]]]
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
+
+to setupstages
+  if stage = 0 [ set speed 5 set pta 0 set ppa 0 set policytriggeron false set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+
+  if stage = 1 [ set speed 4 set pta 15 set ppa 15 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 75 set maskPolicy true set mask_efficacy 75 set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+
+  if stage = 2 [ set speed 3 set pta 25 set ppa 25 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_efficacy 75 set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
+    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+
+  if stage = 3 [ set speed 2 set pta 80 set ppa 80 set policytriggeron true set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_efficacy 75 set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
+    set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+
+  if stage = 4 [ set speed 1 set pta 90 set ppa 90 set policytriggeron true set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true set mask_efficacy 75 set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
+    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+
+end
+
+
+to COVIDPolicyTriggers
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -1222,7 +1250,7 @@ Speed
 Speed
 0
 5
-1.0
+3.0
 .1
 1
 NIL
@@ -1445,7 +1473,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.2
 .05
 1
 NIL
@@ -1574,7 +1602,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -1589,7 +1617,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -1643,7 +1671,7 @@ SWITCH
 618
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -2167,7 +2195,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+25.0
 1
 0
 Number
@@ -2178,7 +2206,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+25.0
 1
 0
 Number
@@ -2220,7 +2248,7 @@ WFH_Capacity
 WFH_Capacity
 0
 100
-33.0
+30.0
 .1
 1
 NIL
@@ -2407,7 +2435,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2647,7 +2675,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-30.0
+50.0
 1
 1
 NIL
@@ -2705,7 +2733,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2718,7 +2746,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+25.0
 1
 1
 NIL
@@ -2733,7 +2761,7 @@ Mask_Efficacy
 Mask_Efficacy
 0
 100
-0.0
+75.0
 1
 1
 NIL
@@ -2886,7 +2914,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -2899,7 +2927,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -2914,7 +2942,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3173,7 +3201,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.0
+0.6
 .01
 1
 NIL
@@ -3267,7 +3295,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+2
 
 @#$#@#$#@
 ## WHAT IS IT?
