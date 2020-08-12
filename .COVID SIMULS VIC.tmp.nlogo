@@ -289,6 +289,7 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
   set spatial_distance false
   set case_isolation false
+  set stage 0 ;; starts the simulation off at zero policy settings
 
   ;; setting households up
 
@@ -406,6 +407,8 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
   if AssignAppEss = true [
     ask n-of ( count simuls with [ essentialWorkerFlag = 1 ] * eWAppUptake ) simuls with [ essentialWorkerFlag = 1 ] [ set haveApp (random App_Uptake)]] ;; assigns the app to a proportion of essential workers determined by EWAppUptake
 end
+
+
 
 to go ;; these funtions get called each time-step
   ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence  ] ;; earn financialstress
@@ -1016,7 +1019,7 @@ to EssentialWorkerID
 end
 
 to seedCases
-    if ticks <= seedticks and scalephase = 0 [ ask n-of 150 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of 150 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 1 [ ask n-of 15 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     if ticks <= seedticks and scalephase = 2 [ ask n-of 2 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
@@ -1154,6 +1157,7 @@ to calculateCasesInLastPeriod
   let prior26	prior25
   let prior27	prior26
 
+  print prior27
 
 set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
     + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
@@ -1163,16 +1167,16 @@ end
 
 
 to COVIDPolicyTriggers
-  if selfgovern = true [
-    if casesinperiod >= zerotoone and ticks > resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if casesinperiod >= onetotwo and ticks > resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if casesinperiod >= twotothree and ticks > resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-    if casesinperiod >= threetofour and ticks > resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    if stage = 4 and casesinperiod < threetofour and ticks > resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-    if stage = 3 and casesinperiod < twotothree and ticks > resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 3 and casesinperiod < onetotwo and ticks > resetdate [ set stage  set resetdate (ticks + JudgeDay1) ]
-    if stage = 2 and casesinperiod < zerotoone and ticks > resetdate [ set stage 0 set resetdate (ticks + JudgeDay1) ]
-  ]
+    if selfgovern = true [
+    if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+    if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
+    ifelse stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)] [ if ticks = resetdate [ set resetdate (ticks + ) ]]
+    ifelse stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ] [ set resetdate (ticks + 14)]
+    ifelse stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ] [ set resetdate (ticks + 14)]
+    ifelse stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1) ] [ set resetdate (ticks + 14)]
+    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1305,7 +1309,7 @@ Speed
 Speed
 0
 5
-1.0
+5.0
 .1
 1
 NIL
@@ -1528,7 +1532,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.15
+0.25
 .05
 1
 NIL
@@ -1657,7 +1661,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+0.0
 .5
 1
 NIL
@@ -1672,7 +1676,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+0.0
 .5
 1
 NIL
@@ -2026,7 +2030,7 @@ Age_Isolation
 Age_Isolation
 0
 100
-70.0
+0.0
 1
 1
 NIL
@@ -2041,7 +2045,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+0.0
 1
 1
 NIL
@@ -2250,7 +2254,7 @@ INPUTBOX
 609
 284
 ppa
-89.0
+0.0
 1
 0
 Number
@@ -2261,7 +2265,7 @@ INPUTBOX
 700
 285
 pta
-89.0
+0.0
 1
 0
 Number
@@ -2730,7 +2734,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-15.0
+100.0
 1
 1
 NIL
@@ -2775,7 +2779,7 @@ App_Uptake
 App_Uptake
 0
 100
-50.0
+0.0
 1
 1
 NIL
@@ -2801,7 +2805,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-95.0
+0.0
 1
 1
 NIL
@@ -2829,7 +2833,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -2943,7 +2947,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -2969,7 +2973,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -2982,7 +2986,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -2997,7 +3001,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -3256,7 +3260,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.0
+0.6
 .01
 1
 NIL
@@ -3350,7 +3354,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-3
+0
 
 PLOT
 2378
@@ -3371,10 +3375,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot casesinperiod"
 
 INPUTBOX
-2522
-116
-2602
-177
+1765
+135
+1845
+196
 zerotoone
 0.0
 1
@@ -3382,32 +3386,32 @@ zerotoone
 Number
 
 INPUTBOX
-2522
-179
-2602
-240
+1765
+198
+1845
+259
 onetotwo
-500.0
+50.0
 1
 0
 Number
 
 INPUTBOX
-2522
-242
-2604
-303
+1765
+260
+1847
+321
 twotothree
-1500.0
+1000.0
 1
 0
 Number
 
 INPUTBOX
-2522
-303
-2604
-364
+1765
+322
+1847
+383
 threetofour
 3000.0
 1
@@ -3455,10 +3459,10 @@ casesinperiod
 11
 
 INPUTBOX
-2606
-115
-2688
-176
+1849
+133
+1931
+194
 JudgeDay1
 7.0
 1
@@ -3466,10 +3470,10 @@ JudgeDay1
 Number
 
 INPUTBOX
-2606
-180
-2689
-241
+1849
+199
+1932
+260
 JudgeDay2
 14.0
 1
@@ -3477,10 +3481,10 @@ JudgeDay2
 Number
 
 INPUTBOX
-2608
-243
-2690
-304
+1851
+262
+1933
+323
 JudgeDay3
 28.0
 1
@@ -3488,15 +3492,26 @@ JudgeDay3
 Number
 
 INPUTBOX
-2608
-305
-2690
-366
+1851
+323
+1933
+384
 JudgeDay4
 42.0
 1
 0
 Number
+
+MONITOR
+1428
+518
+1538
+564
+Policy Reset Date
+ResetDate
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
