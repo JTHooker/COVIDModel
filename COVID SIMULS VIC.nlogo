@@ -1106,7 +1106,7 @@ end
 
 to setupstages
   if stage = 0 [ set speed 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
   if stage = 1 [ set speed 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
@@ -1157,7 +1157,6 @@ to calculateCasesInLastPeriod
   let prior26	prior25
   let prior27	prior26
 
-  print prior27
 
 set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
     + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
@@ -1167,16 +1166,17 @@ end
 
 
 to COVIDPolicyTriggers
-    if selfgovern = true [
+  if selfgovern = true  [
     if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
     if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    ifelse stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)] [ if ticks = resetdate [ set resetdate (ticks + 7) ]]
-    ifelse stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ] [ if ticks = resetdate [ set resetdate (ticks + 7) ]]
-    ifelse stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]   [ if ticks = resetdate [ set resetdate (ticks + 7) ]]
-    ifelse stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]   [ if ticks = resetdate [ set resetdate (ticks + 7) ]]
-    ]
+    if stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
+    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1309,7 +1309,7 @@ Speed
 Speed
 0
 5
-2.0
+5.0
 .1
 1
 NIL
@@ -1532,7 +1532,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.2
+0.25
 .05
 1
 NIL
@@ -1661,7 +1661,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+0.0
 .5
 1
 NIL
@@ -1676,7 +1676,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+0.0
 .5
 1
 NIL
@@ -2045,7 +2045,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2254,7 +2254,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+0.0
 1
 0
 Number
@@ -2265,7 +2265,7 @@ INPUTBOX
 700
 285
 pta
-79.0
+0.0
 1
 0
 Number
@@ -2734,7 +2734,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-25.0
+100.0
 1
 1
 NIL
@@ -2779,7 +2779,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -2805,7 +2805,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-75.0
+0.0
 1
 1
 NIL
@@ -2833,7 +2833,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -2947,7 +2947,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -2973,7 +2973,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -2986,7 +2986,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -3001,7 +3001,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -3247,7 +3247,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-1
+0
 1
 -1000
 
@@ -3260,7 +3260,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.3
+0.6
 .01
 1
 NIL
@@ -3354,7 +3354,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-3
+0
 
 PLOT
 2378

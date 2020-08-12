@@ -1106,7 +1106,7 @@ end
 
 to setupstages
   if stage = 0 [ set speed 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_efficacy 75 set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
   if stage = 1 [ set speed 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
@@ -1157,7 +1157,6 @@ to calculateCasesInLastPeriod
   let prior26	prior25
   let prior27	prior26
 
-  print prior27
 
 set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
     + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
@@ -1167,16 +1166,17 @@ end
 
 
 to COVIDPolicyTriggers
-    if selfgovern = true [
+  ifels selfgovern = true  [
     if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
     if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    ifelse stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)] [ if ticks = resetdate [ set resetdate (ticks + ) ]]
-    ifelse stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ] [ set resetdate (ticks + 14)]
-    ifelse stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ] [ set resetdate (ticks + 14)]
-    ifelse stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1) ] [ set resetdate (ticks + 14)]
-    ]
+    if stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
+  ] [ if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -3486,7 +3486,7 @@ INPUTBOX
 1933
 323
 JudgeDay3
-28.0
+14.0
 1
 0
 Number
@@ -3497,7 +3497,7 @@ INPUTBOX
 1933
 384
 JudgeDay4
-42.0
+28.0
 1
 0
 Number
