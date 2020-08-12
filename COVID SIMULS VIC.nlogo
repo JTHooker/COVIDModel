@@ -52,6 +52,7 @@ globals [
   lastPeriod
   casesinperiod
   resetDate ;; days after today that the policy is reviewed
+  cashposition
 
 
   ;; log transform illness period variables
@@ -411,7 +412,7 @@ end
 
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence  ] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn ] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -463,6 +464,7 @@ to go ;; these funtions get called each time-step
   visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
+  calculateCashPosition
   ask patches [ checkutilisation ]
  tick
 
@@ -1178,6 +1180,10 @@ to COVIDPolicyTriggers
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 
 end
+
+to calculatecashPosition
+  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -1309,7 +1315,7 @@ Speed
 Speed
 0
 5
-5.0
+3.0
 .1
 1
 NIL
@@ -1532,7 +1538,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.15
 .05
 1
 NIL
@@ -1661,7 +1667,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -1676,7 +1682,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -1779,10 +1785,10 @@ PENS
 "default" 1.0 1 -2674135 true "" "Histogram [ agerange ] of simuls with [ color = black ] "
 
 PLOT
-1399
-613
-1919
-763
+1398
+619
+1918
+769
 Infection Proportional Growth Rate
 Time
 Growth rate
@@ -1958,10 +1964,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
 PLOT
-953
-839
-1368
-1098
+955
+843
+1370
+1102
 Active (red) and Total (blue) Infections ICU Beds (black)
 NIL
 NIL
@@ -2045,7 +2051,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
@@ -2254,7 +2260,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+24.0
 1
 0
 Number
@@ -2265,7 +2271,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+24.0
 1
 0
 Number
@@ -2734,7 +2740,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -2779,7 +2785,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -2805,7 +2811,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+25.0
 1
 1
 NIL
@@ -2973,7 +2979,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -2986,7 +2992,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3001,7 +3007,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3354,7 +3360,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+2
 
 PLOT
 2378
@@ -3486,7 +3492,7 @@ INPUTBOX
 1933
 323
 JudgeDay3
-28.0
+14.0
 1
 0
 Number
@@ -3497,16 +3503,16 @@ INPUTBOX
 1933
 384
 JudgeDay4
-42.0
+28.0
 1
 0
 Number
 
 MONITOR
-1428
-518
-1538
-564
+1689
+556
+1799
+602
 Policy Reset Date
 ResetDate
 0
