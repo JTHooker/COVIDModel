@@ -51,6 +51,7 @@ globals [
   lasttransday
   lastPeriod
   casesinperiod
+  resetDate ;; days after today that the policy is reviewed
 
 
   ;; log transform illness period variables
@@ -407,7 +408,7 @@ to assignApptoEssential ;; allocates the COVID-Safe app to essential works that 
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence ] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence  ] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -1154,8 +1155,8 @@ to calculateCasesInLastPeriod
   let prior27	prior26
 
 
-set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior 7 + prior9 + prior10
-    + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior 17 + prior18 + prior19 + prior20
+set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
+    + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
     + prior21 + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
 
 end
@@ -1163,14 +1164,14 @@ end
 
 to COVIDPolicyTriggers
   if selfgovern = true [
-    if casesinperiod >= zerotoone [ set stage 1 ]
-    if casesinperiod >= onetotwo [ set stage 2 ]
-    if casesinperiod >= twotothree [ set stage 3 ]
-    if casesinperiod >= threetofour [ set stage 4 ]
-    if stage = 4 and casesinperiod < threetofour [ set stage 3 ]
-    if stage = 3 and casesinperiod < twotothree [ set stage 2 ]
-    if stage = 3 and casesinperiod < onetotwo [ set stage 1 ]
-    if stage = 2 and casesinperiod < zerotoone [ set stage 0 ]
+    if casesinperiod >= zerotoone and ticks > resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if casesinperiod >= onetotwo and ticks > resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if casesinperiod >= twotothree and ticks > resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+    if casesinperiod >= threetofour and ticks > resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
+    if stage = 4 and casesinperiod < threetofour and ticks > resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod < twotothree and ticks > resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 3 and casesinperiod < onetotwo and ticks > resetdate [ set stage  set resetdate (ticks + JudgeDay1) ]
+    if stage = 2 and casesinperiod < zerotoone and ticks > resetdate [ set stage 0 set resetdate (ticks + JudgeDay1) ]
   ]
 end
 @#$#@#$#@
@@ -1202,10 +1203,10 @@ ticks
 30.0
 
 BUTTON
-193
-175
-257
-209
+205
+176
+269
+210
 NIL
 setup
 NIL
@@ -1219,9 +1220,9 @@ NIL
 1
 
 BUTTON
-158
+169
 220
-222
+233
 254
 Go
 ifelse (count simuls ) = (count simuls with [ color = blue ])  [ stop ] [ Go ]
@@ -1236,10 +1237,10 @@ NIL
 1
 
 BUTTON
-163
-346
-281
-380
+175
+348
+293
+382
 Trace_Patterns
 ask n-of 50 simuls with [ color != black ] [ pen-down ] 
 NIL
@@ -1253,10 +1254,10 @@ NIL
 1
 
 BUTTON
-163
-395
-281
-429
+175
+396
+293
+430
 UnTrace
 ask turtles [ pen-up ]
 NIL
@@ -1281,10 +1282,10 @@ spatial_distance
 -1000
 
 SLIDER
-153
-269
-293
-302
+165
+270
+305
+303
 Population
 Population
 1000
@@ -1296,10 +1297,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-153
-305
-294
-338
+165
+306
+306
+339
 Speed
 Speed
 0
@@ -1438,10 +1439,10 @@ quarantine
 -1000
 
 SLIDER
-126
-712
-315
-745
+138
+713
+327
+746
 Available_Resources
 Available_Resources
 0
@@ -1527,7 +1528,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.1
+0.15
 .05
 1
 NIL
@@ -1719,10 +1720,10 @@ mean [ R ] of simuls with [ color = red and timenow = int Illness_Period ]
 11
 
 SWITCH
-146
-585
-290
-618
+158
+586
+302
+619
 policytriggeron
 policytriggeron
 0
@@ -1818,10 +1819,10 @@ infectionchange
 11
 
 INPUTBOX
-146
-442
-302
-503
+158
+443
+314
+504
 current_cases
 5.0
 1
@@ -1829,10 +1830,10 @@ current_cases
 Number
 
 INPUTBOX
-146
-506
-302
-567
+158
+508
+314
+569
 total_population
 2.5E7
 1
@@ -1840,10 +1841,10 @@ total_population
 Number
 
 SLIDER
-128
-623
-302
-656
+139
+625
+313
+658
 Triggerday
 Triggerday
 0
@@ -2040,7 +2041,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-67.5
+45.0
 1
 1
 NIL
@@ -2065,10 +2066,10 @@ PENS
 "Financial_Reserves" 1.0 0 -16777216 true "" "plot mean [ reserves] of simuls with [ color != black ]"
 
 SWITCH
-162
-752
-266
-785
+173
+753
+277
+786
 stimulus
 stimulus
 0
@@ -2076,10 +2077,10 @@ stimulus
 -1000
 
 SWITCH
-162
-795
-266
-828
+173
+796
+277
+829
 cruise
 cruise
 1
@@ -2109,10 +2110,10 @@ sum [ reserves] of simuls with [ color != black ]  / Initialreserves
 14
 
 BUTTON
-160
-842
-266
-877
+170
+843
+276
+878
 Stop Stimulus
 ask packages [ die ] 
 NIL
@@ -2159,10 +2160,10 @@ mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color
 11
 
 MONITOR
-139
-896
-278
-941
+150
+898
+289
+943
 Count red simuls (raw)
 count simuls with [ color = red ]
 0
@@ -2170,10 +2171,10 @@ count simuls with [ color = red ]
 11
 
 SWITCH
-166
-951
-271
-984
+178
+952
+283
+985
 scale
 scale
 0
@@ -2214,9 +2215,9 @@ count simuls with [ shape = \"star\" ] / count simuls
 12
 
 TEXTBOX
-102
+113
 660
-317
+328
 723
 Days since approximately Jan 16 or Feb 16 for NZ when first case appeared (Jan 26 reported)
 12
@@ -2309,10 +2310,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-129
-1033
-303
-1066
+140
+1035
+314
+1068
 TimeLockDownOff
 TimeLockDownOff
 0
@@ -2324,10 +2325,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-152
-992
-281
-1025
+163
+993
+292
+1026
 lockdown_off
 lockdown_off
 0
@@ -2335,9 +2336,9 @@ lockdown_off
 -1000
 
 SWITCH
-178
+189
 130
-287
+298
 163
 freewheel
 freewheel
@@ -2736,10 +2737,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-130
-1075
-303
-1108
+140
+1076
+313
+1109
 SeedTicks
 SeedTicks
 0
@@ -3349,7 +3350,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+3
 
 PLOT
 2378
@@ -3370,10 +3371,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot casesinperiod"
 
 INPUTBOX
-42
-278
-122
-339
+2522
+116
+2602
+177
 zerotoone
 0.0
 1
@@ -3381,34 +3382,34 @@ zerotoone
 Number
 
 INPUTBOX
-42
-340
-122
-401
+2522
+179
+2602
+240
 onetotwo
-10.0
+500.0
 1
 0
 Number
 
 INPUTBOX
-42
-403
-124
-464
+2522
+242
+2604
+303
 twotothree
-700.0
+1500.0
 1
 0
 Number
 
 INPUTBOX
-42
-465
-124
-526
+2522
+303
+2604
+364
 threetofour
-1400.0
+3000.0
 1
 0
 Number
@@ -3452,6 +3453,50 @@ casesinperiod
 0
 1
 11
+
+INPUTBOX
+2606
+115
+2688
+176
+JudgeDay1
+7.0
+1
+0
+Number
+
+INPUTBOX
+2606
+180
+2689
+241
+JudgeDay2
+14.0
+1
+0
+Number
+
+INPUTBOX
+2608
+243
+2690
+304
+JudgeDay3
+28.0
+1
+0
+Number
+
+INPUTBOX
+2608
+305
+2690
+366
+JudgeDay4
+42.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
