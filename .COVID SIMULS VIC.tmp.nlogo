@@ -1538,7 +1538,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.1
+0.25
 .05
 1
 NIL
@@ -1667,7 +1667,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-14.0
+15.0
 .5
 1
 NIL
@@ -1682,7 +1682,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-14.0
+15.0
 .5
 1
 NIL
@@ -2051,7 +2051,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-67.5
+0.0
 1
 1
 NIL
@@ -2260,7 +2260,7 @@ INPUTBOX
 609
 284
 ppa
-14.0
+15.0
 1
 0
 Number
@@ -2271,7 +2271,7 @@ INPUTBOX
 700
 285
 pta
-14.0
+15.0
 1
 0
 Number
@@ -3509,10 +3509,10 @@ JudgeDay4
 Number
 
 MONITOR
-1425
-518
-1535
-563
+1689
+556
+1799
+601
 Policy Reset Date
 ResetDate
 0
