@@ -1,0 +1,70 @@
+{
+  "bsearchVersionNumber": 2.0,
+  "infoTab": "Write notes here...",
+  "modelDCInfo": {
+    "modelFileName": "C:\\Users\\Thompson3\\Dropbox\\COVIDModel\\COVID SIMULS VIC.nlogo",
+    "setupCommands": "setup",
+    "stepCommands": "go",
+    "stopCondition": "ticks = 150",
+    "measureIfReporter": "@DONE",
+    "maxModelSteps": 150,
+    "rawMeasureReporters": {
+      "RAW1": "currentInfections",
+      "RAW2": "numberinfected",
+      "RAW3": "cashposition"
+    },
+    "singleRunCondenserReporters": {},
+    "fitnessSamplingReplications": 10,
+    "bestCheckingNumReplications": 0
+  },
+  "paramSpecStrings": [
+    "[\"zerotoone\" [ 1 1 10 ]]",
+    "[\"onetotwo\" [ 1 5 50 ]]",
+    "[\"twotothree\" [ 1 50 1000]]",
+    "[\"threetofour\" [ 1 100 3000]]",
+    "[\"selfgovern\" true ]",
+    "[\"judgeday1\" [ 1 1 7]]",
+    "[\"judgeday2\" [ 1 1 42]]",
+    "[\"judgeday3\" [ 1 1 42]]",
+    "[\"judgeday4\" [ 1 1 42]]"
+  ],
+  "objectives": [
+    {
+      "name": "Infectionsatend",
+      "objectiveType": "MINIMIZE",
+      "fitnessCombineReplications": "currentInfections",
+      "fitnessDerivativeParameter": "",
+      "fitnessDerivativeDelta": 0.0,
+      "fitnessDerivativeUseAbs": false
+    },
+    {
+      "name": "totalinfections",
+      "objectiveType": "MINIMIZE",
+      "fitnessCombineReplications": "numberinfected",
+      "fitnessDerivativeParameter": "",
+      "fitnessDerivativeDelta": 0.0,
+      "fitnessDerivativeUseAbs": true
+    },
+    {
+      "name": "financialcost",
+      "objectiveType": "MAXIMIZE",
+      "fitnessCombineReplications": "cashposition",
+      "fitnessDerivativeParameter": "",
+      "fitnessDerivativeDelta": 0.0,
+      "fitnessDerivativeUseAbs": true
+    }
+  ],
+  "searchAlgorithmInfo": {
+    "searchMethodType": "StandardGA",
+    "searchMethodParams": {
+      "population-model": "generational",
+      "population-size": "50",
+      "mutation-rate": "0.01",
+      "crossover-rate": "0.7",
+      "tournament-size": "3"
+    },
+    "chromosomeType": "GrayBinaryChromosome",
+    "caching": true,
+    "evaluationLimit": 300
+  }
+}
