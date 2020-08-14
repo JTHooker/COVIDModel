@@ -1667,7 +1667,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-15.0
+14.0
 .5
 1
 NIL
@@ -1682,7 +1682,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-15.0
+14.0
 .5
 1
 NIL
@@ -2260,7 +2260,7 @@ INPUTBOX
 609
 284
 ppa
-15.0
+14.0
 1
 0
 Number
@@ -2271,7 +2271,7 @@ INPUTBOX
 700
 285
 pta
-15.0
+14.0
 1
 0
 Number
@@ -2714,7 +2714,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-30.0
+15.0
 1
 1
 NIL
@@ -3292,7 +3292,7 @@ OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
 1
-0.6
+0.61
 .01
 1
 NIL
@@ -3397,7 +3397,7 @@ INPUTBOX
 1845
 259
 onetotwo
-116.0
+70.0
 1
 0
 Number
@@ -3408,7 +3408,7 @@ INPUTBOX
 1847
 321
 twotothree
-861.0
+400.0
 1
 0
 Number
@@ -3419,7 +3419,7 @@ INPUTBOX
 1847
 383
 threetofour
-4701.0
+400.0
 1
 0
 Number
@@ -3470,7 +3470,7 @@ INPUTBOX
 1931
 194
 JudgeDay1
-13.0
+19.0
 1
 0
 Number
@@ -3481,7 +3481,7 @@ INPUTBOX
 1932
 260
 JudgeDay2
-27.0
+5.0
 1
 0
 Number
@@ -3503,16 +3503,16 @@ INPUTBOX
 1933
 384
 JudgeDay4
-29.0
+43.0
 1
 0
 Number
 
 MONITOR
-1689
-556
-1799
-601
+1425
+518
+1535
+563
 Policy Reset Date
 ResetDate
 0
