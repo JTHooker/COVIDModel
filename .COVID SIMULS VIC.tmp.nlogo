@@ -53,7 +53,36 @@ globals [
   casesinperiod
   resetDate ;; days after today that the policy is reviewed
   cashposition
-
+  Objfunction ;; seeks to minimise the damage - totalinfection * stage * currentInfections
+  prior0
+  prior1
+  prior2
+  prior3
+  prior4
+  prior5
+  prior6
+  prior7
+  prior8
+  prior9
+  prior10
+  prior11
+  prior12
+  prior13
+  prior14
+  prior15
+  prior16
+  prior17
+  prior18
+  prior19
+  prior20
+  prior21
+  prior22
+  prior23
+  prior24
+  prior25
+  prior26
+  prior27
+  prior28
 
   ;; log transform illness period variables
   Illness_PeriodVariance
@@ -300,7 +329,7 @@ to setup
   ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 300 + 600 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
     set householdUnit random 600 ] ] ]  ;; allocates up to two adults per household
-  ask simuls with [ agerange < 19 and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ]] ;; Identifies students
+  ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ]] ;; Identifies students
 
 
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
@@ -412,7 +441,7 @@ end
 
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn ] ;; earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn ] ;;  financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -465,6 +494,7 @@ to go ;; these funtions get called each time-step
   CovidPolicyTriggers
   calculateCasesInLastPeriod
   calculateCashPosition
+  calculateObjfunction
   ask patches [ checkutilisation ]
  tick
 
@@ -797,7 +827,7 @@ to scaledown ;; preverses the procedure above after the peak of the epidemic
 end
 
 to scaledownhatch ;; removes excess simuls fromt the scaled-down view
-  ifelse count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow ] [ die ] ] [ ask simuls with [ color = yellow ] [ die ] ]
+  ifelse count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow or color = 85 ] [ die ] ] [ ask simuls with [ color = yellow ] [ die ] ]
   if count simuls > Population [ ask n-of ( count simuls - Population ) simuls with [ color = 85 ] [ die ] ]
 end
 
@@ -1021,9 +1051,9 @@ to EssentialWorkerID
 end
 
 to seedCases
-    if ticks < seedticks and scalephase = 0 [ ask n-of 150 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 1 [ ask n-of 15 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 2 [ ask n-of 2 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of 5 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 1 [ ask n-of 5 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 2 [ ask n-of 5 simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
@@ -1121,48 +1151,80 @@ to setupstages
 
   if stage = 3 [ set speed 2 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_efficacy 75 set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
-    set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+    set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  set upperStudentAge 16 set LowerStudentAge 0 ]
 
   if stage = 4 [ set speed 1 set pta 90 set ppa 90 set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true set mask_efficacy 75 set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
-    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
+    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 0 ]
 
 end
 
 to calculateCasesInLastPeriod
-  let prior0 todayinfected
-  let prior1	prior0
-  let prior2	prior1
-  let prior3	prior2
-  let prior4	prior3
-  let prior5	prior4
-  let prior6	prior5
-  let prior7	prior6
-  let prior8	prior7
-  let prior9	prior8
-  let prior10	prior9
-  let prior11	prior10
-  let prior12	prior11
-  let prior13	prior12
-  let prior14	prior13
-  let prior15	prior14
-  let prior16	prior15
-  let prior17	prior16
-  let prior18	prior17
-  let prior19	prior18
-  let prior20	prior19
-  let prior21	prior20
-  let prior22	prior21
-  let prior23	prior22
-  let prior24	prior23
-  let prior25	prior24
-  let prior26	prior25
-  let prior27	prior26
+set prior27	prior26
+set prior26	prior25
+set prior25	prior24
+set prior24	prior23
+set prior23	prior22
+set prior22	prior21
+set prior21	prior20
+set prior20	prior19
+set prior19	prior18
+set prior18	prior17
+set prior17	prior16
+set prior16	prior15
+set prior15	prior14
+set prior14	prior13
+set prior13	prior12
+set prior12	prior11
+set prior11	prior10
+set prior10	prior9
+set prior9	prior8
+set prior8	prior7
+set prior7	prior6
+set prior6	prior5
+set prior5	prior4
+set prior4	prior3
+set prior3	prior2
+set prior2	prior1
+set prior1	prior0
+set todayInfections	
 
 
-set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
+  print "========================"
+
+
+  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
     + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
     + prior21 + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
+
+print	prior26
+print	prior25
+print	prior24
+print	prior23
+print	prior22
+print	prior21
+print	prior20
+print	prior19
+print	prior18
+print	prior17
+print	prior16
+print	prior15
+print	prior14
+print	prior13
+print	prior12
+print	prior11
+print	prior10
+print	prior9
+print	prior8
+print	prior7
+print	prior6
+print	prior5
+print	prior4
+print	prior3
+print	prior2
+print	prior1
+print	prior0
+print	prior0
 
 end
 
@@ -1173,9 +1235,9 @@ to COVIDPolicyTriggers
     if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
     if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    if stage = 4 and casesinperiod < threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-    if stage = 3 and casesinperiod < twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod < onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 4 and casesinperiod <= threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod <= twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 
@@ -1183,6 +1245,10 @@ end
 
 to calculatecashPosition
   set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
+end
+
+to calculateObjfunction
+  if ticks > 1 [ set objFunction (numberInfected * currentinfections * ( 1 - ( sum [ reserves] of simuls with [ color != black ]  / Initialreserves )))]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1287,7 +1353,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1315,7 +1381,7 @@ Speed
 Speed
 0
 5
-4.0
+5.0
 .1
 1
 NIL
@@ -1364,7 +1430,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1667,7 +1733,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-14.0
+0.0
 .5
 1
 NIL
@@ -1682,7 +1748,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-14.0
+0.0
 .5
 1
 NIL
@@ -1736,7 +1802,7 @@ SWITCH
 619
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -1834,7 +1900,7 @@ INPUTBOX
 314
 504
 current_cases
-5.0
+10.0
 1
 0
 Number
@@ -2082,7 +2148,7 @@ SWITCH
 786
 stimulus
 stimulus
-0
+1
 1
 -1000
 
@@ -2093,7 +2159,7 @@ SWITCH
 829
 cruise
 cruise
-1
+0
 1
 -1000
 
@@ -2260,7 +2326,7 @@ INPUTBOX
 609
 284
 ppa
-14.0
+0.0
 1
 0
 Number
@@ -2271,7 +2337,7 @@ INPUTBOX
 700
 285
 pta
-14.0
+0.0
 1
 0
 Number
@@ -2500,7 +2566,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2714,7 +2780,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-15.0
+30.0
 1
 1
 NIL
@@ -2740,7 +2806,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+100.0
 1
 1
 NIL
@@ -2785,7 +2851,7 @@ App_Uptake
 App_Uptake
 0
 100
-5.0
+0.0
 1
 1
 NIL
@@ -2798,7 +2864,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2811,7 +2877,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-5.0
+0.0
 1
 1
 NIL
@@ -2979,7 +3045,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -3253,7 +3319,7 @@ SWITCH
 729
 OS_Import_Switch
 OS_Import_Switch
-0
+1
 1
 -1000
 
@@ -3292,7 +3358,7 @@ OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
 1
-0.61
+0.6
 .01
 1
 NIL
@@ -3360,7 +3426,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -3386,7 +3452,7 @@ INPUTBOX
 1845
 196
 zerotoone
-1.0
+6.0
 1
 0
 Number
@@ -3397,7 +3463,7 @@ INPUTBOX
 1845
 259
 onetotwo
-70.0
+1.0
 1
 0
 Number
@@ -3408,7 +3474,7 @@ INPUTBOX
 1847
 321
 twotothree
-400.0
+281.0
 1
 0
 Number
@@ -3419,7 +3485,7 @@ INPUTBOX
 1847
 383
 threetofour
-400.0
+1201.0
 1
 0
 Number
@@ -3431,7 +3497,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -3470,7 +3536,7 @@ INPUTBOX
 1931
 194
 JudgeDay1
-19.0
+1.0
 1
 0
 Number
@@ -3481,7 +3547,7 @@ INPUTBOX
 1932
 260
 JudgeDay2
-5.0
+25.0
 1
 0
 Number
@@ -3492,7 +3558,7 @@ INPUTBOX
 1933
 323
 JudgeDay3
-1.0
+8.0
 1
 0
 Number
@@ -3503,7 +3569,7 @@ INPUTBOX
 1933
 384
 JudgeDay4
-43.0
+36.0
 1
 0
 Number
@@ -3518,6 +3584,46 @@ ResetDate
 0
 1
 11
+
+INPUTBOX
+2140
+632
+2296
+693
+UpperStudentAge
+16.0
+1
+0
+Number
+
+INPUTBOX
+2142
+693
+2298
+754
+LowerStudentAge
+0.0
+1
+0
+Number
+
+PLOT
+512
+493
+712
+643
+Function
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -2674135 true "" "plot Objfunction"
 
 @#$#@#$#@
 ## WHAT IS IT?
