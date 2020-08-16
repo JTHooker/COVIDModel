@@ -1353,7 +1353,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1381,7 +1381,7 @@ Speed
 Speed
 0
 5
-5.0
+3.0
 .1
 1
 NIL
@@ -1430,7 +1430,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1733,7 +1733,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+25.0
 .5
 1
 NIL
@@ -1748,7 +1748,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+25.0
 .5
 1
 NIL
@@ -2326,7 +2326,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+25.0
 1
 0
 Number
@@ -2337,7 +2337,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+25.0
 1
 0
 Number
@@ -2566,7 +2566,7 @@ SWITCH
 1068
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2806,7 +2806,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -2851,7 +2851,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -2864,7 +2864,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2877,7 +2877,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+25.0
 1
 1
 NIL
@@ -3045,7 +3045,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -3058,7 +3058,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3073,7 +3073,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3426,7 +3426,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+2
 
 PLOT
 2378
@@ -3497,7 +3497,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
