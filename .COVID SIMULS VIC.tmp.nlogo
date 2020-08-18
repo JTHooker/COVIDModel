@@ -1150,15 +1150,15 @@ to setupstages
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
   if stage = 2 [ set speed 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
     set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
   if stage = 3 [ set speed 2 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
+  set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_efficacy 75 set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
     set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  set upperStudentAge 16 set LowerStudentAge 0 ]
 
   if stage = 4 [ set speed 1 set pta 90 set ppa 90 set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true  set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true set mask_efficacy 75 set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
     set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 0 ]
   ]
 end
