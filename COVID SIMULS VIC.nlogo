@@ -269,10 +269,10 @@ to setup
         let stream_id random-float 999
         let seed random-float 999
         rngs:set-seed stream_id seed
-        let complianceDist rngs:rnd-beta  stream_id 30 10
+        let complianceDist rngs:rnd-beta  stream_id 28 3
         set ownComplianceWithIsolation complianceDist
         let maskWearEfficacy rngs:rnd-beta stream_id 20 11
-        set ownMaskEfficacy maskWearEfficacy
+        set ownMaskEfficacy maskWearEfficacy ;; assigng mask efficacy to individuals around a distribution with median 66%
 
         set asymptom random 100
         set essentialWorker random 100
@@ -281,8 +281,8 @@ to setup
         iterateAsymptomAge
         resetPersonalVirulence
         assignApptoEssential
-        ;;set ppa 85
-        ;; set pta 85
+       ;set pta random-float ((Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2))
+       ;set ppa random-float ((Proportion_People_avoid - (Proportion_People_Avoid * .2)) + random-float (Proportion_People_avoid + (1 - Proportion_People_avoid) * .2))
 
 
        ]]
@@ -508,7 +508,6 @@ to move ;; describes the circumstances under which people can move and infect on
 
   ifelse remainder randombinary 1 = 0 [
 
-
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
@@ -535,24 +534,50 @@ to move ;; describes the circumstances under which people can move and infect on
 
     ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
 
-  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ] ;; non-compliant people continue to move around the environment unless they are very sick
+  if color = red and Case_Isolation = false and ownCompliancewithIsolation < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]  ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
 
   ] [
-    move-to homeLocation]
+    move-to homeLocation
+
+    if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
+    set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85  [
+    set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy  [
+    set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy  [
+    set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
+
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 and random 100 > ownMaskEfficacy
+  [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  ownMaskEfficacy
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
+
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
+
+    ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
+
+  ]
 end
 
 
 to avoid ;; these are the circustances under which people will interact
 ask simuls [
   (ifelse
-      Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 0 [
+      Spatial_Distance = true and (Proportion_People_Avoid + random-normal 0 2) > random 100 and (Proportion_Time_Avoid + random-normal 0 2) > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 0 [
         if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself ]
         [ if any? neighbors with [ utilisation = 0  ] [ move-to one-of neighbors with [ utilisation = 0 ] ]]]
       ;; so, if the social distancing policies are on and you are distancing at this time and you are not part of an age-isolated group and you are not an essentialworker, then if there is anyone near you, move away if you can.
       ;; else...
-      Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 1 [
+      Spatial_Distance = true and (Proportion_People_Avoid + random-normal 0 2) > random 100 and (Proportion_Time_Avoid + random-normal 0 2) > random 100 and AgeRange > Age_Isolation and EssentialWorkerFlag = 1 [
         if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself ]
         [ if any? neighbors with [ utilisation = 0  ] and Ess_W_Risk_Reduction > random 100  [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are an essential worker, you can only reduce your
       ;;contacts when you are not at work assuming 8 hours work, 8 hours rest, 8 hours recreation - rest doesn't count for anyone, hence it is set at 50 on the input slider. People don't isolate from others in their household unit
@@ -561,7 +586,7 @@ ask simuls [
 
   if policyTriggerOn = true and freewheel = false and schoolsPolicy = true and ticks >= triggerday + SchoolReturnDate [ ask simuls with [ studentFlag = 1 ] [ ;; same thing but specifically targets the movement of students if the schools policy is turned on - that is
     ;;if students are expected to return to school
-     ifelse Spatial_Distance = true and Proportion_People_Avoid > random 100 and Proportion_Time_Avoid > random 100 and AgeRange > Age_Isolation  [
+     ifelse Spatial_Distance = true and Proportion_People_Avoid + random-normal 0 2 > random 100 and Proportion_Time_Avoid + random-normal 0 2 > random 100 and AgeRange > Age_Isolation  [
       if any? other simuls-here with [ householdUnit != [ householdUnit ] of myself or studentFlag != 1 ]  [ ;; students don't isolate from each other or their household unit
         if any? neighbors with [ utilisation = 0 ] and Ess_W_Risk_Reduction > random 100 [ move-to one-of neighbors with [ utilisation = 0 ] ]]];;; if you are a student, you avoid everyone you can except for essential workers (i.e., teachers),  other students
    ;; and people from your own household
@@ -712,6 +737,8 @@ to Cruiseship
         rngs:set-seed stream_id seed
         let dist rngs:rnd-beta  stream_id 28 2
         set ownComplianceWithIsolation dist
+        let maskWearEfficacy rngs:rnd-beta stream_id 20 11
+        set ownMaskEfficacy maskWearEfficacy
 
       ]]
 end
@@ -737,7 +764,7 @@ to death ;; calculates death for individuals and adds them to a total for the po
 end
 
 to respeed
-  if tracked != 1 [ set pace speed ] ;; If people aren't tracked they can move as they wish
+  if tracked != 1 [ set pace span ] ;; If people aren't tracked they can move as they wish
 end
 
 to checkutilisation
@@ -797,8 +824,10 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
         let stream_id random-float 999
         let seed random-float 999
         rngs:set-seed stream_id seed
-        let dist rngs:rnd-beta  stream_id 28 2
-        set ownComplianceWithIsolation dist ] ;;
+        let dist rngs:rnd-beta  stream_id 30 10
+        set ownComplianceWithIsolation dist
+        let maskWearEfficacy rngs:rnd-beta stream_id 20 11
+        set ownMaskEfficacy maskWearEfficacy] ;;
 
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls) resethealth set imported 0
@@ -813,24 +842,27 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
         let stream_id random-float 999
         let seed random-float 999
         rngs:set-seed stream_id seed
-        let dist rngs:rnd-beta  stream_id 28 2
+        let dist rngs:rnd-beta  stream_id 30 10
         set ownComplianceWithIsolation dist
-
+        let maskWearEfficacy rngs:rnd-beta stream_id 20 11
+        set ownMaskEfficacy maskWearEfficacy
     ]
+
+
  set contact_Radius Contact_Radius + (90 / 4)
     Set days 0
          ] [scaledown ]
 
 end
 
-to scaledown ;; preverses the procedure above after the peak of the epidemic
+to scaledown ;; reverses the procedure above after the peak of the epidemic
   if scale = true and count simuls with [ color = red ] <= 25 and yellowcount > redcount and days > 0 and scalephase > 0 [ ask n-of (count simuls with [ color = red ] * .9 ) simuls with [ color = red ]
     [ hatch 10 move-to one-of patches with [ pcolor = black ] ]
   set contact_Radius Contact_radius - (90 / 4) set scalephase scalephase - 1  ]
 end
 
 to scaledownhatch ;; removes excess simuls fromt the scaled-down view
-  if count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color = yellow or color = 85 ] [ die ] ]
+  if count simuls > Population [  ask n-of ( count simuls - Population ) simuls with [ color != red or color != black ] [ die ] ]
  ;; if count simuls > Population [ ask n-of ( count simuls - Population ) simuls with [ color = 85 ] [ die ] ]
 end
 
@@ -1140,24 +1172,24 @@ end
 
 
 to setupstages
-  if selfgovern = true [
-    if stage = 0 [ set speed 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if selfgovern = true [ ;; need to alter compliance with isolation using the beta distribution at each stage
+    if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 1 [ set speed 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 1 [ set span 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 2 [ set speed 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 2 [ set span 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
     set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ]
 
-  if stage = 3 [ set speed 2 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 3 [ set span 2 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion .3 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 30
     set residualcautionPPA 30 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  set upperStudentAge 16 set LowerStudentAge 0 ]
 
-  if stage = 4 [ set speed 1 set pta 90 set ppa 90 set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 4 [ set span 1 set pta 90 set ppa 90 set spatial_distance true set age_isolation 70 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 15 set maskPolicy true  set mask_wearing 95 set tracking true set App_Uptake 50 set residualcautionPTA 80
     set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 0 ]
   ]
@@ -1356,7 +1388,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1380,8 +1412,8 @@ SLIDER
 306
 306
 339
-Speed
-Speed
+Span
+Span
 0
 5
 4.0
@@ -1433,7 +1465,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1513,7 +1545,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2008,7 +2040,7 @@ Incubation_Period
 Incubation_Period
 0
 10
-5.1
+4.8
 .1
 1
 NIL
@@ -3414,7 +3446,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -5572,7 +5604,7 @@ set PTA random 100</setup>
   </experiment>
   <experiment name="Victoria LE Grattan 1" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup
-set mask_Efficacy Mask_Efficacy + random-normal 0 5</setup>
+set asymptomatic asymptomatic + random-normal 0 3</setup>
     <go>go</go>
     <timeLimit steps="100"/>
     <metric>count turtles</metric>
@@ -5694,7 +5726,254 @@ set mask_Efficacy Mask_Efficacy + random-normal 0 5</setup>
       <value value="0.8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AsymptomaticPercentage">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Population">
+      <value value="2500"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mean_Individual_Income">
+      <value value="55000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="current_cases">
+      <value value="63"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Available_Resources">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="saliency_of_experience">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scale">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_illnesspd">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Beds_in_Australia">
+      <value value="4200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Media_Exposure">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initialassociationstrength">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Superspreaders">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="care_attitude">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Contact_Radius">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
+      <value value="65000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_switch">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Incubation_Period">
+      <value value="5.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="case_isolation">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="policytriggeron">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Required">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Speed">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Ess_W_Risk_reduction">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Essential_Workers">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="tracking">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPPA">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPTA">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Asymptomatic_Trans">
+      <value value="0.33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Proportion">
+      <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Post_Proportion">
+      <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="MaskPolicy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mask_Efficacy">
+      <value value="75"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mask_Wearing">
+      <value value="90"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SchoolsPolicy">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="App_Uptake">
       <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_switch">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="schoolpolicyactive">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="seedticks">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scalephase">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="schoolreturndate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Complacency">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Victoria new MJA" repetitions="1000" runMetricsEveryStep="true">
+    <setup>setup
+set asymptomatic asymptomatic + random-normal 0 3
+set pta - random-float (Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2)
+set ppa - random-float (Proportion_People_avoid - (Proportion_People_Avoid * .2)) + random-float (Proportion_People_avoid + (1 - Proportion_People_avoid) * .2)</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
+    <metric>count turtles</metric>
+    <metric>ticks</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
+    <metric>essentialworkerpercentage</metric>
+    <metric>nonesspercentage</metric>
+    <metric>scale</metric>
+    <enumeratedValueSet variable="OS_Import_Switch">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maxv">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RestrictedMovement">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="days_of_cash_reserves">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_Time_Avoid">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pta">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cruise">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TimeLockDownOff">
+      <value value="28"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
+      <value value="0.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Treatment_Benefit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FearTrigger">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Diffusion_Adjustment">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="total_population">
+      <value value="6400000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Triggerday">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lockdown_off">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_incubation">
+      <value value="2.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarantine">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="spatial_distance">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Global_Transmissability">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="minv">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Initial">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freewheel">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="self_capacity">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Compliance_with_Isolation">
+      <value value="95"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Illness_period">
+      <value value="20.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stimulus">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="WFH_Capacity">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Bed_Capacity">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ReInfectionRate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ppa">
+      <value value="85"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity_of_illness">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ProductionRate">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="phwarnings">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="AsymptomaticPercentage">
+      <value value="25"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
       <value value="2500"/>
