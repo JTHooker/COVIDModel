@@ -901,15 +901,17 @@ end
 
 
 to countDailyCases ;; sets the day for reporting new cases at 6 (adjustable) days after initial infection, scales up as the population scales
-  let casestoday count simuls with [ color = red and tracked = 1 and reported = 0 ] ;; this could be used to look at reported vs actual by including 'and tracked = 1'
+ ;; let casestoday count simuls with [ color = red and tracked = 1 and reported = 0 ] ;; this could be used to look at reported vs actual by including 'and tracked = 1'
+ ;;or
+  let casestoday count simuls with [ color = red and timenow = int Case_reporting_delay ]
+
+
 
   if Scalephase = 0 [ set dailyCases casestoday ]
   if Scalephase = 1 [ set dailyCases casestoday * 10 ]
   if Scalephase = 2 [ set dailyCases casestoday * 100 ]
   if Scalephase = 3 [ set dailyCases casestoday * 1000 ]
   if Scalephase = 4 [ set dailyCases casestoday * 10000 ]
-
-  ask simuls with [ tracked = 1 ] [ set reported 1 ]
 
 end
 
@@ -923,6 +925,7 @@ end
 
 to checkICU
   if color = red and RequireICU < ICU_Required and timenow >= ownIncubationPeriod [ set requireICU 1 ] ;; estimates if someone needs and ICU bed
+    if tracked = 1 and reported = 0 [ set reported 1 ] ;; and updates their reported status - this needs to go after the last function as it wasn;t being counted properly
 end
 
 to CalculateICUBedsRequired ;; calculates the number of ICU beds required at any time
@@ -1236,33 +1239,33 @@ set prior0 dailyCases
     + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
     + prior21 + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
 
-print	prior26
-print	prior25
-print	prior24
-print	prior23
-print	prior22
-print	prior21
-print	prior20
-print	prior19
-print	prior18
-print	prior17
-print	prior16
-print	prior15
-print	prior14
-print	prior13
-print	prior12
-print	prior11
-print	prior10
-print	prior9
-print	prior8
-print	prior7
-print	prior6
-print	prior5
-print	prior4
-print	prior3
-print	prior2
-print	prior1
-print	prior0
+;print	prior26
+;print	prior25
+;print	prior24
+;print	prior23
+;print	prior22
+;print	prior21
+;print	prior20
+;print	prior19
+;print	prior18
+;print	prior17
+;print	prior16
+;print	prior15
+;print	prior14
+;print	prior13
+;print	prior12
+;print	prior11
+;print	prior10
+;print	prior9
+;print	prior8
+;print	prior7
+;print	prior6
+;print	prior5
+;print	prior4
+;print	prior3
+;print	prior2
+;print	prior1
+;print	prior0
 
 
 end
@@ -1644,7 +1647,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.15
+0.1
 .05
 1
 NIL
@@ -2157,7 +2160,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+67.5
 1
 1
 NIL
