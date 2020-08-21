@@ -1,0 +1,59 @@
+{
+  "bsearchVersionNumber": 2.0,
+  "infoTab": "Write notes here...",
+  "modelDCInfo": {
+    "modelFileName": "C:\\Users\\Thompson3\\Dropbox\\COVIDModel\\COVID SIMULS VIC.nlogo",
+    "setupCommands": "setup",
+    "stepCommands": "go",
+    "stopCondition": "ticks = 100",
+    "measureIfReporter": "@DONE",
+    "maxModelSteps": 100,
+    "rawMeasureReporters": {
+      "RAW1": "currentinfections",
+      "RAW2": "numberinfected"
+    },
+    "singleRunCondenserReporters": {},
+    "fitnessSamplingReplications": 10,
+    "bestCheckingNumReplications": 1
+  },
+  "paramSpecStrings": [
+    "[\"spatial_distance\" true false]",
+    "[\"case_isolation\" true false]",
+    "[\"quarantine\" true false]",
+    "[\"track_and_trace_efficiency\" [0 0.05 1]]",
+    "[\"proportion_people_avoid\" [0 5 100]]",
+    "[\"proportion_time_avoid\" [0 5 100]]",
+    "[\"compliance_with_isolation\" [0 5 100]]"
+  ],
+  "objectives": [
+    {
+      "name": "min_cinfections",
+      "objectiveType": "MINIMIZE",
+      "fitnessCombineReplications": "currentinfections",
+      "fitnessDerivativeParameter": "",
+      "fitnessDerivativeDelta": 0.0,
+      "fitnessDerivativeUseAbs": false
+    },
+    {
+      "name": "min_tinfections",
+      "objectiveType": "MINIMIZE",
+      "fitnessCombineReplications": "numberinfected",
+      "fitnessDerivativeParameter": "",
+      "fitnessDerivativeDelta": 0.0,
+      "fitnessDerivativeUseAbs": true
+    }
+  ],
+  "searchAlgorithmInfo": {
+    "searchMethodType": "StandardGA",
+    "searchMethodParams": {
+      "population-model": "generational",
+      "population-size": "50",
+      "mutation-rate": "0.01",
+      "crossover-rate": "0.7",
+      "tournament-size": "3"
+    },
+    "chromosomeType": "GrayBinaryChromosome",
+    "caching": true,
+    "evaluationLimit": 100
+  }
+}
