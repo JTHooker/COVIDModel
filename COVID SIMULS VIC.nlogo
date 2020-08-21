@@ -295,7 +295,7 @@ to setup
 
   ask n-of ( Current_Cases ) simuls [  set color red set timenow random int ( ownillnessperiod ) set personalVirulence Global_Transmissability  ]
 
-  ask n-of 100 simuls with [ color = 85 ] [  set reported 1 set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ] ;; this is for the MJA paper
+ ;; ask n-of 90 simuls with [ color = 85 ] [  set reported 1 set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ] ;; this is for the MJA paper
 
   if count simuls with [ color = red ] <= 1 [ ask n-of 1 simuls [ set xcor 0 set ycor 0 set color red set timenow int ownIllnessperiod - 1 ] ;; sould be 'ownincubationperiod' for new outbreaks
  ]
@@ -343,7 +343,9 @@ to setup
   resetHouseholdUnit ;; iterates this process
   ask simuls [ resetlandingSimul ]
 
- setupstages
+  setupstages ;; setting up for the MJA runs
+
+
   ;;set tracking false ;; ensures this is set to false each time the model starts
   ;;set link_switch false ;; ensures this is set to false each timme the model starts
   ;;set schoolspolicy false ;; ensures that the schools settings don't begin before the policy trigger starts
@@ -1417,7 +1419,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1481,7 +1483,7 @@ Illness_period
 Illness_period
 0
 25
-20.8
+20.2
 .1
 1
 NIL
@@ -1494,7 +1496,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1574,7 +1576,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1727,7 +1729,7 @@ Superspreaders
 Superspreaders
 0
 100
-9.109449650477428
+10.646667326670027
 1
 1
 NIL
@@ -2181,7 +2183,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2818,7 +2820,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-25.0
+23.977142632931766
 1
 1
 NIL
@@ -3355,7 +3357,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.33
+9.304566785201944
 .01
 1
 NIL
@@ -3475,7 +3477,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-4
+0
 
 PLOT
 2378
@@ -6598,7 +6600,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="6"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="schoolsPolicy">
-      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="phwarnings">
       <value value="0.8"/>
@@ -6628,7 +6630,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="SeedTicks">
-      <value value="6"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="scale">
       <value value="true"/>
