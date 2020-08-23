@@ -2,6 +2,9 @@
 
 **** SEE NOTES ON ODD PROTOCOL BELOW IF YOU ARE LOOKING FOR IT ****
 
+If you are looking for the ODD protocol and this link does not work: https://github.com/JTHooker/COVIDModel/blob/master/ODD%20Protocol%20Aus%20NZ%20COVID19%20model.pdf , please see instructions below.
+
+************************************************************************************************************************************************************************************
 
 This is an Agent-Based Model being built to assist with modeling the spread, health and economic impact of COVID 19 in Australia and policy-settings during its expansion and contraction phase that could limit its damage.
 
