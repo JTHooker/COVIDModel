@@ -241,7 +241,8 @@ to setup
 
   ask red-links [ set color red ]
 ;; sets color of patches to black
-  ask patches [ set pcolor black  ]
+  ask patches [ set pcolor black ]
+  ask n-of (count patches * Outside ) patches [ set pcolor green ] ;; sets a proportion of interactions outside vs inside
   ask n-of 100 patches with [ pcolor = black ] [ set destination 1 ] ;; a beta function for testing locating many people in one place at a single time
 
  ;; setting up the hospital
@@ -395,7 +396,7 @@ to resethouseholdUnit ;; allocates children to households
 end
 
 to resetlandingSimul
-  move-to one-of simuls with [ householdUnit = [ houseHoldUnit ] of myself ] ;; for some reason, this isn't working... NEED TO FIX
+  move-to one-of simuls with [ pcolor = black and householdUnit = [ houseHoldUnit ] of myself ] ;; now working so home locations are not in green space
   set homeLocation patch-here
   ;; if any? other simuls-here with [ householdUnit != [ householdUnit] of myself ] [
   ;; iterates / sorts people into households
@@ -498,12 +499,13 @@ to go ;; these funtions get called each time-step
   calculateMeanDaysInfected
   profilerstop
   traceadjust
- ;;linearbehdecrease
+  ;;linearbehdecrease
   visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
   calculateCashPosition
   calculateObjfunction
+  updateoutside
   ask patches [ checkutilisation ]
  tick
 
@@ -516,29 +518,59 @@ to move ;; describes the circumstances under which people can move and infect on
 
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
+  ;;Infection transmission - inside
+
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85 and [ pcolor ] of patch-here = black  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85 and [ pcolor ] of patch-here = black  [
     set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = black  [
     set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy  [
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = black  [
     set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 and random 100 > ownMaskEfficacy
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = black
   [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  ownMaskEfficacy
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  ownMaskEfficacy and [ pcolor ] of patch-here = black
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
 
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 and [ pcolor ] of patch-here = black
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
-  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0 and [ pcolor ] of patch-here = black
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
 
-    ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
+
+;; infection transmission outside
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85 and [ pcolor ] of patch-here = green and outsiderisk < random 100  [
+    set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85 and [ pcolor ] of patch-here = green and outsiderisk < random 100   [
+    set color red set timenow 0 traceme ] ;; people who are symptomatic pass on the virus at the rate of their personal virulence, which is drawn from population means
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = green and outsiderisk < random 100  [
+    set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
+
+  if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 1 ] and color = 85 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = green and outsiderisk < random 100  [
+    set color red set timenow 0 traceme ] ;; accounts for a % reduction in transfer through mask wearing
+
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 1 and random 100 > ownMaskEfficacy and [ pcolor ] of patch-here = green and outsiderisk < random 100
+  [ set R R + 1 set GlobalR GlobalR + 1 ]  ;; asymptomatic and wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 1 and random 100 >  ownMaskEfficacy and [ pcolor ] of patch-here = green and outsiderisk < random 100
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and wearing mask
+
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 and [ pcolor ] of patch-here = green and outsiderisk < random 100
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; asymptomatic and not wearing mask
+  if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0 and [ pcolor ] of patch-here = green and outsiderisk < random 100
+  [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
+
+
+    ;; these functions reflect those above but allow the Reff to be measured over the course of the simulation
+
 
   if color = red and Case_Isolation = false and ownCompliancewithIsolation * 100 < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]  ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
@@ -1099,9 +1131,9 @@ to EssentialWorkerID
 end
 
 to seedCases ;; set up to take the pre-intervention growth pre July 9th and use it to seed new cases
-    if ticks <= seedticks and scalephase = 0 [ ask n-of (5.5375 * 1.12064 ^ ticks) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 1 [ ask n-of ((5.5375 * 1.12064 ^ ticks) / 10) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 2 [ ask n-of ((5.5375 * 1.12064 ^ ticks) / 100) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 0 [ ask n-of (566.31 * -.061 ^ (ticks + 21)) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 1 [ ask n-of ((566.31 * -.061 ^ (ticks + 21)) / 10) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 2 [ ask n-of ((566.31 * -.061 ^ (ticks + 21)) / 100) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
@@ -1188,33 +1220,28 @@ end
 
 to setupstages
 
-  set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set tracking true set App_Uptake 20 set residualcautionPTA 85
-    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0
+  if selfgovern = true [ ;; need to alter compliance with isolation using the beta distribution at each stage
+    if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
 
-;
-;  if selfgovern = true [ ;; need to alter compliance with isolation using the beta distribution at each stage
-;    if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
-;    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
-;
-;  if stage = 1 [ set span 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
-;    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
-;
-;  if stage = 2 [ set span 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
-;    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
-;
-;  if stage = 3 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 20 set residualcautionPTA 85
-;    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0 ]
-;
-;  if stage = 4 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-;  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
-;    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0]
-;
-;  ]
+  if stage = 1 [ set span 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
+
+  if stage = 2 [ set span 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
+    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
+
+  if stage = 3 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 20 set residualcautionPTA 85
+    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0 ]
+
+  if stage = 4 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
+    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0]
+
+  ]
 end
 
 to calculateCasesInLastPeriod
@@ -1284,29 +1311,25 @@ set prior0 dailyCases
 
 end
 
-to covidpolicytriggers
-
-  if ticks > 0 [ set stage 4 ] ;; used to set up initial stages for Victoria runs
-
-  ;;if ticks > 0 [ set stage 3 ] ;; used to set up initial stages for Victoria runs
-
-end
-
-
-
-;to COVIDPolicyTriggers ;; used in idynamic model
-;    if selfgovern = true  [
-;    if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-;    if stage = 4 and casesinperiod <= threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-;    if stage = 3 and casesinperiod <= twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
+;to covidpolicytriggers
 ;
+;  if ticks > 0 [ set stage 4 ] ;; used to set up initial stages for Victoria runs
+;
+;  ;;if ticks > 0 [ set stage 3 ] ;; used to set up initial stages for Victoria runs
 ;end
+
+to COVIDPolicyTriggers ;; used in idynamic model
+    if selfgovern = true  [
+    if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+    if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
+    if stage = 4 and casesinperiod <= threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod <= twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
+    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
+end
 
 to calculatecashPosition
   set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
@@ -1315,6 +1338,11 @@ end
 to calculateObjfunction
   if ticks > 1 [ set objFunction (numberInfected * currentinfections * ( 1 - ( sum [ reserves] of simuls with [ color != black ]  / Initialreserves )))]
   ;;if ticks > 1 [ set objFunction  ( 1 - ( sum [ reserves] of simuls with [ color != black ]  / Initialreserves ))]
+end
+
+to updateoutside
+  if count patches with [ pcolor = green ] < ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = black ] [ set pcolor green ] ]
+  if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1447,7 +1475,7 @@ Span
 Span
 0
 5
-5.0
+3.0
 .1
 1
 NIL
@@ -1799,7 +1827,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -1814,7 +1842,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -1966,7 +1994,7 @@ INPUTBOX
 314
 504
 current_cases
-100.0
+40.0
 1
 0
 Number
@@ -2183,7 +2211,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2361,7 +2389,7 @@ TEXTBOX
 678
 318
 700
-Days since July 25th, 2020
+Day 1 - August 24th, 2020
 12
 15.0
 1
@@ -2392,7 +2420,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+25.0
 1
 0
 Number
@@ -2403,7 +2431,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+25.0
 1
 0
 Number
@@ -2872,7 +2900,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -2943,7 +2971,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+25.0
 1
 1
 NIL
@@ -2956,7 +2984,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -3070,7 +3098,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3109,7 +3137,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -3124,7 +3152,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -3383,7 +3411,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.0
+0.6
 .01
 1
 NIL
@@ -3467,7 +3495,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4
-1
+2
 
 CHOOSER
 506
@@ -3477,7 +3505,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-4
+2
 
 PLOT
 2378
@@ -3514,7 +3542,7 @@ INPUTBOX
 1845
 259
 onetotwo
-1.0
+30.0
 1
 0
 Number
@@ -3525,7 +3553,7 @@ INPUTBOX
 1847
 321
 twotothree
-1.0
+500.0
 1
 0
 Number
@@ -3536,7 +3564,7 @@ INPUTBOX
 1847
 383
 threetofour
-1.0
+1000.0
 1
 0
 Number
@@ -3587,7 +3615,7 @@ INPUTBOX
 1931
 194
 JudgeDay1
-1.0
+7.0
 1
 0
 Number
@@ -3598,7 +3626,7 @@ INPUTBOX
 1932
 260
 JudgeDay2
-1.0
+7.0
 1
 0
 Number
@@ -3609,7 +3637,7 @@ INPUTBOX
 1933
 323
 JudgeDay3
-1.0
+7.0
 1
 0
 Number
@@ -3620,7 +3648,7 @@ INPUTBOX
 1933
 384
 JudgeDay4
-100.0
+7.0
 1
 0
 Number
@@ -3675,6 +3703,47 @@ false
 "" ""
 PENS
 "default" 1.0 0 -2674135 true "" "plot Objfunction"
+
+SLIDER
+508
+823
+681
+858
+Outside
+Outside
+0
+1
+0.2
+.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+963
+472
+1136
+507
+outsideRisk
+outsideRisk
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+330
+76
+413
+122
+Green space
+count patches with [ pcolor = green ]
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
