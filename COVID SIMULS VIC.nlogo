@@ -2183,7 +2183,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -3357,7 +3357,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
--1.3409844583844217
+0.33
 .01
 1
 NIL
@@ -3477,7 +3477,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-4
+0
 
 PLOT
 2378
@@ -6408,7 +6408,7 @@ set App_uptake App_Uptake + random-normal 0 2</setup>
   <experiment name="MJA stage 4 no complacency" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
-set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 6 
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
 set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4</setup>
@@ -6705,7 +6705,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
   <experiment name="MJA stage 3 no complacency" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
-set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 6 
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
 set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4</setup>
