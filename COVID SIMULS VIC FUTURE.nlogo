@@ -452,7 +452,7 @@ end
 
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn athome ] ;;  financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn  ] ;;  financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -507,15 +507,16 @@ to go ;; these funtions get called each time-step
   calculateCashPosition
   calculateObjfunction
   updateoutside
+  updatestudentStatus
   ask patches [ checkutilisation ]
  tick
 
 end
 
 to move ;; describes the circumstances under which people can move and infect one another
-  let randombinary random 1
+  let randombinary random 2 ;; this is assigned per agent so day and night are not aligned across people - this is deliberate
 
-  ifelse remainder randombinary 2 = 1 [
+  ifelse randombinary = 1 [
 
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
@@ -575,9 +576,9 @@ to move ;; describes the circumstances under which people can move and infect on
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
 
-  ]
+  set mobility 1 ] ;; this considers how mobile people are
 
-  [ move-to homeLocation ]
+  [ move-to homeLocation set mobility 0 ]
 
 
    if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
@@ -1224,23 +1225,23 @@ to setupstages
   if selfgovern = true [ ;; need to alter compliance with isolation using the beta distribution at each stage
     if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
-    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 1 [ set span 4 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 1 [ set span 5 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
-    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
+    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 2 [ set span 3 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 2 [ set span 4 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
-    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false ]
+    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 3 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 3 [ set span 3 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 20 set residualcautionPTA 85
-    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0 ]
+    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 3 ]
 
-  if stage = 4 [ set span 5 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 4 [ set span 2 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
-    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 0]
+    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 3 ] ;; check student age update
 
   ]
 end
@@ -1346,8 +1347,13 @@ to updateoutside
   if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
 
-to athome
-  ifelse patch-here = homelocation [ set mobility 1 ] [ set mobility 0 ]
+;to athome
+;  ifelse patch-here = homelocation [ set mobility 0 ] [ set mobility 1 ]
+;  ;;if patch-here != homelocation [ set mobility 1 ]
+;end
+
+to updateStudentStatus
+  ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge ] [ set studentFlag 1  ] ;; Identifies students
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1480,7 +1486,7 @@ Span
 Span
 0
 5
-5.0
+4.0
 .1
 1
 NIL
@@ -1832,7 +1838,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -1847,7 +1853,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+25.0
 .5
 1
 NIL
@@ -2057,7 +2063,7 @@ true
 true
 "" ""
 PENS
-"Contacts" 1.0 0 -16777216 true "" ";;if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
+"Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
 "Mobility" 1.0 0 -13840069 true "" "plot mean [ mobility ] of simuls"
 
 PLOT
@@ -2132,8 +2138,8 @@ PENS
 PLOT
 955
 843
-1370
-1102
+1371
+1099
 Active (red) and Total (blue) Infections ICU Beds (black)
 NIL
 NIL
@@ -2426,7 +2432,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+25.0
 1
 0
 Number
@@ -2437,7 +2443,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+25.0
 1
 0
 Number
@@ -2906,7 +2912,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -2977,7 +2983,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+25.0
 1
 1
 NIL
@@ -2990,7 +2996,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -3104,7 +3110,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3143,7 +3149,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -3158,7 +3164,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-85.0
+20.0
 1
 1
 NIL
@@ -3417,7 +3423,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.0
+0.6
 .01
 1
 NIL
@@ -3511,7 +3517,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-4
+2
 
 PLOT
 2378
@@ -3676,7 +3682,7 @@ INPUTBOX
 2296
 693
 UpperStudentAge
-16.0
+18.0
 1
 0
 Number
@@ -3687,7 +3693,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-0.0
+3.0
 1
 0
 Number
