@@ -497,7 +497,7 @@ to go ;; these funtions get called each time-step
   ;;visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
-  calculateCashPosition
+  ;;calculateCashPosition
   calculateObjfunction
   updateoutside
   updatestudentStatus
@@ -703,7 +703,7 @@ end
 ;;;;;*********END OF RESOURCES********************
 
 
-;;;ANXIETY::::::::::::::::::
+;;;*******************ANXIETY******************::::::::::::::::::
 
 to createanxiety
   set anxiety ( anxiety + anxietyfactor ) * random-normal .9 .1 ;; a fairly unsophisticated (currently unused) means of allocating anxiety around COVID-19 to people - will be updated
@@ -782,17 +782,17 @@ to CalculateDailyGrowth ;; calculated the growth in infectes per day
 end
 
 to countcontacts
-
+  if color != red [
   set contacts7 contacts6
   set contacts6 contacts5
   set contacts5 contacts4
   set contacts4 contacts3
   set contacts3 contacts2
   set contacts2 contacts1
-  set contacts1 (count other simuls-here with [ color != black  and householdUnit != [ householdUnit ] of myself ]) ;; or alternatively add the following ## and householdUnit != [ householdUnit ] of myself
+  set contacts1 (count other simuls-here with [ color != black and householdUnit != [ householdUnit ] of myself ]) ;; or alternatively add the following ## and householdUnit != [ householdUnit ] of myself
 
   set contacts ( contacts1 + contacts2 + contacts3 + contacts4 + contacts5 + contacts6 + contacts7 ) /  7
-
+  ]
 end
 
 to death ;; calculates death for individuals and adds them to a total for the population
@@ -1223,25 +1223,25 @@ end
 to setupstages
 
   if selfgovern = true [
-    if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 0 set residualcautionPTA 0
+    if stage = 0 [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 1 [ set span 5 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 5 set residualcautionPTA 0
-    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
+  if stage = 1 [ set span 30 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
+    set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 2 [ set span 4 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 20
-    set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
+  if stage = 2 [ set span 15 set pta 75 set ppa 75 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 60
+    set residualcautionPPA 60 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 3 [ set span 3 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
-    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 3 ]
+  if stage = 3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
-  if stage = 4 [ set span 2 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
-    set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 3 ] ;; check student age update
+  if stage = 4 [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 81
+    set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ] ;; check student age update
 
   ]
 end
@@ -1314,26 +1314,26 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 4 and casesinperiod <= threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
     if stage = 3 and casesinperiod <= twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 set resetdate (ticks + JudgeDay1)]
+    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 ]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 end
 
 ;to calculatecashPosition
-  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
-end
+;  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
+;end
 
 to calculateObjfunction
   ;; mobility
-  if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
+  ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-  ;; if ticks > 1 [ set objFunction (numberInfected * currentinfections )]
+   if ticks > 1 [ set objFunction (numberInfected * currentinfections ) * 2 - (( mean [ contacts ] of simuls ) ]
 
   ;; cases
   ;; if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
 end
 
-to updateoutside
+to updateoutside ;; controls the amount of time that interactions happen outside
   if count patches with [ pcolor = green ] < ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = black ] [ set pcolor green ] ]
   if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
@@ -1471,9 +1471,9 @@ SLIDER
 Span
 Span
 0
-5
-5.0
-.1
+30
+30.0
+1
 1
 NIL
 HORIZONTAL
@@ -2208,7 +2208,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+45.0
 1
 1
 NIL
@@ -2942,7 +2942,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3181,7 +3181,7 @@ NIL
 0.0
 10.0
 0.0
-15.0
+10.0
 true
 false
 "" ""
@@ -3330,7 +3330,7 @@ Visit_Frequency
 Visit_Frequency
 0
 6
-6.0
+3.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.0
 .01
 1
 NIL
@@ -3509,7 +3509,7 @@ PLOT
 981
 2578
 1102
-New cases in last 28 days
+New cases in last 14 days
 NIL
 NIL
 0.0
