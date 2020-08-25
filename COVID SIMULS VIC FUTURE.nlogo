@@ -179,6 +179,7 @@ simuls-own [
   homeLocation ;; this is where these people live
   ownMaskEfficacy ;; the efficacy of the person's own mask
   reported ;; has the person's case been reported yet
+  mobility; the extent to which the person is moving around the community
 
 ]
 
@@ -374,15 +375,15 @@ to setdeathrisk
   if agerange = 25 [ set riskofDeath .002 ]
   if agerange = 35 [ set riskofDeath .002 ]
   if agerange = 45 [ set riskofDeath .004 ]
-  if agerange = 55 [ set riskofDeath .004 ]
-  if agerange = 65 [ set riskofDeath .03]
-  if agerange = 75 [ set riskofDeath .03  ]
-  if agerange = 85 [ set riskofDeath .223 ]
-  if agerange = 95 [ set riskofDeath .223 ] ;; updated from department of health July 15
+  if agerange = 55 [ set riskofDeath .01  ]
+  if agerange = 65 [ set riskofDeath .05  ]
+  if agerange = 75 [ set riskofDeath .05  ]
+  if agerange = 85 [ set riskofDeath .151 ]
+  if agerange = 95 [ set riskofDeath .151 ] ;; updated from department of health Report 22 - does not map directly to age deciles here
 end
 
 to resetlanding
-  if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ] ;; ensures that people don;t start on top of one another in the model
+  if any? other resources-here [ set ycor one-of [ -30 -10 10 30 ] resetlanding ] ;; ensures that resources don't start on top of one another in the model
 end
 
 
@@ -451,7 +452,7 @@ end
 
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn ] ;;  financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn athome ] ;;  financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -514,12 +515,11 @@ end
 to move ;; describes the circumstances under which people can move and infect one another
   let randombinary random 1
 
-  ifelse remainder randombinary 1 = 0 [
+  ifelse remainder randombinary 2 = 1 [
 
   if color != red or color != black and spatial_Distance = false [ set heading heading + Contact_Radius + random 45 - random 45 fd pace avoidICUs ] ;; contact radius defines how large the circle of contacts for the person is.
 
   ;;Infection transmission - inside
-
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85 and [ pcolor ] of patch-here = black  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
@@ -543,8 +543,7 @@ to move ;; describes the circumstances under which people can move and infect on
   if any? other simuls-here with [ color = 85 ] and color = red and Asymptomaticflag = 0 and currentVirulence  > random 100 and wearingMask = 0 and [ pcolor ] of patch-here = black
   [ set R R + 1 set GlobalR GlobalR + 1 ] ;; symptomatic and not wearing mask
 
-
-;; infection transmission outside
+  ;; Infection transmission outside
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85 and [ pcolor ] of patch-here = green and outsiderisk < random 100  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
@@ -576,10 +575,12 @@ to move ;; describes the circumstances under which people can move and infect on
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
 
-  ] [
-    move-to homeLocation
+  ]
 
-    if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
+  [ move-to homeLocation ]
+
+
+   if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
     set color red set timenow 0 traceme ] ;; reduces capacity of asymptomatic people to pass on the virus by 1/3
 
   if any? other simuls-here with [ color = red and asymptomaticFlag = 0 and currentVirulence > random 100 and wearingMask = 0  ] and color = 85  [
@@ -603,7 +604,7 @@ to move ;; describes the circumstances under which people can move and infect on
 
     ;; these functions reflect thos above but allow the Reff to be measured over the course of the simulation
 
-  ]
+
 end
 
 
@@ -1344,6 +1345,10 @@ to updateoutside
   if count patches with [ pcolor = green ] < ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = black ] [ set pcolor green ] ]
   if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
+
+to athome
+  ifelse patch-here = homelocation [ set mobility 1 ] [ set mobility 0 ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 328
@@ -1475,7 +1480,7 @@ Span
 Span
 0
 5
-3.0
+5.0
 .1
 1
 NIL
@@ -1827,7 +1832,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-25.0
+85.0
 .5
 1
 NIL
@@ -1842,7 +1847,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-25.0
+85.0
 .5
 1
 NIL
@@ -2041,7 +2046,7 @@ PLOT
 503
 1155
 624
-Close contacts per day
+Close contacts and Mobility
 NIL
 NIL
 0.0
@@ -2049,10 +2054,11 @@ NIL
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
-"Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
+"Contacts" 1.0 0 -16777216 true "" ";;if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
+"Mobility" 1.0 0 -13840069 true "" "plot mean [ mobility ] of simuls"
 
 PLOT
 951
@@ -2211,7 +2217,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-45.0
 1
 1
 NIL
@@ -2420,7 +2426,7 @@ INPUTBOX
 609
 284
 ppa
-25.0
+85.0
 1
 0
 Number
@@ -2431,7 +2437,7 @@ INPUTBOX
 700
 285
 pta
-25.0
+85.0
 1
 0
 Number
@@ -2900,7 +2906,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -2971,7 +2977,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-25.0
+90.0
 1
 1
 NIL
@@ -2984,7 +2990,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
@@ -3098,7 +3104,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3137,7 +3143,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-20.0
+85.0
 1
 1
 NIL
@@ -3152,7 +3158,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-20.0
+85.0
 1
 1
 NIL
@@ -3411,7 +3417,7 @@ OS_Import_Proportion
 OS_Import_Proportion
 0
 1
-0.6
+0.0
 .01
 1
 NIL
@@ -3505,7 +3511,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+4
 
 PLOT
 2378
