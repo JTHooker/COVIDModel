@@ -112,6 +112,7 @@ breed [ resources resource ]
 breed [ medresources medresource ] ;; people living in the city
 breed [ packages package ]
 
+
 directed-link-breed [red-links red-link]
 
 
@@ -164,15 +165,14 @@ simuls-own [
   homeLocation ;; this is where these people live
   ownMaskEfficacy ;; the efficacy of the person's own mask
   reported ;; has the person's case been reported yet
-  mobility; the extent to which the person is moving around the community
 
-  contacts7
+  contacts7 ;; contacts from seven days ago
   contacts6
   contacts5
   contacts4
   contacts3
   contacts2
-  contacts1
+  contacts1 ;; contacts from today
 
 ]
 
@@ -203,7 +203,7 @@ to setup
    ;; random-seed  100 ;; for use in setting random nuber generator seeds
 
   clear-all
-  import-drawing "Background1.png" ;; imports MSD image
+  ;;import-drawing "Background1.png" ;; imports MSD image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -445,7 +445,7 @@ end
 
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt  AccessPackage calculateIncomeperday checkMask updatepersonalvirulence earn  ] ;;  financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage calculateIncomeperday checkMask updatepersonalvirulence visitDestination  ] ;; earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -491,10 +491,10 @@ to go ;; these funtions get called each time-step
   countSchoolInfections
   finished
   calculateMeanDaysInfected
-  profilerstop
+  ;;profilerstop
   traceadjust
   ;;linearbehdecrease
-  visitDestination
+  ;;visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
   calculateCashPosition
@@ -568,10 +568,9 @@ to move ;; describes the circumstances under which people can move and infect on
   if color = red and Case_Isolation = false and ownCompliancewithIsolation * 100 < random 100 and health > random 100 [ set heading heading + random 90 - random 90 fd pace ]  ;; non-compliant people continue to move around the environment unless they are very sick
   if color = red and Quarantine = false [ avoidICUs ] ;; steers people away from the hospital
   if color = black [ move-to one-of MedResources ] ;; hides deceased simuls from remaining simuls, preventing interaction
+ ] ;; this considers how mobile people are
 
-  set mobility 1 ] ;; this considers how mobile people are
-
-  [ move-to homeLocation set mobility 0 ]
+  [ move-to homeLocation  ]
 
 
    if any? other simuls-here with [ color = red and asymptomaticFlag = 1 and ( currentVirulence * Asymptomatic_Trans ) > random 100 and wearingMask = 0 ] and color = 85  [
@@ -788,9 +787,9 @@ to countcontacts
   set contacts6 contacts5
   set contacts5 contacts4
   set contacts4 contacts3
-  set contacts3 contacts3
+  set contacts3 contacts2
   set contacts2 contacts1
-  set contacts1 (count other simuls-here with [ color != black ] )
+  set contacts1 (count other simuls-here with [ color != black  and householdUnit != [ householdUnit ] of myself ]) ;; or alternatively add the following ## and householdUnit != [ householdUnit ] of myself
 
   set contacts ( contacts1 + contacts2 + contacts3 + contacts4 + contacts5 + contacts6 + contacts7 ) /  7
 
@@ -849,8 +848,8 @@ to setInitialReserves
 end
 
 to CalculateAverageContacts ;; calculates average contacts for simuls and average financial contacts, which are contacts with people who have positive cash reserves
-  if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and reserves > 0 and color != black ] / ticks ]
-  if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black ] / ticks ]
+  if ticks > 0 [ set AverageFinancialContacts mean [ contacts ] of simuls with [ agerange >= 18 and reserves > 0 and color != black ] ]
+  if ticks > 0 [ set AverageContacts mean [ contacts ] of simuls with [ color != black ]  ]
 end
 
 to scaleup ;; this function scales up the simulation over 5 phases at base 10 to enable a small and large-scale understanding of dynamics. It enables the fine-grained analysis in early stages
@@ -1134,10 +1133,10 @@ to EssentialWorkerID
   ifelse EssentialWorker < Essential_Workers [ set EssentialWorkerFlag 1 ] [ set EssentialWorkerFlag 0 ] ;; identifies essential workers
 end
 
-to seedCases ;; set up to take the pre-intervention growth pre July 9th and use it to seed new cases
-    if ticks <= seedticks and scalephase = 0 [ ask n-of (566.31 * -.061 ^ (ticks + 21)) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 1 [ ask n-of ((566.31 * -.061 ^ (ticks + 21)) / 10) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
-    if ticks <= seedticks and scalephase = 2 [ ask n-of ((566.31 * -.061 ^ (ticks + 21)) / 100) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+to seedCases ;; set up to take the pre-intervention growth pre ******August 24th ********* and use it to seed new cases in the next week - must be updated each day
+    if ticks <= seedticks and scalephase = 0 [ ask n-of (573.74 * -.063 ^ (ticks + 22)) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 1 [ ask n-of ((573.74 * -.063 ^ (ticks + 22)) / 10) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
+    if ticks <= seedticks and scalephase = 2 [ ask n-of ((573.74 * -.063 ^ (ticks + 22)) / 100) simuls with [ color = 85 ] [ set color red set timenow int ownIncubationPeriod - 1 set Essentialworker random 100 ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
@@ -1184,12 +1183,12 @@ to updatepersonalvirulence ;; creates a triangular distribution of virulence tha
   if color = red and timenow > ownIncubationPeriod [ set currentVirulence ( personalVirulence  * ( ( ownIllnessPeriod - timenow ) / ( ownIllnessPeriod - ownIncubationPeriod ))) ]
 end
 
-to profilerstop
-  if ticks = 25  [
-  profiler:stop          ;; stop profiling
-  print profiler:report  ;; view the results
-    profiler:reset  ]       ;; clear the data
-end
+;to profilerstop
+;  if ticks = 25  [
+;  profiler:stop          ;; stop profiling
+;  print profiler:report  ;; view the results
+;    profiler:reset  ]       ;; clear the data
+;end
 
 ;to-report essentialworkerpercentage
 ;  if ticks > 1 [ report (count simuls with [ essentialWorkerflag = 1 and color != 85 ]) / (count simuls with [ essentialWorkerFlag = 1 ])]
@@ -1215,30 +1214,29 @@ end
 
 
 to visitDestination
-  if visit_Frequency > 0 [ ask simuls [ ;;; sets up destinations where people might gather and set off superspreader events
-    if remainder ticks Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius Visit_Radius [ move-to one-of patches with [ destination = 1 ]
-  ]]]
+  ;;; sets up destinations where people might gather and set off superspreader events
+  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (5 - stage) [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 
 
 to setupstages
 
-  if selfgovern = true [ ;; need to alter compliance with isolation using the beta distribution at each stage
+  if selfgovern = true [
     if stage = 0 [ set span 5 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking false set App_Uptake 0 set residualcautionPTA 0
+  set OS_Import_Proportion .60 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 0 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
   if stage = 1 [ set span 5 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 5 set tracking true set App_Uptake 5 set residualcautionPTA 0
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 5 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
   if stage = 2 [ set span 4 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 25 set tracking true set App_Uptake 20 set residualcautionPTA 20
+  set OS_Import_Proportion .60 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 20
     set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ]
 
   if stage = 3 [ set span 3 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 20 set residualcautionPTA 85
+  set OS_Import_Proportion .1 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 20 set residualcautionPTA 85
     set residualcautionPPA 85 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 16 set LowerStudentAge 3 ]
 
   if stage = 4 [ set span 2 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
@@ -1249,19 +1247,7 @@ to setupstages
 end
 
 to calculateCasesInLastPeriod
-set prior27	prior26
-set prior26	prior25
-set prior25	prior24
-set prior24	prior23
-set prior23	prior22
-set prior22	prior21
-set prior21	prior20
-set prior20	prior19
-set prior19	prior18
-set prior18	prior17
-set prior17	prior16
-set prior16	prior15
-set prior15	prior14
+
 set prior14	prior13
 set prior13	prior12
 set prior12	prior11
@@ -1278,11 +1264,8 @@ set prior2	prior1
 set prior1	prior0
 set prior0 dailyCases	
 
-
-
   set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
-    + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20
-    + prior21 + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
+    + prior11 + prior12 + prior13 + prior14 )
 
 ;print	prior26
 ;print	prior25
@@ -1324,7 +1307,7 @@ end
 
 to COVIDPolicyTriggers ;; used in idynamic model
     if selfgovern = true  [
-    if stage = 0 and casesinperiod >= 1 and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 0 and casesinperiod >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
     if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
@@ -1340,19 +1323,20 @@ to calculatecashPosition
 end
 
 to calculateObjfunction
-  if ticks > 1 [ set objFunction (numberInfected * currentinfections * ( 1 - ( sum [ reserves] of simuls with [ color != black ]  / Initialreserves )))]
-  ;;if ticks > 1 [ set objFunction  ( 1 - ( sum [ reserves] of simuls with [ color != black ]  / Initialreserves ))]
+  ;; mobility
+  if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
+
+  ;; moderate
+  ;; if ticks > 1 [ set objFunction (numberInfected * currentinfections )]
+
+  ;; cases
+  ;; if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
 end
 
 to updateoutside
   if count patches with [ pcolor = green ] < ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = black ] [ set pcolor green ] ]
   if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
-
-;to athome
-;  ifelse patch-here = homelocation [ set mobility 0 ] [ set mobility 1 ]
-;  ;;if patch-here != homelocation [ set mobility 1 ]
-;end
 
 to updateStudentStatus
   ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge ] [ set studentFlag 1  ] ;; Identifies students
@@ -1460,7 +1444,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1537,7 +1521,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -2007,7 +1991,7 @@ INPUTBOX
 314
 504
 current_cases
-40.0
+36.0
 1
 0
 Number
@@ -2018,7 +2002,7 @@ INPUTBOX
 314
 569
 total_population
-6400000.0
+2.5E7
 1
 0
 Number
@@ -2065,8 +2049,7 @@ true
 true
 "" ""
 PENS
-"Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] / ticks ] "
-"Mobility" 1.0 0 -13840069 true "" "plot mean [ mobility ] of simuls"
+"Contacts" 1.0 0 -16777216 true "" "if ticks > 0 [ plot mean [ contacts ] of simuls with [ color != black  ] ] "
 
 PLOT
 951
@@ -2138,10 +2121,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [ agerange ] of simuls"
 
 PLOT
-955
-843
-1371
-1099
+952
+842
+1368
+1098
 Active (red) and Total (blue) Infections ICU Beds (black)
 NIL
 NIL
@@ -2225,7 +2208,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2669,12 +2652,12 @@ count links / count simuls with [ color = red ]
 
 SWITCH
 1400
-1035
+1033
 1514
-1068
+1066
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -2862,7 +2845,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-27.59771761435131
+33.0
 1
 1
 NIL
@@ -2888,7 +2871,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-35.0
+23.0
 1
 1
 NIL
@@ -2972,7 +2955,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -2985,7 +2968,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -3138,7 +3121,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-1
+0
 1
 -1000
 
@@ -3198,7 +3181,7 @@ NIL
 0.0
 10.0
 0.0
-10.0
+15.0
 true
 false
 "" ""
@@ -3346,8 +3329,8 @@ SLIDER
 Visit_Frequency
 Visit_Frequency
 0
-100
-0.0
+6
+6.0
 1
 1
 NIL
@@ -3540,9 +3523,9 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot casesinperiod"
 
 INPUTBOX
-1765
+1766
 135
-1845
+1846
 196
 zerotoone
 1.0
@@ -3590,7 +3573,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -3742,7 +3725,7 @@ outsideRisk
 outsideRisk
 0
 100
-50.0
+33.0
 1
 1
 NIL
