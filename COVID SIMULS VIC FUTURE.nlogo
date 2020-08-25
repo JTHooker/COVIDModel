@@ -1246,7 +1246,7 @@ to setupstages
   ]
 end
 
-to calculateCasesInLastPeriod
+to calculateCasesInLastPeriod ;; counts cases in the last 14 days
 
 set prior13	prior12
 set prior12	prior11
