@@ -1458,7 +1458,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1486,7 +1486,7 @@ Span
 Span
 0
 5
-4.0
+5.0
 .1
 1
 NIL
@@ -1535,7 +1535,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1838,7 +1838,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-25.0
+0.0
 .5
 1
 NIL
@@ -1853,7 +1853,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-25.0
+0.0
 .5
 1
 NIL
@@ -2223,7 +2223,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2432,7 +2432,7 @@ INPUTBOX
 609
 284
 ppa
-25.0
+0.0
 1
 0
 Number
@@ -2443,7 +2443,7 @@ INPUTBOX
 700
 285
 pta
-25.0
+0.0
 1
 0
 Number
@@ -2672,7 +2672,7 @@ SWITCH
 1068
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2912,7 +2912,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -2957,7 +2957,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -2970,7 +2970,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -2983,7 +2983,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-25.0
+0.0
 1
 1
 NIL
@@ -3136,7 +3136,7 @@ SWITCH
 375
 MaskPolicy
 MaskPolicy
-0
+1
 1
 -1000
 
@@ -3149,7 +3149,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -3164,7 +3164,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -3397,7 +3397,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
--1.3409844583844217
+0.33
 .01
 1
 NIL
@@ -3517,7 +3517,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+0
 
 PLOT
 2378
@@ -3720,7 +3720,7 @@ SLIDER
 508
 823
 681
-858
+856
 Outside
 Outside
 0
@@ -3735,7 +3735,7 @@ SLIDER
 963
 472
 1136
-507
+505
 outsideRisk
 outsideRisk
 0
@@ -3750,7 +3750,7 @@ MONITOR
 330
 76
 413
-122
+121
 Green space
 count patches with [ pcolor = green ]
 0
@@ -6489,7 +6489,7 @@ set App_uptake App_Uptake + random-normal 0 2</setup>
   <experiment name="MJA stage 4 no complacency" repetitions="1000" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
-set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 6 
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
 set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4</setup>
