@@ -1248,7 +1248,6 @@ end
 
 to calculateCasesInLastPeriod
 
-set prior14	prior13
 set prior13	prior12
 set prior12	prior11
 set prior11	prior10
@@ -1264,8 +1263,8 @@ set prior2	prior1
 set prior1	prior0
 set prior0 dailyCases	
 
-  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
-    + prior11 + prior12 + prior13 + prior14 )
+  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior8 + prior9
+    + prior10 + prior11 + prior12 + prior13 )
 
 ;print	prior26
 ;print	prior25
@@ -1444,7 +1443,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1521,7 +1520,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -2208,7 +2207,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2657,7 +2656,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2955,7 +2954,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 

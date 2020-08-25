@@ -1264,7 +1264,7 @@ set prior2	prior1
 set prior1	prior0
 set prior0 dailyCases	
 
-  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior9 + prior10
+  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior + prior10
     + prior11 + prior12 + prior13 + prior14 )
 
 ;print	prior26
@@ -1327,7 +1327,7 @@ to calculateObjfunction
   ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-   if ticks > 1 [ set objFunction (numberInfected * currentinfections ) * 2 - (( mean [ contacts ] of simuls ) ]
+   if ticks > 1 [ set objFunction (numberInfected * currentinfections ) * (2 - (( mean [ contacts ] of simuls ) + 1 ))]
 
   ;; cases
   ;; if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
@@ -1444,7 +1444,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1521,7 +1521,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -2208,7 +2208,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+0.0
 1
 1
 NIL
@@ -2657,7 +2657,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -2955,7 +2955,7 @@ SWITCH
 205
 tracking
 tracking
-0
+1
 1
 -1000
 
@@ -3573,7 +3573,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
