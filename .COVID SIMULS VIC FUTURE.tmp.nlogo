@@ -1248,7 +1248,6 @@ end
 
 to calculateCasesInLastPeriod
 
-set prior14	prior13
 set prior13	prior12
 set prior12	prior11
 set prior11	prior10
@@ -1264,8 +1263,8 @@ set prior2	prior1
 set prior1	prior0
 set prior0 dailyCases	
 
-  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior + prior10
-    + prior11 + prior12 + prior13 + prior14 )
+  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior8 + prior9
+    + prior10 + prior11 + prior12 + prior13 )
 
 ;print	prior26
 ;print	prior25
