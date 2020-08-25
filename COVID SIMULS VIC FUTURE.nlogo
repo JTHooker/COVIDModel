@@ -497,7 +497,7 @@ to go ;; these funtions get called each time-step
   ;;visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
-  calculateCashPosition
+  ;;calculateCashPosition
   calculateObjfunction
   updateoutside
   updatestudentStatus
@@ -1318,9 +1318,9 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 end
 
-to calculatecashPosition
-  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
-end
+;to calculatecashPosition
+;  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
+;end
 
 to calculateObjfunction
   ;; mobility
@@ -1444,7 +1444,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1521,7 +1521,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1601,7 +1601,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2208,7 +2208,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL

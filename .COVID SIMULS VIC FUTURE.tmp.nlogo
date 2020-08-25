@@ -1307,7 +1307,7 @@ end
 
 to COVIDPolicyTriggers ;; used in idynamic model
     if selfgovern = true  [
-    if stage = 0 and casesinperiod >=  and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 0 and casesinperiod >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
     if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
@@ -1318,7 +1318,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 end
 
-to calculatecashPosition
+;to calculatecashPosition
   set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
 end
 
