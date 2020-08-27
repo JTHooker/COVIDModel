@@ -1142,9 +1142,9 @@ to EssentialWorkerID
 end
 
 to seedCases ;; set up to take the pre-intervention growth pre ******August 25th ********* and use it to seed new cases in the next week - must be updated each day 600.18*EXP(-0.067)^K56
-    if ticks <= seedticks and scalephase = 0 [ ask n-of int (600.18 * (.92312 ^ (ticks + 23)))  simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star" ]]
-    if ticks <= seedticks and scalephase = 1 [ ask n-of int ((600.18 * (.92312 ^ (ticks + 23))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
-    if ticks <= seedticks and scalephase = 2 [ ask n-of int ((600.18 * (.92312 ^ (ticks + 23))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
+    if ticks <= seedticks and scalephase = 0 [ ask n-of int (141.42 * 1.061730368 ^ (ticks + 15))  simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star" ]]
+    if ticks <= seedticks and scalephase = 1 [ ask n-of int (((141.42 * 1.061730368 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
+    if ticks <= seedticks and scalephase = 2 [ ask n-of int (((141.42 * 1.061730368 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
@@ -1230,7 +1230,7 @@ end
 
 to setupstages
 
- if selfgovern = true [
+;;  if selfgovern = true [
 
  ;; this section for Tony
 
@@ -1277,7 +1277,7 @@ to setupstages
 ;    set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ] ;; check student age update
 
 
- ]
+;;  ]
 end
 
 to calculateCasesInLastPeriod ;; counts cases in the last 14 days
@@ -1859,7 +1859,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+89.0
 .5
 1
 NIL
@@ -1874,7 +1874,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-90.0
+89.0
 .5
 1
 NIL
@@ -2026,7 +2026,7 @@ INPUTBOX
 314
 504
 current_cases
-35.0
+160.0
 1
 0
 Number
@@ -2243,7 +2243,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2452,7 +2452,7 @@ INPUTBOX
 609
 284
 ppa
-90.0
+89.0
 1
 0
 Number
@@ -2463,7 +2463,7 @@ INPUTBOX
 700
 285
 pta
-90.0
+89.0
 1
 0
 Number
@@ -3527,7 +3527,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4
-2
+1
 
 CHOOSER
 506
@@ -3832,6 +3832,23 @@ count simuls with [ color = yellow ]
 0
 1
 11
+
+BUTTON
+40
+367
+150
+401
+stage 4
+if ticks = 14 [ set stage 4 ] 
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
