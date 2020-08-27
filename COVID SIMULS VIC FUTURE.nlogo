@@ -50,7 +50,8 @@ globals [
   meanDaysInfected
   lasttransday
   lastPeriod
-  casesinperiod
+  casesinperiod14
+  casesinperiod7
   resetDate ;; days after today that the policy is reviewed
   cashposition
   Objfunction ;; seeks to minimise the damage - totalinfection * stage * currentInfections
@@ -287,6 +288,8 @@ to setup
   ;; set up initial infected people
 
   set scalephase InitialScale
+
+  set resetdate 7 ;; sets up the initial date for looking at policy-changes
 
   ask n-of ( Current_Cases ) simuls [  set color red set timenow random int ( ownillnessperiod ) set personalVirulence Global_Transmissability  ]
 
@@ -1293,8 +1296,10 @@ set prior2	prior1
 set prior1	prior0
 set prior0 dailyCases	
 
-  set casesinperiod (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior8 + prior9
+  set casesinperiod14 (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior8 + prior9
     + prior10 + prior11 + prior12 + prior13 )
+
+  set casesinperiod7 (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 )
 
 ;print	prior26
 ;print	prior25
@@ -1336,14 +1341,14 @@ end
 
 to COVIDPolicyTriggers ;; used in idynamic model
     if selfgovern = true  [
-    if stage = 0 and casesinperiod >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-    if stage = 3 and casesinperiod >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    if stage = 4 and casesinperiod <= threetofour and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-    if stage = 3 and casesinperiod <= twotothree and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod <= zerotoone and ticks = resetdate [ set stage 0 ]
+    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+    if stage = 3 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
+    if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]]
 end
 
@@ -1502,7 +1507,7 @@ Span
 Span
 0
 30
-5.0
+10.0
 1
 1
 NIL
@@ -1784,7 +1789,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+5.0
 1
 1
 NIL
@@ -1854,7 +1859,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+80.0
 .5
 1
 NIL
@@ -1869,7 +1874,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-90.0
+80.0
 .5
 1
 NIL
@@ -2447,7 +2452,7 @@ INPUTBOX
 609
 284
 ppa
-90.0
+80.0
 1
 0
 Number
@@ -2458,7 +2463,7 @@ INPUTBOX
 700
 285
 pta
-90.0
+80.0
 1
 0
 Number
@@ -2927,7 +2932,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3164,7 +3169,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+64.0
 1
 1
 NIL
@@ -3179,7 +3184,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+64.0
 1
 1
 NIL
@@ -3532,14 +3537,14 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-4
+3
 
 PLOT
 2378
 981
 2578
 1102
-New cases in last 14 days
+New cases in last 7 or 14 days
 NIL
 NIL
 0.0
@@ -3550,48 +3555,49 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot casesinperiod"
+"default" 1.0 0 -16777216 true "" "plot casesinperiod14"
+"pen-1" 1.0 0 -7500403 true "" "plot casesinperiod7"
 
 INPUTBOX
-1766
-135
-1846
-196
+1425
+133
+1505
+194
 zerotoone
-3.0
+1.0
 1
 0
 Number
 
 INPUTBOX
-1765
-198
-1845
-259
+1423
+196
+1503
+257
 onetotwo
-271.0
+2.0
 1
 0
 Number
 
 INPUTBOX
-1765
-260
-1847
-321
+1423
+258
+1505
+319
 twotothree
-701.0
+10.0
 1
 0
 Number
 
 INPUTBOX
-1765
-322
-1847
-383
+1423
+320
+1505
+381
 threetofour
-4101.0
+52.0
 1
 0
 Number
@@ -3628,54 +3634,54 @@ PENS
 MONITOR
 2379
 926
-2475
-971
-NIL
-casesinperiod
+2494
+972
+Cases in period 14
+casesinperiod14
 0
 1
 11
 
 INPUTBOX
-1849
-133
-1931
-194
+1508
+132
+1590
+193
 JudgeDay1
-15.0
+7.0
 1
 0
 Number
 
 INPUTBOX
-1849
-199
-1932
-260
+1508
+198
+1591
+259
 JudgeDay2
-9.0
+7.0
 1
 0
 Number
 
 INPUTBOX
-1851
-262
-1933
-323
+1509
+260
+1591
+321
 JudgeDay3
-1.0
+7.0
 1
 0
 Number
 
 INPUTBOX
-1851
-323
-1933
-384
+1509
+322
+1591
+383
 JudgeDay4
-15.0
+7.0
 1
 0
 Number
@@ -3697,7 +3703,7 @@ INPUTBOX
 2296
 693
 UpperStudentAge
-18.0
+16.0
 1
 0
 Number
@@ -3708,7 +3714,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-0.0
+3.0
 1
 0
 Number
@@ -3771,6 +3777,50 @@ count patches with [ pcolor = green ]
 0
 1
 11
+
+INPUTBOX
+1829
+132
+1902
+193
+onetozero
+0.0
+1
+0
+Number
+
+INPUTBOX
+1831
+193
+1903
+254
+twotoone
+0.0
+1
+0
+Number
+
+INPUTBOX
+1831
+255
+1901
+316
+threetotwo
+7.0
+1
+0
+Number
+
+INPUTBOX
+1831
+316
+1903
+377
+fourtothree
+35.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
