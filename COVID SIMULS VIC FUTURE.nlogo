@@ -268,8 +268,8 @@ to setup
         rngs:set-seed stream_id seed
         let complianceDist rngs:rnd-beta  stream_id 450.3 23.7
         set ownComplianceWithIsolation complianceDist
-        let maskWearEfficacy rngs:rnd-beta stream_id 79.2 19.8
-        set ownMaskEfficacy maskWearEfficacy * 33  ;; assigng mask efficacy to individuals around a distribution with median 66% or 66% x 1/3 if 33
+        let maskWearEfficacy rngs:rnd-beta stream_id 24.3 8.08
+        set ownMaskEfficacy maskWearEfficacy * 100  ;; assigng mask efficacy to individuals around a distribution with median 66% or 66% x 1/3 if 33
 
         set asymptom random 100
         set essentialWorker random 100
@@ -1502,7 +1502,7 @@ Span
 Span
 0
 30
-15.0
+5.0
 1
 1
 NIL
@@ -1784,7 +1784,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.456421709401218
+2.0
 1
 1
 NIL
@@ -1854,7 +1854,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-75.0
+90.0
 .5
 1
 NIL
@@ -1869,7 +1869,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-75.0
+90.0
 .5
 1
 NIL
@@ -2238,7 +2238,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2447,7 +2447,7 @@ INPUTBOX
 609
 284
 ppa
-75.0
+90.0
 1
 0
 Number
@@ -2458,7 +2458,7 @@ INPUTBOX
 700
 285
 pta
-75.0
+90.0
 1
 0
 Number
@@ -2927,7 +2927,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3164,7 +3164,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-60.0
+81.0
 1
 1
 NIL
@@ -3179,7 +3179,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-60.0
+81.0
 1
 1
 NIL
@@ -3510,7 +3510,7 @@ SWITCH
 380
 Complacency
 Complacency
-0
+1
 1
 -1000
 
@@ -3532,7 +3532,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+4
 
 PLOT
 2378
@@ -3708,7 +3708,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+0.0
 1
 0
 Number
