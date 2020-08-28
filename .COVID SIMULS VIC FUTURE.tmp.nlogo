@@ -1565,7 +1565,7 @@ Span
 Span
 0
 30
-10.0
+5.0
 1
 1
 NIL
@@ -1847,7 +1847,7 @@ Superspreaders
 Superspreaders
 0
 100
-5.0
+2.0
 1
 1
 NIL
@@ -1917,7 +1917,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+90.0
 .5
 1
 NIL
@@ -1932,7 +1932,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+90.0
 .5
 1
 NIL
@@ -2301,7 +2301,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2510,7 +2510,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+90.0
 1
 0
 Number
@@ -2521,7 +2521,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+90.0
 1
 0
 Number
@@ -2990,7 +2990,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3227,7 +3227,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-68.0
+81.0
 1
 1
 NIL
@@ -3242,7 +3242,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-68.0
+81.0
 1
 1
 NIL
@@ -3595,7 +3595,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3.5 3.9 4
-3
+5
 
 PLOT
 2378
@@ -3772,7 +3772,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-4.0
+0.0
 1
 0
 Number
