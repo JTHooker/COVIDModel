@@ -1565,7 +1565,7 @@ Span
 Span
 0
 30
-15.0
+5.0
 1
 1
 NIL
@@ -1847,7 +1847,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -1917,7 +1917,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-25.0
+90.0
 .5
 1
 NIL
@@ -1932,7 +1932,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-25.0
+90.0
 .5
 1
 NIL
@@ -2301,7 +2301,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2510,7 +2510,7 @@ INPUTBOX
 609
 284
 ppa
-25.0
+90.0
 1
 0
 Number
@@ -2521,7 +2521,7 @@ INPUTBOX
 700
 285
 pta
-25.0
+90.0
 1
 0
 Number
@@ -2964,7 +2964,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-0.0
+100.0
 1
 1
 NIL
@@ -2990,7 +2990,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3074,7 +3074,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
@@ -3188,7 +3188,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3227,7 +3227,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3242,7 +3242,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3595,7 +3595,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3.5 3.9 4
-2
+5
 
 PLOT
 2378
@@ -3772,7 +3772,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+0.0
 1
 0
 Number
@@ -9408,7 +9408,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 28_8 New" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="JN experiment 28_8 New" repetitions="200" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -9613,14 +9613,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
       <value value="14"/>
-      <value value="28"/>
       <value value="42"/>
-      <value value="56"/>
       <value value="70"/>
-      <value value="84"/>
       <value value="98"/>
-      <value value="112"/>
-      <value value="126"/>
       <value value="140"/>
       <value value="210"/>
       <value value="280"/>
