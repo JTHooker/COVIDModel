@@ -1399,7 +1399,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
     ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
     if stage = 4 and ticks = 18 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
-    if stage = 4 and ticks > 18 and casesinperiod14 >= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
+    if stage = 4 and ticks > 18 and casesinperiod14 = fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
         ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 3.9 and ticks = 31 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
     if stage = 3.5 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
@@ -1565,7 +1565,7 @@ Span
 Span
 0
 30
-5.0
+15.0
 1
 1
 NIL
@@ -1847,7 +1847,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -1917,7 +1917,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+25.0
 .5
 1
 NIL
@@ -1932,7 +1932,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-90.0
+25.0
 .5
 1
 NIL
@@ -2301,7 +2301,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-45.0
 1
 1
 NIL
@@ -2510,7 +2510,7 @@ INPUTBOX
 609
 284
 ppa
-90.0
+25.0
 1
 0
 Number
@@ -2521,7 +2521,7 @@ INPUTBOX
 700
 285
 pta
-90.0
+25.0
 1
 0
 Number
@@ -2964,7 +2964,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-25.0
+0.0
 1
 1
 NIL
@@ -2990,7 +2990,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -3074,7 +3074,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -3188,7 +3188,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3227,7 +3227,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3242,7 +3242,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3595,7 +3595,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3.5 3.9 4
-5
+2
 
 PLOT
 2378
@@ -3772,7 +3772,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-0.0
+3.0
 1
 0
 Number
@@ -9672,7 +9672,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="fourtothree">
-      <value value="35"/>
+      <value value="500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Asymptomatic_Trans">
       <value value="0.35844673433467694"/>
