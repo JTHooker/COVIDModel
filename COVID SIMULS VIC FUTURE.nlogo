@@ -1467,7 +1467,7 @@ to updateStudentStatus
 end
 
 to incursion
-  if ticks > 0 and currentinfections = 0 and 1 > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]
+  if ticks > 0 and currentinfections = 0 and 1 > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
