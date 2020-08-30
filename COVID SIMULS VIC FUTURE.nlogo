@@ -515,6 +515,7 @@ to go ;; these funtions get called each time-step
   calculateObjfunction
   updateoutside
   updatestudentStatus
+  incursion
   ask patches [ checkutilisation ]
  tick
 
@@ -810,11 +811,11 @@ end
 
 to death ;; calculates death for individuals and adds them to a total for the population
 
-  if Scalephase = 0 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
-  if Scalephase = 1 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
-  if Scalephase = 2 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
-  if Scalephase = 3 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
-  if Scalephase = 4 and color = red and timenow = int Illness_Period and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
+  if Scalephase = 0 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
+  if Scalephase = 1 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
+  if Scalephase = 2 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
+  if Scalephase = 3 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
+  if Scalephase = 4 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
 end
 
 to respeed
@@ -1387,17 +1388,34 @@ end
 to COVIDPolicyTriggers ;; used in idynamic model
     if selfgovern = true  [
 
-   ;; regular section
-    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-    if stage = 3 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-    if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-    if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod7 <= zerotoone and ticks = resetdate [ set stage 0 ]
+
+    ;; Optimisation section
+    ;;;********************************************************************************************************************************
+
+
+    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+    if stage = 3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
+    if stage = 4 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
+    if stage = 3 and casesinperiod14 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
+    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
 
+
+
+;    ;; regular section
+;    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
+;    if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
+;    if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+;    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
+;    if stage = 1 and casesinperiod7 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+;
 
 ;;**********************************************************************************************************************************
 
@@ -1433,10 +1451,10 @@ to calculateObjfunction
    ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-   if ticks > 1 [ set objFunction (numberInfected * currentinfections ) * (2 - (( mean [ contacts ] of simuls ) + 1 ))]
+  ;; if ticks > 1 [ set objFunction (numberInfected * currentinfections ) * (2 - (( mean [ contacts ] of simuls ) + 1 ))]
 
   ;; cases
-  ;; if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
+  if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
 end
 
 to updateoutside ;; controls the amount of time that interactions happen outside
@@ -1446,6 +1464,10 @@ end
 
 to updateStudentStatus
   ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge ] [ set studentFlag 1  ] ;; Identifies students
+end
+
+to incursion
+  if ticks > 0 and currentinfections = 0 and 1 > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1578,7 +1600,7 @@ Span
 Span
 0
 30
-15.0
+5.0
 1
 1
 NIL
@@ -1860,7 +1882,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -1930,7 +1952,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+90.0
 .5
 1
 NIL
@@ -1945,7 +1967,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+90.0
 .5
 1
 NIL
@@ -2314,7 +2336,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--45.0
+0.0
 1
 1
 NIL
@@ -2523,7 +2545,7 @@ INPUTBOX
 609
 284
 ppa
-24.0
+90.0
 1
 0
 Number
@@ -2534,7 +2556,7 @@ INPUTBOX
 700
 285
 pta
-24.0
+90.0
 1
 0
 Number
@@ -2951,7 +2973,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-31.9786782754768
+33.371329598785564
 1
 1
 NIL
@@ -3003,7 +3025,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3018,7 +3040,7 @@ SeedTicks
 SeedTicks
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -3087,7 +3109,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
@@ -3201,7 +3223,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3240,7 +3262,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3255,7 +3277,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3488,7 +3510,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.26642146168603675
+0.3348592663278498
 .01
 1
 NIL
@@ -3540,7 +3562,7 @@ OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
 1
-0.6
+0.58
 .01
 1
 NIL
@@ -3608,7 +3630,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.5 3.9 4
-2
+6
 
 PLOT
 2378
@@ -3635,7 +3657,7 @@ INPUTBOX
 1505
 194
 zerotoone
-160.0
+32.0
 1
 0
 Number
@@ -3646,7 +3668,7 @@ INPUTBOX
 1503
 257
 onetotwo
-160.0
+32.0
 1
 0
 Number
@@ -3657,7 +3679,7 @@ INPUTBOX
 1505
 319
 twotothree
-160.0
+32.0
 1
 0
 Number
@@ -3668,7 +3690,7 @@ INPUTBOX
 1505
 381
 threetofour
-160.0
+32.0
 1
 0
 Number
@@ -3785,7 +3807,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+0.0
 1
 0
 Number
@@ -3855,7 +3877,7 @@ INPUTBOX
 1902
 193
 onetozero
-80.0
+16.0
 1
 0
 Number
@@ -3866,7 +3888,7 @@ INPUTBOX
 1903
 254
 twotoone
-80.0
+16.0
 1
 0
 Number
@@ -3877,7 +3899,7 @@ INPUTBOX
 1901
 316
 threetotwo
-80.0
+16.0
 1
 0
 Number
@@ -3888,7 +3910,7 @@ INPUTBOX
 1903
 377
 fourtothree
-80.0
+16.0
 1
 0
 Number
@@ -3914,6 +3936,50 @@ StageHasChanged
 0
 1
 11
+
+INPUTBOX
+1754
+134
+1824
+194
+JudgeDay1_d
+0.0
+1
+0
+Number
+
+INPUTBOX
+1754
+195
+1828
+255
+Judgeday2_d
+0.0
+1
+0
+Number
+
+INPUTBOX
+1754
+257
+1831
+317
+Judgeday3_d
+0.0
+1
+0
+Number
+
+INPUTBOX
+1754
+320
+1829
+380
+Judgeday4_d
+0.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
