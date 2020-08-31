@@ -301,7 +301,10 @@ to setup
   set resetdate 7 ;; sets up the initial date for looking at policy-changes
 
   ask n-of ( Current_Cases ) simuls [  set color red set tracked 1 set reported 1 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
-    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ]
+    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion reported cases in the community at the initialisation step matched to current day data
+
+  ask n-of ((Current_Cases * (AsymptomaticPercentage / 100)  * ( Undetected_Proportion / 100 )) simuls [  set color red set asymptomaticFlag 1 set undetectedFlag 1 set tracked 0 set reported 0 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
+    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion of undetected cases in the community at the initialisation step
 
  ;; ask n-of 90 simuls with [ color = 85 ] [  set reported 1 set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ] ;; this is for the MJA paper
 
@@ -1159,10 +1162,10 @@ to EssentialWorkerID
   ifelse EssentialWorker < Essential_Workers [ set EssentialWorkerFlag 1 ] [ set EssentialWorkerFlag 0 ] ;; identifies essential workers
 end
 
-to seedCases ;; set up to take the pre-intervention growth pre ******August 25th ********* and use it to seed new cases in the next week - must be updated each day
-    if ticks <= seedticks and scalephase = 0 [ ask n-of int (409.94 * (.92682 ^ (ticks + 15)))  simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star" ]]
-    if ticks <= seedticks and scalephase = 1 [ ask n-of int ((409.94 * (.92682 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
-    if ticks <= seedticks and scalephase = 2 [ ask n-of int ((409.94 * (.92682 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
+to seedCases ;; set up to take the pre-intervention growth pre ******August 25th ********* and use it to seed new cases in the next week - must be updated each day 31_8_2020 =265.46*EXP(-0.08)^G55
+    if ticks <= seedticks and scalephase = 0 [ ask n-of int (265 * (.923 ^ (ticks + 15)))  simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star" ]]
+    if ticks <= seedticks and scalephase = 1 [ ask n-of int ((265 * (.923 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
+    if ticks <= seedticks and scalephase = 2 [ ask n-of int ((265 * (.923 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
     ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
 end
 
@@ -1639,7 +1642,7 @@ Span
 Span
 0
 30
-30.0
+5.0
 1
 1
 NIL
@@ -1921,7 +1924,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -1991,7 +1994,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-14.0
+89.0
 .5
 1
 NIL
@@ -2006,7 +2009,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-14.0
+89.0
 .5
 1
 NIL
@@ -2584,7 +2587,7 @@ INPUTBOX
 609
 284
 ppa
-14.0
+89.0
 1
 0
 Number
@@ -2595,7 +2598,7 @@ INPUTBOX
 700
 285
 pta
-14.0
+89.0
 1
 0
 Number
@@ -3064,7 +3067,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+20.0
 1
 1
 NIL
@@ -3148,7 +3151,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-0
+1
 1
 -1000
 
@@ -3262,7 +3265,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3301,7 +3304,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-12.0
+81.0
 1
 1
 NIL
@@ -3316,7 +3319,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-12.0
+81.0
 1
 1
 NIL
@@ -3669,7 +3672,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.5 3.9 4
-1
+6
 
 PLOT
 2378
@@ -3846,7 +3849,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+0.0
 1
 0
 Number
