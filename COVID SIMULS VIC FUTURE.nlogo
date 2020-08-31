@@ -678,7 +678,6 @@ to superSpread
 
   if count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] > Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
     ask n-of int (count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] / Diffusion_Adjustment ) simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] [fd world-width / 2]
-
     ;; only moves people who don't know they are sick yet
 
   if count simuls with [ color = yellow ] >= 1 [ ask n-of int (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
@@ -3682,8 +3681,8 @@ CHOOSER
 821
 Stage
 Stage
-0 1 2 3 3.5 3.9 4
-6
+0 1 2 3 3.3 3.4 3.5 3.9 4
+8
 
 PLOT
 2378
@@ -3710,7 +3709,7 @@ INPUTBOX
 1505
 194
 zerotoone
-32.0
+1.0
 1
 0
 Number
@@ -3721,7 +3720,7 @@ INPUTBOX
 1503
 257
 onetotwo
-32.0
+30.0
 1
 0
 Number
@@ -3732,7 +3731,7 @@ INPUTBOX
 1505
 319
 twotothree
-32.0
+420.0
 1
 0
 Number
@@ -3743,7 +3742,7 @@ INPUTBOX
 1505
 381
 threetofour
-32.0
+1400.0
 1
 0
 Number
@@ -3930,7 +3929,7 @@ INPUTBOX
 1902
 193
 onetozero
-16.0
+0.0
 1
 0
 Number
@@ -3941,7 +3940,7 @@ INPUTBOX
 1903
 254
 twotoone
-16.0
+14.0
 1
 0
 Number
@@ -3952,7 +3951,7 @@ INPUTBOX
 1901
 316
 threetotwo
-16.0
+42.0
 1
 0
 Number
@@ -3963,7 +3962,7 @@ INPUTBOX
 1903
 377
 fourtothree
-16.0
+500.0
 1
 0
 Number
@@ -9774,6 +9773,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="42"/>
       <value value="70"/>
       <value value="140"/>
+      <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">

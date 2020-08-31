@@ -678,7 +678,6 @@ to superSpread
 
   if count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] > Diffusion_Adjustment and Case_Isolation = true [  if Superspreaders > random 100 [
     ask n-of int (count simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] / Diffusion_Adjustment ) simuls with [ color = red and timenow < ownIncubationPeriod and tracked = 0 ] [fd world-width / 2]
-
     ;; only moves people who don't know they are sick yet
 
   if count simuls with [ color = yellow ] >= 1 [ ask n-of int (count simuls with [ color = yellow ] / Diffusion_Adjustment) simuls with [ color = yellow ]
@@ -1473,7 +1472,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
    ;; new section
     if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
+    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
     if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
     if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
     if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
@@ -1483,7 +1482,6 @@ to COVIDPolicyTriggers ;; used in idynamic model
        ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage >= 0 and stage <= 3.5 and ticks = 35 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
     if stage >= 0 and stage <= 3.5 and ticks = 42 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
-
     if stage = 3.9 and ticks = 28 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
     if stage = 3.5 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
@@ -3683,8 +3681,8 @@ CHOOSER
 821
 Stage
 Stage
-0 1 2 3 3.5 3.9 4
-6
+0 1 2 3 3.3 3.4 3.5 3.9 4
+8
 
 PLOT
 2378
@@ -3711,7 +3709,7 @@ INPUTBOX
 1505
 194
 zerotoone
-32.0
+1.0
 1
 0
 Number
@@ -3722,7 +3720,7 @@ INPUTBOX
 1503
 257
 onetotwo
-32.0
+30.0
 1
 0
 Number
@@ -3733,7 +3731,7 @@ INPUTBOX
 1505
 319
 twotothree
-32.0
+420.0
 1
 0
 Number
@@ -3744,7 +3742,7 @@ INPUTBOX
 1505
 381
 threetofour
-32.0
+1400.0
 1
 0
 Number
@@ -3942,7 +3940,7 @@ INPUTBOX
 1903
 254
 twotoone
-16.0
+14.0
 1
 0
 Number
@@ -3964,7 +3962,7 @@ INPUTBOX
 1903
 377
 fourtothree
-16.0
+500.0
 1
 0
 Number
@@ -9775,6 +9773,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="42"/>
       <value value="70"/>
       <value value="140"/>
+      <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
