@@ -356,7 +356,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls-here with [ color = red ]  and 90 > random 100 [ set color yellow ]
+    if any? other simuls-here with [ color = red ]  and  > random 100 [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
   ;;set tracking false ;; ensures this is set to false each time the model starts
@@ -1609,7 +1609,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1686,7 +1686,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1766,7 +1766,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
