@@ -978,7 +978,7 @@ to countDailyCases ;; sets the day for reporting new cases at 6 (adjustable) day
   ;; let casestoday count simuls with [ color = red and tracked = 1 and reported = 0 ] ;; use this if you want to adjust cases for those that go unreported at the peak
  ;;or
 
-  let casestoday count simuls with [ color = red and unDetectedFlag = 1 and timenow = int Case_reporting_delay ] ;; this now ONLY reports detected cases, not all infections - this flows through to daily cases
+  let casestoday count simuls with [ color = red and unDetectedFlag = 0 and timenow = int Case_reporting_delay ] ;; this now ONLY reports detected cases, not all infections - this flows through to daily cases
 
   if Scalephase = 0 [ set dailyCases casestoday ]
   if Scalephase = 1 [ set dailyCases casestoday * 10 ]
@@ -1395,19 +1395,6 @@ set prior0 dailyCases
 
   set casesinperiod7 (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 )
 
-;print	prior26
-;print	prior25
-;print	prior24
-;print	prior23
-;print	prior22
-;print	prior21
-;print	prior20
-;print	prior19
-;print	prior18
-;print	prior17
-;print	prior16
-;print	prior15
-;print	prior14
 ;print	prior13
 ;print	prior12
 ;print	prior11
@@ -1422,7 +1409,7 @@ set prior0 dailyCases
 ;print	prior2
 ;print	prior1
 ;print	prior0
-
+;print"****************************************************"
 
 end
 
@@ -1483,7 +1470,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage >= 0 and stage <= 3.5 and ticks = 35 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
     if stage >= 0 and stage <= 3.5 and ticks = 42 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
     if stage = 3.9 and ticks = 28 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
-    if stage = 3.5 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
     if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
@@ -1652,7 +1639,7 @@ Span
 Span
 0
 30
-5.0
+10.0
 1
 1
 NIL
@@ -1934,7 +1921,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+5.0
 1
 1
 NIL
@@ -2004,7 +1991,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+84.0
 .5
 1
 NIL
@@ -2019,7 +2006,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+84.0
 .5
 1
 NIL
@@ -2388,7 +2375,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+-45.0
 1
 1
 NIL
@@ -2507,10 +2494,10 @@ mean [ expenditure ] of simuls with [ agerange >= 18 and agerange < 70 and color
 11
 
 MONITOR
-95
-898
-234
-943
+52
+885
+191
+930
 Count red simuls (raw)
 count simuls with [ color = red ]
 0
@@ -2566,7 +2553,7 @@ TEXTBOX
 678
 318
 700
-Day 1 - August 31th, 2020
+Day 1 - August 31st, 2020
 12
 15.0
 1
@@ -2597,7 +2584,7 @@ INPUTBOX
 609
 284
 ppa
-89.0
+84.0
 1
 0
 Number
@@ -2608,7 +2595,7 @@ INPUTBOX
 700
 285
 pta
-89.0
+84.0
 1
 0
 Number
@@ -3077,7 +3064,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+25.0
 1
 1
 NIL
@@ -3314,7 +3301,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+68.0
 1
 1
 NIL
@@ -3329,7 +3316,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+68.0
 1
 1
 NIL
@@ -3682,7 +3669,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+6
 
 PLOT
 2378
@@ -3832,10 +3819,10 @@ JudgeDay4
 Number
 
 MONITOR
-1425
-518
-1535
-563
+1417
+548
+1527
+593
 Policy Reset Date
 ResetDate
 0
@@ -3859,7 +3846,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-0.0
+4.0
 1
 0
 Number
@@ -4037,22 +4024,22 @@ SLIDER
 423
 83
 603
-118
+116
 Undetected_Proportion
 Undetected_Proportion
 0
 100
-50.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-92
-846
-207
-892
+52
+830
+167
+875
 Undetected Cases
 count simuls with [ color = red and undetectedFlag = 1 ]
 0
@@ -9571,7 +9558,8 @@ set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
 set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
-set App_uptake App_Uptake + random-normal 0 4</setup>
+set App_uptake App_Uptake + random-normal 0 4
+set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
     <timeLimit steps="306"/>
     <metric>count turtles</metric>
@@ -9883,6 +9871,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Ess_W_Risk_Reduction">
       <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Undetected_Proportion">
+      <value value="15"/>
     </enumeratedValueSet>
   </experiment>
   <experiment name="Tight Suppression" repetitions="100" runMetricsEveryStep="true">
