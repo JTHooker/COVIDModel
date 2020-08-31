@@ -360,7 +360,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls-here with [ color = red ] [ set color yellow ]
+    if any? other simuls-here with [ color = red ]  [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
   ;;set tracking false ;; ensures this is set to false each time the model starts
@@ -1639,7 +1639,7 @@ Span
 Span
 0
 30
-10.0
+7.0
 1
 1
 NIL
@@ -1921,7 +1921,7 @@ Superspreaders
 Superspreaders
 0
 100
-5.0
+3.0
 1
 1
 NIL
@@ -1991,7 +1991,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-84.0
+89.0
 .5
 1
 NIL
@@ -2006,7 +2006,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-84.0
+89.0
 .5
 1
 NIL
@@ -2060,7 +2060,7 @@ SWITCH
 619
 policytriggeron
 policytriggeron
-0
+1
 1
 -1000
 
@@ -2375,7 +2375,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+-45.0
 1
 1
 NIL
@@ -2584,7 +2584,7 @@ INPUTBOX
 609
 284
 ppa
-84.0
+89.0
 1
 0
 Number
@@ -2595,7 +2595,7 @@ INPUTBOX
 700
 285
 pta
-84.0
+89.0
 1
 0
 Number
@@ -3012,7 +3012,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-33.371329598785564
+24.1532494593477
 1
 1
 NIL
@@ -3038,7 +3038,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-23.0
+25.0
 1
 1
 NIL
@@ -3064,7 +3064,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-25.0
+20.0
 1
 1
 NIL
@@ -3079,7 +3079,7 @@ SeedTicks
 SeedTicks
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -3301,7 +3301,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-68.0
+80.0
 1
 1
 NIL
@@ -3316,7 +3316,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-68.0
+80.0
 1
 1
 NIL
@@ -3549,7 +3549,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.33
+0.2860937124445646
 .01
 1
 NIL
@@ -3601,7 +3601,7 @@ OS_Import_Post_Proportion
 OS_Import_Post_Proportion
 0
 1
-0.58
+0.61
 .01
 1
 NIL
@@ -3669,7 +3669,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-6
+7
 
 PLOT
 2378
@@ -3846,7 +3846,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-4.0
+0.0
 1
 0
 Number
@@ -3938,7 +3938,7 @@ INPUTBOX
 1901
 316
 threetotwo
-42.0
+350.0
 1
 0
 Number
@@ -4029,7 +4029,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-0.0
+51.54464146407885
 1
 1
 NIL
@@ -9552,7 +9552,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 31_8 New" repetitions="200" runMetricsEveryStep="true">
+  <experiment name="JN experiment 31_8 New" repetitions="100" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -9576,7 +9576,6 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
-    <metric>count simuls with [ detectedFlag = 1 ]</metric>
     <enumeratedValueSet variable="maxv">
       <value value="1"/>
     </enumeratedValueSet>
@@ -9758,6 +9757,8 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="14"/>
+      <value value="28"/>
       <value value="42"/>
       <value value="70"/>
       <value value="140"/>
@@ -9873,7 +9874,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Undetected_Proportion">
-      <value value="15"/>
+      <value value="50"/>
     </enumeratedValueSet>
   </experiment>
   <experiment name="Tight Suppression" repetitions="100" runMetricsEveryStep="true">

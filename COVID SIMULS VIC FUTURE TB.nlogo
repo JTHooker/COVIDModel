@@ -1600,7 +1600,7 @@ Span
 Span
 0
 30
-5.0
+30.0
 1
 1
 NIL
@@ -1882,7 +1882,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -1952,7 +1952,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+0.0
 .5
 1
 NIL
@@ -1967,7 +1967,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-90.0
+0.0
 .5
 1
 NIL
@@ -2336,7 +2336,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-45.0
 1
 1
 NIL
@@ -2545,7 +2545,7 @@ INPUTBOX
 609
 284
 ppa
-90.0
+0.0
 1
 0
 Number
@@ -2556,7 +2556,7 @@ INPUTBOX
 700
 285
 pta
-90.0
+0.0
 1
 0
 Number
@@ -2973,7 +2973,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-33.371329598785564
+34.38567451428606
 1
 1
 NIL
@@ -3025,7 +3025,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -3070,7 +3070,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3096,7 +3096,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3109,7 +3109,7 @@ SWITCH
 416
 schoolsPolicy
 schoolsPolicy
-1
+0
 1
 -1000
 
@@ -3223,7 +3223,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3262,7 +3262,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+0.0
 1
 1
 NIL
@@ -3277,7 +3277,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+0.0
 1
 1
 NIL
@@ -3510,7 +3510,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3348592663278498
+0.38772621355643777
 .01
 1
 NIL
@@ -3630,7 +3630,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.5 3.9 4
-6
+0
 
 PLOT
 2378
@@ -3807,7 +3807,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-0.0
+3.0
 1
 0
 Number
@@ -3990,7 +3990,7 @@ IncursionRate
 IncursionRate
 0
 5
-1.0
+2.5
 .5
 1
 NIL
@@ -10454,10 +10454,29 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
+  <experiment name="Optimised cases with incursion" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup
+set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
+set Essential_Workers Essential_Workers + random-normal 0 2
+set Superspreaders Superspreaders + random-normal 0 2
+set App_uptake App_Uptake + random-normal 0 4</setup>
     <go>go</go>
+    <timeLimit steps="540"/>
     <metric>count turtles</metric>
+    <metric>ticks</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
+    <metric>Essential_Workers</metric>
+    <metric>scale</metric>
+    <metric>stage</metric>
+    <metric>averagecontacts</metric>
     <enumeratedValueSet variable="JudgeDay1_d">
       <value value="7"/>
     </enumeratedValueSet>
