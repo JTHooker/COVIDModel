@@ -172,7 +172,7 @@ simuls-own [
   ownMaskEfficacy ;; the efficacy of the person's own mask
   reported ;; has the person's case been reported yet
   detectable ;; Is the infected person detectable likelihood
-  DetectedFlag;; Indicates whether they are detected or not.
+  unDetectedFlag;; Indicates whether they are detected or not.
 
   contacts7 ;; contacts from seven days ago
   contacts6
@@ -279,7 +279,7 @@ to setup
         let complianceDist rngs:rnd-beta  stream_id 450.3 23.7
         set ownComplianceWithIsolation complianceDist
         let maskWearEfficacy rngs:rnd-beta stream_id 24.3 8.08
-        set ownMaskEfficacy maskWearEfficacy * 100  ;; assigning mask efficacy to individuals around a distribution with median 75% or 75% x 1/3 if 33 as per DHHS request based on Burnett Institute #s
+        set ownMaskEfficacy maskWearEfficacy * 33  ;; assigning mask efficacy to individuals around a distribution with median 75% or 75% x 1/3 if 33 as per request based on Burnett Institute #s
 
         set asymptom random 100
         set essentialWorker random 100
@@ -300,7 +300,8 @@ to setup
 
   set resetdate 7 ;; sets up the initial date for looking at policy-changes
 
-  ask n-of ( Current_Cases ) simuls [  set color red set tracked 1 set reported 1 set timenow random int OwnIllnessperiod UpdatePersonalVirulence]
+  ask n-of ( Current_Cases ) simuls [  set color red set tracked 1 set reported 1 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
+    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ]
 
  ;; ask n-of 90 simuls with [ color = 85 ] [  set reported 1 set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ] ;; this is for the MJA paper
 
@@ -356,7 +357,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls-here with [ color = red ]  and  > random 100 [ set color yellow ]
+    if any? other simuls-here with [ color = red ]  [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
   ;;set tracking false ;; ensures this is set to false each time the model starts
@@ -465,7 +466,7 @@ to setASFlag
 end
 
 to assigndetectablestatus
-  if asymptomaticFlag = 1 and detectable < Undetected_Proportion [ set detectedFlag 1 ]
+  if asymptomaticFlag = 1 and detectable < Undetected_Proportion [ set unDetectedFlag 1 ]
 end
 
 to go ;; these funtions get called each time-step
@@ -823,13 +824,14 @@ to countcontacts
   ]
 end
 
-to death ;; calculates death for individuals and adds them to a total for the population
+to death ;; calculates death for individuals and adds them to a total for the population - This should not be relied upon to esitmate deaths as it currently interacts with asymptomatic cases and undetected cases in the most recent version
 
   if Scalephase = 0 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1 ]
   if Scalephase = 1 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
   if Scalephase = 2 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
   if Scalephase = 3 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
   if Scalephase = 4 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
+
 end
 
 to respeed
@@ -974,7 +976,7 @@ to countDailyCases ;; sets the day for reporting new cases at 6 (adjustable) day
   ;; let casestoday count simuls with [ color = red and tracked = 1 and reported = 0 ] ;; use this if you want to adjust cases for those that go unreported at the peak
  ;;or
 
-  let casestoday count simuls with [ color = red and detectedFlag = 1 and timenow = int Case_reporting_delay ] ;; this now ONLY reports detected cases, not all infections - this flows through to daily cases
+  let casestoday count simuls with [ color = red and unDetectedFlag = 1 and timenow = int Case_reporting_delay ] ;; this now ONLY reports detected cases, not all infections - this flows through to daily cases
 
   if Scalephase = 0 [ set dailyCases casestoday ]
   if Scalephase = 1 [ set dailyCases casestoday * 10 ]
@@ -994,7 +996,7 @@ end
 
 to checkICU
   if color = red and RequireICU < ICU_Required and timenow >= ownIncubationPeriod [ set requireICU 1 ] ;; estimates if someone needs and ICU bed
-    if tracked = 1 and reported = 0 [ set reported 1 ] ;; and updates their reported status - this needs to go after the last function as it wasn;t being counted properly
+    if unDetectedFlag = 0 and reported = 0 [ set reported 1 ] ;; and updates their reported status - this needs to go after the last function as it wasn;t being counted properly
 end
 
 to CalculateICUBedsRequired ;; calculates the number of ICU beds required at any time
@@ -1035,7 +1037,7 @@ end
 ;;;;;;;;;;;;;; *****TRACKING AND TRACING FUNCTIONS*********;;;;;;;;;
 
 to traceme
-  if tracked != 1 and tracking = true [ if color = red and track_and_trace_efficiency > random-float 1 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime
+  if tracked != 1 and tracking = true [ if color = red and track_and_trace_efficiency > random-float 1 and unDetectedFlag = 0 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime - undetected people are not tracked
    if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
 
@@ -2551,7 +2553,7 @@ TEXTBOX
 678
 318
 700
-Day 1 - August 28th, 2020
+Day 1 - August 31th, 2020
 12
 15.0
 1
@@ -4032,6 +4034,17 @@ Undetected_Proportion
 1
 NIL
 HORIZONTAL
+
+MONITOR
+92
+846
+207
+892
+Undetected Cases
+count simuls with [ color = red and undetectedFlag = 1 ]
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
