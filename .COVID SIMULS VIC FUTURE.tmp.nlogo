@@ -301,10 +301,10 @@ to setup
   set resetdate 7 ;; sets up the initial date for looking at policy-changes
 
   ask n-of ( Current_Cases ) simuls [  set color red set tracked 1 set reported 1 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
-    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion reported cases in the community at the initialisation step matched to current day data
+    if timenow <= 7 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion reported cases in the community at the initialisation step matched to current day data
 
-  ask n-of ((Current_Cases * (AsymptomaticPercentage / 100)  * ( Undetected_Proportion / 100 )) simuls [  set color red set asymptomaticFlag 1 set undetectedFlag 1 set tracked 0 set reported 0 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
-    if timenow <= 6 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion of undetected cases in the community at the initialisation step
+  ask n-of ((Current_Cases * (AsymptomaticPercentage / 100)  * ( Undetected_Proportion / 100 ))) simuls [  set color red set asymptomaticFlag 1 set undetectedFlag 1 set tracked 0 set reported 0 set timenow random int OwnIllnessperiod UpdatePersonalVirulence
+    if timenow <= 7 [ set timenow random int Ownillnessperiod UpdatepersonalVirulence ] ] ;; includes a proportion of undetected cases in the community at the initialisation step
 
  ;; ask n-of 90 simuls with [ color = 85 ] [  set reported 1 set color yellow set timenow 0 set health (100 - agerange ) set inICU 0 set requireICU 0  ] ;; this is for the MJA paper
 
@@ -360,7 +360,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls-here with [ color = red ]  [ set color yellow ]
+    if any? other simuls-here with [ color = red ] [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
   ;;set tracking false ;; ensures this is set to false each time the model starts
@@ -1073,7 +1073,6 @@ to hunt ;; this specifically uses the app to trace people
 end
 
 
-
 ;;;;;;;;;;;;*********END OF TTI FUNCTIONS*******;;;;;;;;;;;;;
 
 
@@ -1162,7 +1161,7 @@ to EssentialWorkerID
   ifelse EssentialWorker < Essential_Workers [ set EssentialWorkerFlag 1 ] [ set EssentialWorkerFlag 0 ] ;; identifies essential workers
 end
 
-to seedCases ;; set up to take the pre-intervention growth pre ******August th ********* and use it to seed new cases in the next week - must be updated each day 31_8_2020 =265.46*EXP(-0.08)^G55
+to seedCases ;; set up to take the pre-intervention growth pre ******August 31th ********* and use it to seed new cases in the next week - must be updated each day 31_8_2020 =265.46*EXP(-0.08)^15
     if ticks <= seedticks and scalephase = 0 [ ask n-of int (265 * (.923 ^ (ticks + 15)))  simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star" ]]
     if ticks <= seedticks and scalephase = 1 [ ask n-of int ((265 * (.923 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
     if ticks <= seedticks and scalephase = 2 [ ask n-of int ((265 * (.923 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow 6 set Essentialworker random 100 set shape "star"  ]]
@@ -1255,9 +1254,9 @@ to setupstages
 
 ;; *****************************************************************************************************************************************************************************************************
 
- ;;   This section for 31_8
+ ;;   This section for 31_8_2020
 
-        if stage = 0 [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+    if stage = 0 [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
     set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 10 ]
 
@@ -1269,8 +1268,16 @@ to setupstages
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
     set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 10 ]
 
+    if stage = 3.3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 15 set LowerStudentAge 10 set superspreaders 5 ]
+
+    if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 10 set superspreaders 5 ]
+
     if stage = 3.5 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 30 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
     set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 4 set superspreaders 5 ]
 
    if stage = 3.9 [ set span 7 set pta 89 set ppa 89 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
@@ -1435,15 +1442,15 @@ to COVIDPolicyTriggers ;; used in idynamic model
     ;;;********************************************************************************************************************************
 
 
-    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-    if stage = 3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
-    if stage = 4 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
-    if stage = 3 and casesinperiod14 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
-    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
-    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
+;    if stage = 4 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
+;    if stage = 3 and casesinperiod14 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
+;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
 
 
 
@@ -1462,21 +1469,26 @@ to COVIDPolicyTriggers ;; used in idynamic model
 ;;**********************************************************************************************************************************
 
    ;; Vic section
-;
-;    ;; new section
-;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ]
-;    ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-;    if stage = 4 and ticks = 18 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
-;    if stage = 4 and ticks > 18 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
-;        ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 3.9 and ticks = 31 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 3.5 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+
+   ;; new section
+    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
+    if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+    if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+       ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+    if stage = 4 and ticks = 15 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
+    if stage = 4 and ticks > 15 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
+       ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage >= 0 and stage <= 3.5 and ticks = 35 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
+    if stage >= 0 and stage <= 3.5 and ticks = 42 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
+
+    if stage = 3.9 and ticks = 28 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
+    if stage = 3.5 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
 
  ;;************************************************************************************************************************************
 
@@ -3783,7 +3795,7 @@ INPUTBOX
 1590
 193
 JudgeDay1
-7.0
+14.0
 1
 0
 Number
@@ -3794,7 +3806,7 @@ INPUTBOX
 1591
 259
 JudgeDay2
-7.0
+14.0
 1
 0
 Number
@@ -3805,7 +3817,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-7.0
+14.0
 1
 0
 Number
@@ -3816,7 +3828,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-7.0
+14.0
 1
 0
 Number
@@ -3985,7 +3997,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-0.0
+14.0
 1
 0
 Number
@@ -3996,7 +4008,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-0.0
+14.0
 1
 0
 Number
@@ -4007,7 +4019,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-0.0
+14.0
 1
 0
 Number
@@ -4018,7 +4030,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-0.0
+14.0
 1
 0
 Number
