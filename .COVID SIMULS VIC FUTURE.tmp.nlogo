@@ -1280,11 +1280,11 @@ to setupstages
 
   if stage = 1 [ set span 30 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 12
-    set residualcautionPPA 12 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
+      set residualcautionPPA 12 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 2 [ set span 15 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
-    set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
     if stage = 3.3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
@@ -1659,7 +1659,7 @@ Span
 Span
 0
 30
-7.0
+10.0
 1
 1
 NIL
@@ -1941,7 +1941,7 @@ Superspreaders
 Superspreaders
 0
 100
-3.0
+5.0
 1
 1
 NIL
@@ -2011,7 +2011,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+84.0
 .5
 1
 NIL
@@ -2026,7 +2026,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+84.0
 .5
 1
 NIL
@@ -2080,7 +2080,7 @@ SWITCH
 619
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -2339,10 +2339,10 @@ DailyCases
 12
 
 PLOT
-330
-942
-632
-1097
+323
+949
+625
+1104
 New Infections Per Day
 NIL
 NIL
@@ -2604,7 +2604,7 @@ INPUTBOX
 609
 284
 ppa
-89.0
+84.0
 1
 0
 Number
@@ -2615,7 +2615,7 @@ INPUTBOX
 700
 285
 pta
-89.0
+84.0
 1
 0
 Number
@@ -3032,7 +3032,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-37.230308709450476
+26.950068802414812
 1
 1
 NIL
@@ -3084,7 +3084,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+25.0
 1
 1
 NIL
@@ -3321,7 +3321,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+68.0
 1
 1
 NIL
@@ -3336,7 +3336,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+68.0
 1
 1
 NIL
@@ -3569,7 +3569,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.24607361773354908
+0.38200261789784973
 .01
 1
 NIL
@@ -3689,7 +3689,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-7
+4
 
 PLOT
 2378
@@ -3866,7 +3866,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+4.0
 1
 0
 Number
@@ -4049,7 +4049,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-43.96568637798937
+47.08278251666819
 1
 1
 NIL
@@ -4067,10 +4067,10 @@ count simuls with [ color = red and undetectedFlag = 1 ]
 11
 
 MONITOR
-498
-966
-570
-1011
+340
+922
+412
+967
 NIL
 Dailycases
 0
@@ -10880,7 +10880,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="15"/>
+    <timeLimit steps="35"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -11175,7 +11175,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="policytriggeron">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
       <value value="5"/>

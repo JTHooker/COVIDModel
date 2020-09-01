@@ -1631,7 +1631,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1708,7 +1708,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1788,7 +1788,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1941,7 +1941,7 @@ Superspreaders
 Superspreaders
 0
 100
-5.0
+6.326062187399923
 1
 1
 NIL
@@ -2011,7 +2011,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+68.0
 .5
 1
 NIL
@@ -2026,7 +2026,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+68.0
 .5
 1
 NIL
@@ -2339,10 +2339,10 @@ DailyCases
 12
 
 PLOT
-330
-942
-632
-1097
+323
+949
+625
+1104
 New Infections Per Day
 NIL
 NIL
@@ -2604,7 +2604,7 @@ INPUTBOX
 609
 284
 ppa
-85.0
+68.0
 1
 0
 Number
@@ -2615,7 +2615,7 @@ INPUTBOX
 700
 285
 pta
-85.0
+68.0
 1
 0
 Number
@@ -3032,7 +3032,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-37.230308709450476
+33.3783701091269
 1
 1
 NIL
@@ -3084,7 +3084,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-25.0
+32.272608647900405
 1
 1
 NIL
@@ -3129,7 +3129,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+27.240982614723134
 1
 1
 NIL
@@ -3569,7 +3569,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.24607361773354908
+0.25539767961756654
 .01
 1
 NIL
@@ -3689,7 +3689,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+5
 
 PLOT
 2378
@@ -3866,7 +3866,7 @@ INPUTBOX
 2298
 754
 LowerStudentAge
-3.0
+4.0
 1
 0
 Number
@@ -4049,7 +4049,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-43.96568637798937
+43.60093559429306
 1
 1
 NIL
@@ -4067,10 +4067,10 @@ count simuls with [ color = red and undetectedFlag = 1 ]
 11
 
 MONITOR
-498
-966
-570
-1011
+340
+922
+412
+967
 NIL
 Dailycases
 0
@@ -10880,7 +10880,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="15"/>
+    <timeLimit steps="35"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -11175,7 +11175,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="policytriggeron">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
       <value value="5"/>
