@@ -533,7 +533,7 @@ to go ;; these funtions get called each time-step
   calculateMeanDaysInfected
   ;;profilerstop
   traceadjust
-  ;;linearbehdecrease
+  linearbehdecrease
   ;;visitDestination
   CovidPolicyTriggers
   calculateCasesInLastPeriod
@@ -1288,7 +1288,7 @@ to setupstages
 
     if stage = 3.3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
-      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] ]
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 5 ]]
 
     if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
@@ -1306,7 +1306,7 @@ to setupstages
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 81
       set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] ]
 
-  ]]
+  ]
 
  ;;; *******************************************************************************************************************************************************************************************************
 
@@ -3032,7 +3032,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-26.950068802414812
+33.1296929881422
 1
 1
 NIL
@@ -3569,7 +3569,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.38200261789784973
+0.29915132048304477
 .01
 1
 NIL
@@ -4049,7 +4049,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-47.08278251666819
+49.77877015019175
 1
 1
 NIL
@@ -4107,7 +4107,7 @@ MONITOR
 1529
 549
 1594
-595
+594
 Students
 count simuls with [ studentFlag = 1 ]
 0
@@ -11190,7 +11190,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 1_9 Testing" repetitions="50" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Evening Testing" repetitions="250" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -11270,12 +11270,6 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Triggerday">
       <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="LowerStudentAge">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="UpperStudentAge">
-      <value value="18"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="lockdown_off">
       <value value="true"/>
@@ -11395,8 +11389,12 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="14"/>
+      <value value="42"/>
       <value value="70"/>
+      <value value="98"/>
       <value value="140"/>
+      <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
@@ -11496,7 +11494,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="policytriggeron">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
       <value value="5"/>
