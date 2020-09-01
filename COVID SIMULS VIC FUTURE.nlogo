@@ -89,6 +89,9 @@ globals [
   stageToday
   stageYesterday
 
+  PrimaryUpper
+  SecondaryLower
+
 
   ;; log transform illness period variables
   Illness_PeriodVariance
@@ -351,8 +354,8 @@ to setup
   ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 300 + 600 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
     set householdUnit random 600 ] ] ]  ;; allocates up to two adults per household
-  ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] set studentFlag 1  ]] ;; Identifies students
-
+  ask simuls with [ agerange <= 18 and agerange >= 5 and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] ]] ;; Identifies students
+ ;; ask simuls [ updatestudentstatus ]
 
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
 
@@ -537,7 +540,7 @@ to go ;; these funtions get called each time-step
   ;;calculateCashPosition
   calculateObjfunction
   updateoutside
-  updatestudentStatus
+  ;;updatestudentStatus
   incursion
   ask patches [ checkutilisation ]
  tick
@@ -1273,37 +1276,37 @@ to setupstages
 
     if stage = 0 [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
-    set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 10 ]
+      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 1 [ set span 30 set pta 15 set ppa 15 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 12
-    set residualcautionPPA 12 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 10 ]
+      set residualcautionPPA 12 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 2 [ set span 15 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
-    set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 10 ]
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
-    if stage = 3.3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+    if stage = 3.3 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 15 set LowerStudentAge 10 set superspreaders 5 ]
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] ]
 
-    if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+    if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 10 set superspreaders 5 ]
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ]]
 
-    if stage = 3.5 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+    if stage = 3.5 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 4 set superspreaders 5 ]
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ] ]
 
-   if stage = 3.9 [ set span 7 set pta 89 set ppa 89 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+   if stage = 3.9 [ set span 7 set pta 89 set ppa 89 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 80
-    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 3 ] ;; check st
+    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 3 ask simuls [ set studentFlag 0 ] ] ;; check st
 
-  if stage = 4 [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy false set quarantine true set schoolPolicyActive false
+  if stage = 4 [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 81
-    set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set upperStudentAge 18 set LowerStudentAge 3 set superspreaders 2 ]
+      set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] ]
 
-
+  ]]
 
  ;;; *******************************************************************************************************************************************************************************************************
 
@@ -1385,7 +1388,7 @@ to setupstages
 ;    set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ] ;; check student age update
 
 ;;*************************************************************************************************************************************************************************************************************************
- ]
+
 end
 
 to calculateCasesInLastPeriod ;; counts cases in the last 14 days -
@@ -1517,9 +1520,10 @@ to updateoutside ;; controls the amount of time that interactions happen outside
   if count patches with [ pcolor = green ] > ( Outside * (count patches) ) [ ask n-of random 10 patches with [ pcolor = green ] [ set pcolor black ] ]
 end
 
-to updateStudentStatus
-  ask simuls with [ agerange < UpperStudentAge and agerange >= LowerStudentAge ] [ set studentFlag 1  ] ;; Identifies students
-end
+;to updateStudentStatus
+;  ask simuls with [ agerange = 5 ] [ set studentFlag 1 ] ;;; students can only be young or older
+;  ask simuls with [ agerange = 15 ] [ set studentFlag 1 ]
+;end
 
 to incursion
   if ticks > 0 and currentinfections = 0 and 1 > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
@@ -1627,7 +1631,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1655,7 +1659,7 @@ Span
 Span
 0
 30
-5.0
+10.0
 1
 1
 NIL
@@ -1704,7 +1708,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1784,7 +1788,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1937,7 +1941,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+5.0
 1
 1
 NIL
@@ -2007,7 +2011,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-90.0
+85.0
 .5
 1
 NIL
@@ -2022,7 +2026,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-90.0
+85.0
 .5
 1
 NIL
@@ -2076,7 +2080,7 @@ SWITCH
 619
 policytriggeron
 policytriggeron
-1
+0
 1
 -1000
 
@@ -2600,7 +2604,7 @@ INPUTBOX
 609
 284
 ppa
-90.0
+85.0
 1
 0
 Number
@@ -2611,7 +2615,7 @@ INPUTBOX
 700
 285
 pta
-90.0
+85.0
 1
 0
 Number
@@ -3080,7 +3084,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+25.0
 1
 1
 NIL
@@ -3317,7 +3321,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+68.0
 1
 1
 NIL
@@ -3332,7 +3336,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+68.0
 1
 1
 NIL
@@ -4082,7 +4086,7 @@ Household_Attack
 Household_Attack
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -4095,6 +4099,17 @@ MONITOR
 380
 Time = 1 
 count simuls with [ timenow = 2 ]
+0
+1
+11
+
+MONITOR
+1529
+549
+1594
+595
+Students
+count simuls with [ studentFlag = 1 ]
 0
 1
 11
