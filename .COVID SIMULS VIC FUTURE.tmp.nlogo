@@ -1254,9 +1254,9 @@ to traceadjust
 ;  if scalephase = 4 [ set track_and_trace_efficiency .05 ]
 end
 
-;to linearbehdecrease
-;  if complacency = true [ if ticks > triggerday and ppa > ResidualCautionppa [ set ppa (ppa - 1) set pta ( pta - 1)]]
-;end
+to linearbehdecrease
+  if complacency = true [ if ticks > triggerday and ppa > ResidualCautionppa [ set ppa (ppa - 1) set pta ( pta - 1)]]
+end
 
 
 to visitDestination
@@ -1292,7 +1292,7 @@ to setupstages
 
     if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ]]
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask s[ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 5 ]]
 
     if stage = 3.5 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
@@ -2604,7 +2604,7 @@ INPUTBOX
 609
 284
 ppa
-84.0
+83.0
 1
 0
 Number
@@ -2615,7 +2615,7 @@ INPUTBOX
 700
 285
 pta
-84.0
+83.0
 1
 0
 Number
@@ -3689,7 +3689,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-4
+5
 
 PLOT
 2378

@@ -1292,7 +1292,7 @@ to setupstages
 
     if stage = 3.4 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ]]
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 5 ]]
 
     if stage = 3.5 [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
@@ -1659,7 +1659,7 @@ Span
 Span
 0
 30
-30.0
+10.0
 1
 1
 NIL
@@ -1941,7 +1941,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+5.0
 1
 1
 NIL
@@ -2011,7 +2011,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-14.0
+84.0
 .5
 1
 NIL
@@ -2026,7 +2026,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-14.0
+84.0
 .5
 1
 NIL
@@ -2395,7 +2395,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2604,7 +2604,7 @@ INPUTBOX
 609
 284
 ppa
-13.0
+83.0
 1
 0
 Number
@@ -2615,7 +2615,7 @@ INPUTBOX
 700
 285
 pta
-13.0
+83.0
 1
 0
 Number
@@ -3084,7 +3084,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+25.0
 1
 1
 NIL
@@ -3282,7 +3282,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3321,7 +3321,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-12.0
+68.0
 1
 1
 NIL
@@ -3336,7 +3336,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-12.0
+68.0
 1
 1
 NIL
@@ -3689,7 +3689,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-1
+5
 
 PLOT
 2378
