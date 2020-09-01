@@ -11158,7 +11158,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 1_9 Testing" repetitions="30" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Testing" repetitions="50" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -11363,12 +11363,8 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
-      <value value="14"/>
-      <value value="28"/>
-      <value value="42"/>
       <value value="70"/>
       <value value="140"/>
-      <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
