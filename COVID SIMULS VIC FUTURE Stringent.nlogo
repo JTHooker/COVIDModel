@@ -1652,7 +1652,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1680,7 +1680,7 @@ Span
 Span
 0
 30
-5.0
+15.0
 1
 1
 NIL
@@ -1729,7 +1729,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1809,7 +1809,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1962,7 +1962,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -2032,7 +2032,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-81.0
+58.0
 .5
 1
 NIL
@@ -2047,7 +2047,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-81.0
+58.0
 .5
 1
 NIL
@@ -2625,7 +2625,7 @@ INPUTBOX
 609
 284
 ppa
-81.0
+57.0
 1
 0
 Number
@@ -2636,7 +2636,7 @@ INPUTBOX
 700
 285
 pta
-81.0
+57.0
 1
 0
 Number
@@ -3053,7 +3053,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.08279894765068
+29.23868082084951
 1
 1
 NIL
@@ -3105,7 +3105,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -3303,7 +3303,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3342,7 +3342,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+52.0
 1
 1
 NIL
@@ -3357,7 +3357,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+52.0
 1
 1
 NIL
@@ -3590,7 +3590,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.40281127897740354
+0.38566860210045134
 .01
 1
 NIL
@@ -3710,7 +3710,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+2
 
 PLOT
 2378
@@ -12180,7 +12180,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 ;;set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="150"/>
+    <timeLimit steps="120"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -12370,6 +12370,7 @@ set App_uptake App_Uptake + random-normal 0 4
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="70"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">

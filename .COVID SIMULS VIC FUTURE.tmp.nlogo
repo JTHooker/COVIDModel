@@ -364,7 +364,7 @@ to setup
   resetHouseholdUnit ;; iterates this process
   ask simuls [ resetlandingSimul ]
 
-  setupstages ;; setting up for the MJA runs
+
 
 
   ask simuls [
@@ -384,6 +384,7 @@ to setup
   ;;set maskPolicy false ;; that the mask policy doesn't begin before the policy trigger starts
   ;;set assignAppEss false ;; that the assigning the App to EssentialWorkers doesn't begin before the policy trigger starts
   reset-ticks
+   setupstages ;; setting up for the MJA runs
 end
 
 to matchages
@@ -1281,7 +1282,48 @@ end
 
 to setupstages
 
+ if selfgovern = true   [
 
+;; *****************************************************************************************************************************************************************************************************
+
+ ;;   This section for 31_8_2020
+
+    if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
+      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+
+  if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+
+  if stage = 2 and ticks = resetdate [ set span 15 set pta 65 set ppa 65 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 52
+      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ] set superspreaders 10 ]]
+
+    if stage = 3.3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  ask simuls [ if agerange = 5 and returntoschool <= 33 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ]
+       if agerange = 5 and returntoschool > 50 [ set studentFlag 0 ]] ask simuls [ if agerange = 15 and returntoschool > 33 [ set studentflag 0 ]  set superspreaders 5 ]]
+
+    if stage = 3.4 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
+      set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 33 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ]
+       if agerange = 5 and returntoschool > 33 [ set studentFlag 0 ]] ask simuls [ if agerange = 15 and returntoschool > 20 [ set studentflag 0 ] set superspreaders 5 ]]
+
+    if stage = 3.5 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ] ]
+
+   if stage = 3.9 and ticks = resetdate [ set span 7 set pta 89 set ppa 89 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 80
+    set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 3 ask simuls [ set studentFlag 0 ] ] ;; check st
+
+  if stage = 4 and ticks = resetdate [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 81
+      set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] ]
+
+
+  ]
 
  ;;; *******************************************************************************************************************************************************************************************************
 
@@ -1986,7 +2028,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+60.0
 .5
 1
 NIL
@@ -2001,7 +2043,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+60.0
 .5
 1
 NIL
@@ -2579,7 +2621,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+59.0
 1
 0
 Number
@@ -2590,7 +2632,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+59.0
 1
 0
 Number
@@ -3007,7 +3049,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.92319425621641
+36.021313322264035
 1
 1
 NIL
@@ -3296,7 +3338,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3311,7 +3353,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3544,7 +3586,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.27917613900264193
+0.3071402943285892
 .01
 1
 NIL
@@ -3933,7 +3975,7 @@ INPUTBOX
 1901
 316
 threetotwo
-14.0
+140.0
 1
 0
 Number
@@ -4024,7 +4066,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-50.930224678255684
+2.4057005028602383
 1
 1
 NIL
@@ -11487,7 +11529,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="250" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="400" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -11496,7 +11538,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="303"/>
+    <timeLimit steps="120"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -11686,8 +11728,9 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="42"/>
+      <value value="70"/>
       <value value="140"/>
-      <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
@@ -11799,7 +11842,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Undetected_Proportion">
-      <value value="15"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Household_Attack">
       <value value="50"/>

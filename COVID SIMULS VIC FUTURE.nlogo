@@ -364,7 +364,7 @@ to setup
   resetHouseholdUnit ;; iterates this process
   ask simuls [ resetlandingSimul ]
 
-  setupstages ;; setting up for the MJA runs
+
 
 
   ask simuls [
@@ -384,6 +384,7 @@ to setup
   ;;set maskPolicy false ;; that the mask policy doesn't begin before the policy trigger starts
   ;;set assignAppEss false ;; that the assigning the App to EssentialWorkers doesn't begin before the policy trigger starts
   reset-ticks
+   setupstages ;; setting up for the MJA runs
 end
 
 to matchages
@@ -2027,7 +2028,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+56.0
 .5
 1
 NIL
@@ -2042,7 +2043,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+56.0
 .5
 1
 NIL
@@ -2411,7 +2412,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2620,7 +2621,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+55.0
 1
 0
 Number
@@ -2631,7 +2632,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+55.0
 1
 0
 Number
@@ -3048,7 +3049,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.92319425621641
+32.57951911205748
 1
 1
 NIL
@@ -3337,7 +3338,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3352,7 +3353,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3585,7 +3586,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.27917613900264193
+0.38415400797167576
 .01
 1
 NIL
@@ -3974,7 +3975,7 @@ INPUTBOX
 1901
 316
 threetotwo
-14.0
+350.0
 1
 0
 Number
@@ -4065,7 +4066,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-50.930224678255684
+-0.0031251302904836686
 1
 1
 NIL
@@ -11528,7 +11529,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="250" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="50" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -11537,7 +11538,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="303"/>
+    <timeLimit steps="120"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -11727,7 +11728,8 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
-      <value value="140"/>
+      <value value="42"/>
+      <value value="70"/>
       <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
@@ -11840,7 +11842,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Undetected_Proportion">
-      <value value="15"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Household_Attack">
       <value value="50"/>

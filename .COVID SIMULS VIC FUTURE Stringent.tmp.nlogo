@@ -364,7 +364,7 @@ to setup
   resetHouseholdUnit ;; iterates this process
   ask simuls [ resetlandingSimul ]
 
-  setupstages ;; setting up for the MJA runs
+
 
 
   ask simuls [
@@ -384,6 +384,7 @@ to setup
   ;;set maskPolicy false ;; that the mask policy doesn't begin before the policy trigger starts
   ;;set assignAppEss false ;; that the assigning the App to EssentialWorkers doesn't begin before the policy trigger starts
   reset-ticks
+  setupstages ;; setting up for the MJA runs
 end
 
 to matchages
@@ -1651,7 +1652,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1728,7 +1729,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1808,7 +1809,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2031,7 +2032,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-63.0
+58.0
 .5
 1
 NIL
@@ -2046,7 +2047,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-63.0
+58.0
 .5
 1
 NIL
@@ -2415,7 +2416,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2624,7 +2625,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+57.0
 1
 0
 Number
@@ -2635,7 +2636,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+57.0
 1
 0
 Number
@@ -3052,7 +3053,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.08279894765068
+32.51256716468588
 1
 1
 NIL
@@ -3341,7 +3342,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-45.0
+52.0
 1
 1
 NIL
@@ -3356,7 +3357,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-45.0
+52.0
 1
 1
 NIL
@@ -3589,7 +3590,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.40281127897740354
+0.4030462615107694
 .01
 1
 NIL
@@ -3709,7 +3710,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+2
 
 PLOT
 2378
@@ -3978,7 +3979,7 @@ INPUTBOX
 1901
 316
 threetotwo
-350.0
+140.0
 1
 0
 Number
@@ -12170,7 +12171,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 2_9 Stringent Small trial" repetitions="20" runMetricsEveryStep="true">
+  <experiment name="JN experiment 2_9 Stringent Small trial" repetitions="400" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -12179,7 +12180,7 @@ set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4
 ;;set undetected_proportion undetected_proportion + random-normal 0 3</setup>
     <go>go</go>
-    <timeLimit steps="150"/>
+    <timeLimit steps="120"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -12369,6 +12370,9 @@ set App_uptake App_Uptake + random-normal 0 4
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="42"/>
+      <value value="70"/>
+      <value value="140"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
