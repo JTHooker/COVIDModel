@@ -1497,12 +1497,16 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
     if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
     if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-       ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+
+
+
     if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
     if stage = 4 and ticks > 14 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
-       ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage >= 0 and stage <= 3.5 and ticks = 34 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
-    if stage >= 0 and stage <= 3.5 and ticks = 41 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
+
+
+
+  ;;  if stage >= 0 and stage <= 3.5 and ticks = 34 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
+  ;;  if stage >= 0 and stage <= 3.5 and ticks = 41 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
     if stage = 3.9 and ticks = 27 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
     if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
     if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
@@ -1674,7 +1678,7 @@ Span
 Span
 0
 30
-15.0
+7.0
 1
 1
 NIL
@@ -1956,7 +1960,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+3.0
 1
 1
 NIL
@@ -2026,7 +2030,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+88.0
 .5
 1
 NIL
@@ -2041,7 +2045,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+88.0
 .5
 1
 NIL
@@ -2619,7 +2623,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+87.0
 1
 0
 Number
@@ -2630,7 +2634,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+87.0
 1
 0
 Number
@@ -3099,7 +3103,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3297,7 +3301,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3336,7 +3340,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+80.0
 1
 1
 NIL
@@ -3351,7 +3355,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+80.0
 1
 1
 NIL
@@ -3704,7 +3708,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-2
+7
 
 PLOT
 2378
@@ -11205,7 +11209,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 2_9 School Run" repetitions="50" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Evening Testing" repetitions="250" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -11404,8 +11408,11 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
+      <value value="14"/>
       <value value="42"/>
       <value value="70"/>
+      <value value="98"/>
+      <value value="140"/>
       <value value="210"/>
       <value value="350"/>
     </enumeratedValueSet>
