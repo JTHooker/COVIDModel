@@ -373,7 +373,7 @@ to setup
 
 
   ask simuls [
-    if agerange = 5 and 60 > random 100 [ set AsymptomaticFlag 1 ]
+    if agerange = 5 and 50 > random 100 [ set AsymptomaticFlag 1 ]
   ]
 
 
@@ -1288,7 +1288,7 @@ to setupstages
 
  ;;   This section for 31_8_2020
 
-    if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+ if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
       set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
@@ -1652,7 +1652,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1729,7 +1729,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1809,7 +1809,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2032,7 +2032,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-58.0
+53.0
 .5
 1
 NIL
@@ -2047,7 +2047,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-58.0
+53.0
 .5
 1
 NIL
@@ -2625,7 +2625,7 @@ INPUTBOX
 609
 284
 ppa
-57.0
+53.0
 1
 0
 Number
@@ -2636,7 +2636,7 @@ INPUTBOX
 700
 285
 pta
-57.0
+53.0
 1
 0
 Number
@@ -3053,7 +3053,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-29.23868082084951
+35.93258396763669
 1
 1
 NIL
@@ -3590,7 +3590,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.38566860210045134
+0.39303434113868274
 .01
 1
 NIL
@@ -3710,7 +3710,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-2
+8
 
 PLOT
 2378
@@ -12171,7 +12171,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 2_9 Stringent Small trial" repetitions="20" runMetricsEveryStep="true">
+  <experiment name="JN experiment 2_9 Stringent Small trial" repetitions="100" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
@@ -12371,6 +12371,7 @@ set App_uptake App_Uptake + random-normal 0 4
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
       <value value="70"/>
+      <value value="140"/>
       <value value="350"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">

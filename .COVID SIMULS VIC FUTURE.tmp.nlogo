@@ -2028,7 +2028,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-60.0
+56.0
 .5
 1
 NIL
@@ -2043,7 +2043,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-60.0
+56.0
 .5
 1
 NIL
@@ -2412,7 +2412,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2621,7 +2621,7 @@ INPUTBOX
 609
 284
 ppa
-59.0
+55.0
 1
 0
 Number
@@ -2632,7 +2632,7 @@ INPUTBOX
 700
 285
 pta
-59.0
+55.0
 1
 0
 Number
@@ -3049,7 +3049,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-36.021313322264035
+32.57951911205748
 1
 1
 NIL
@@ -3586,7 +3586,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3071402943285892
+0.38415400797167576
 .01
 1
 NIL
@@ -3975,7 +3975,7 @@ INPUTBOX
 1901
 316
 threetotwo
-140.0
+350.0
 1
 0
 Number
@@ -4066,7 +4066,7 @@ Undetected_Proportion
 Undetected_Proportion
 0
 100
-2.4057005028602383
+-0.0031251302904836686
 1
 1
 NIL
@@ -11529,7 +11529,7 @@ set undetected_proportion undetected_proportion + random-normal 0 3</setup>
       <value value="50"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="400" runMetricsEveryStep="true">
+  <experiment name="JN experiment 1_9 Evening Testing High" repetitions="150" runMetricsEveryStep="true">
     <setup>setup
 set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
