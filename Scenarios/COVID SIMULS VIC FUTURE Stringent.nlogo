@@ -1547,7 +1547,7 @@ end
 ;end
 
 to incursion
-  if ticks > 0 and currentinfections = 0 and 1 > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
+  if ticks > 0 and currentinfections = 0 and IncursionRate > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1652,7 +1652,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1729,7 +1729,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1809,7 +1809,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2416,7 +2416,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2600,16 +2600,6 @@ Day 1 - August 31st, 2020
 1
 
 TEXTBOX
-578
-15
-2057
-95
-COVID-19 Policy Options and Impact Model for Victoria
-60
-104.0
-1
-
-TEXTBOX
 1164
 744
 1379
@@ -2640,16 +2630,6 @@ pta
 1
 0
 Number
-
-TEXTBOX
-346
-210
-522
-296
-Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
-12
-0.0
-0
 
 PLOT
 1609
@@ -3710,7 +3690,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-2
+8
 
 PLOT
 2378
@@ -4099,10 +4079,10 @@ Dailycases
 11
 
 SLIDER
-756
-86
-929
-119
+757
+84
+930
+117
 Household_Attack
 Household_Attack
 0
@@ -4134,6 +4114,31 @@ count simuls with [ studentFlag = 1 ]
 0
 1
 11
+
+SLIDER
+608
+83
+753
+116
+IncursionRate
+IncursionRate
+0
+100
+1.0
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+346
+210
+522
+296
+Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
+12
+0.0
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
