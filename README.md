@@ -20,3 +20,8 @@ The model will be updated regularly as it is constructed.
 
 If you have any specific questions or would like to contribute / comment, please contact jason.thompson@unimelb.edu.au .
 
+
+## Usage
+
+Sharing the model is great but it would be a lot more useful if you could include the steps required to run it.
+
