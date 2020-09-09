@@ -1536,13 +1536,6 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
     if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
 
-
-
-
-
-
-
-
   ]
 
 end
