@@ -10,7 +10,7 @@ There are multiple versions of the model available in the repository - all of wh
 
 The core model 'COVID Simuls' is the most generic and was set up to answer early questions from a 'whole of Australia' perspective.
 
-'COVID SIMULS VIC' is the most recent model, and includes additional features and functions relevant to the unfolding 'second wave' in the state of Victoria.
+Models relating to the current Victorian situation are not included in the repository, but they can be considered analogous in many ways to those that are. We will release a generic Victorian version in the near future. 
 
 The ODD protocol has been built on the Australian model and will be updated over time to reflect additional functions and features as new questions are asked of the model. You should look for the most recent version of the ODD protocol available in the repository for the most recent version as the url for this will be updated over time.
 
@@ -20,8 +20,7 @@ The model will be updated regularly as it is constructed.
 
 If you have any specific questions or would like to contribute / comment, please contact jason.thompson@unimelb.edu.au .
 
-
 ## Usage
 
-Sharing the model is great but it would be a lot more useful if you could include the steps required to run it.
+
 
