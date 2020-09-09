@@ -1542,7 +1542,6 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
 
 
-
   ]
 
 end
