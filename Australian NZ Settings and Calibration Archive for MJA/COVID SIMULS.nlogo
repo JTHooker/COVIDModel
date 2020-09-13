@@ -165,11 +165,9 @@ to setup
 
   rngs:init
    ;; random-seed  100 ;; for use in setting random nuber generator seeds
-   ;; random-seed  100 ;; for use in setting random number generator seeds
 
   clear-all
   import-drawing "Background1.png" ;; imports MSD image
-  import-drawing "../Images/Background1.png" ;; imports MSD image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -1307,7 +1305,6 @@ quarantine
 quarantine
 0
 1
-1
 -1000
 
 SLIDER
@@ -1529,7 +1526,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-85.0
+20.0
 .5
 1
 NIL
@@ -1544,7 +1541,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-85.0
+20.0
 .5
 1
 NIL
@@ -2660,7 +2657,7 @@ SWITCH
 205
 tracking
 tracking
-1
+0
 1
 -1000
 
@@ -3196,7 +3193,7 @@ MONITOR
 1092
 426
 1148
-471
+472
 AFCs
 AverageFinancialContacts
 2
@@ -3207,7 +3204,7 @@ SLIDER
 1745
 876
 1918
-909
+911
 Ex_Adjust
 Ex_Adjust
 0
