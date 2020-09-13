@@ -164,12 +164,10 @@ to setup
   profiler:start
 
   rngs:init
-   ;; random-seed  100 ;; for use in setting random nuber generator seeds
    ;; random-seed  100 ;; for use in setting random number generator seeds
 
   clear-all
   import-drawing "Background1.png" ;; imports MSD image
-  import-drawing "../Images/Background1.png" ;; imports MSD image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -1148,7 +1146,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1225,7 +1223,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1305,7 +1303,6 @@ SWITCH
 349
 quarantine
 quarantine
-0
 1
 1
 -1000
