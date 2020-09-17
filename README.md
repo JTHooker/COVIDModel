@@ -1,6 +1,6 @@
 # COVID Model in the Australian Context
 
-Explanatory notes on the [Odd Protocol](https://github.com/thatstat/COVIDModel/blob/master/ODD%20Protocol/ODD%20Protocol%20Aus%20NZ%20COVID19%20model.pdf)
+Explanatory notes on the [Odd Protocol](https://github.com/JTHooker/COVIDModel/tree/master/ODD%20Protocol)
 
 This is an Agent-Based Model being built to assist with modeling the spread, health and economic impact of COVID 19 in Australia and policy-settings during its expansion and contraction phase that could limit its damage to health and the economy.
 
