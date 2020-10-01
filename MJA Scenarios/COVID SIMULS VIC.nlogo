@@ -206,10 +206,10 @@ to setup
   profiler:start
 
   rngs:init
-   ;; random-seed  100 ;; for use in setting random nuber generator seeds
+   ;; random-seed  100 ;; for use in setting random number generator seeds
 
   clear-all
-  import-drawing "Background1.png" ;; imports MSD image
+  import-drawing "../Images/Background1.png" ;; imports MSD image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -2369,7 +2369,7 @@ Days since July 25th, 2020
 TEXTBOX
 578
 15
-2057
+2217
 95
 COVID-19 Policy Options and Impact Model for Victoria
 60
