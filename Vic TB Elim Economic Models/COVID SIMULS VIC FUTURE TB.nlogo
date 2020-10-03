@@ -1689,7 +1689,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1766,7 +1766,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1846,7 +1846,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2069,7 +2069,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+88.0
 .5
 1
 NIL
@@ -2084,7 +2084,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+88.0
 .5
 1
 NIL
@@ -2453,7 +2453,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+0.0
 1
 1
 NIL
@@ -4181,7 +4181,7 @@ MONITOR
 1613
 139
 1728
-185
+184
 Last Decision Date
 DecisionDate
 0
@@ -13687,6 +13687,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
       <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
