@@ -1279,7 +1279,107 @@ to visitDestination
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 
+to COVIDPolicyTriggers ;; used in idynamic model
+    if selfgovern = true  [
 
+
+    ;; Optimisation section
+    ;;;********************************************************************************************************************************
+
+
+;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
+;    if stage = 4 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
+;    if stage = 3 and casesinperiod14 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
+;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+
+
+
+;    ;; regular section
+;    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
+;    if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
+;    if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+;    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
+;    if stage = 1 and casesinperiod7 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+;
+
+;;**********************************************************************************************************************************
+
+   ;; Vic section
+
+   ;; new section
+;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;    if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;       ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
+;    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
+;    if stage = 4 and ticks > 14 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
+;       ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage >= 0 and stage <= 3.5 and ticks = 34 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
+;    if stage >= 0 and stage <= 3.5 and ticks = 41 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
+;    if stage = 3.9 and ticks = 27 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
+;    if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+
+ ;;************************************************************************************************************************************
+
+ ;;   TB Section
+
+   ;;up
+
+    if stage = 0 and casesinperiod7 >= zerotoone [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
+    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+
+  ;; down
+    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d ) ]
+    if stage = 3.5 and casesinperiod7 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
+    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
+    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
+    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3_d)     ] ; ramps down to 3.9 on September 15th
+
+
+  ;;Previous
+
+    ;      ;;up
+;
+;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
+;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
+;    if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;    if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+;
+;  ;; down
+;
+;    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3)     ] ; ramps down to 3.9 on September 15th
+;    if stage = 4 and ticks > 14 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
+;
+;    if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
+;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1 * 2) ]
+;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
+;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
+
+
+  ]
+
+end
 to setupstages
 
  if selfgovern = true   [
@@ -1456,108 +1556,6 @@ end
 ;  ;;if ticks > 0 [ set stage 3 ] ;; used to set up initial stages for Victoria runs
 ;end
 
-to COVIDPolicyTriggers ;; used in idynamic model
-    if selfgovern = true  [
-
-
-    ;; Optimisation section
-    ;;;********************************************************************************************************************************
-
-
-;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
-;    if stage = 4 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
-;    if stage = 3 and casesinperiod14 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
-;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
-;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-
-
-
-;    ;; regular section
-;    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4_d) ]
-;    if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3_d)]
-;    if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
-;    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d) ]
-;    if stage = 1 and casesinperiod7 <= zerotoone and ticks = resetdate [ set stage 0 ]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-;
-
-;;**********************************************************************************************************************************
-
-   ;; Vic section
-
-   ;; new section
-;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;    if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;       ;;if stage = 4 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3 set resetdate (ticks + JudgeDay3)]
-;    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3)] ; ramps down to 3.9 on September 15th
-;    if stage = 4 and ticks > 14 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
-;       ;; if stage = 3 and casesinperiod7 <= threetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage >= 0 and stage <= 3.5 and ticks = 34 [ set stage 3.4 ] ;; this sends 300000 students back on Oct 5th
-;    if stage >= 0 and stage <= 3.5 and ticks = 41 [ set stage 3.3 ] ;; this sends another 100,000 students back on Oct 12th
-;    if stage = 3.9 and ticks = 27 [ set stage 3.5 set resetdate (ticks + JudgeDay2) ]
-;    if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-
- ;;************************************************************************************************************************************
-
- ;;   TB Section
-
-   ;;up
-
-    if stage = 0 and casesinperiod7 >= zerotoone [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
-    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-
-  ;; down
-
-    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3_d)     ] ; ramps down to 3.9 on September 15th
-    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
-    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
-
-    if stage = 3.5 and casesinperiod7 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
-    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d ) ]
-    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-
-;;Previous
-
-    ;      ;;up
-;
-;    if stage = 0 and casesinperiod14 >= zerotoone and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-;    if stage = 1 and casesinperiod14 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
-;    if stage = 3.3 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;    if stage = 3.4 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;    if stage = 3.5 and casesinperiod14 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
-;
-;  ;; down
-;
-;    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3)     ] ; ramps down to 3.9 on September 15th
-;    if stage = 4 and ticks > 14 and casesinperiod14 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay4) ]
-;
-;    if stage <= 3.5 and stage >= 3 and casesinperiod14 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-;    if stage = 2 and casesinperiod14 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1 * 2) ]
-;    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-
-
-  ]
-
-end
 
 ;to calculatecashPosition
 ;  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
@@ -1690,7 +1688,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1718,7 +1716,7 @@ Span
 Span
 0
 30
-30.0
+7.0
 1
 1
 NIL
@@ -1767,7 +1765,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1847,7 +1845,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2000,7 +1998,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+3.0
 1
 1
 NIL
@@ -2070,7 +2068,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+80.0
 .5
 1
 NIL
@@ -2085,7 +2083,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+80.0
 .5
 1
 NIL
@@ -2454,7 +2452,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2653,7 +2651,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+80.0
 1
 0
 Number
@@ -2664,7 +2662,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+80.0
 1
 0
 Number
@@ -3133,7 +3131,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+20.0
 1
 1
 NIL
@@ -3178,7 +3176,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3204,7 +3202,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+90.0
 1
 1
 NIL
@@ -3331,7 +3329,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3370,7 +3368,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+80.0
 1
 1
 NIL
@@ -3385,7 +3383,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+80.0
 1
 1
 NIL
@@ -3738,7 +3736,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+7
 
 PLOT
 2378
