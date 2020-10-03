@@ -1348,13 +1348,13 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
   ;; down
 
-    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
-    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ]
-    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ]
-    if stage = 3.5 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + JudgeDay2_d) set decisionDate ticks ]
-    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + JudgeDay1_d ) set decisionDate ticks ]
+    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + 1) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
+    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 3.5 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
-    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) set decisionDate ticks ]
+    if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
 
@@ -1689,7 +1689,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1717,7 +1717,7 @@ Span
 Span
 0
 30
-15.0
+5.0
 1
 1
 NIL
@@ -1766,7 +1766,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1846,7 +1846,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1999,7 +1999,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -2069,7 +2069,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-52.0
+89.0
 .5
 1
 NIL
@@ -2084,7 +2084,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-52.0
+89.0
 .5
 1
 NIL
@@ -2453,7 +2453,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+45.0
 1
 1
 NIL
@@ -2652,7 +2652,7 @@ INPUTBOX
 609
 284
 ppa
-52.0
+88.0
 1
 0
 Number
@@ -2663,7 +2663,7 @@ INPUTBOX
 700
 285
 pta
-52.0
+88.0
 1
 0
 Number
@@ -3132,7 +3132,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3330,7 +3330,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3369,7 +3369,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-52.0
+81.0
 1
 1
 NIL
@@ -3384,7 +3384,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-52.0
+81.0
 1
 1
 NIL
@@ -3859,7 +3859,7 @@ INPUTBOX
 1591
 259
 JudgeDay2
-7.0
+1.0
 1
 0
 Number
@@ -4178,11 +4178,11 @@ NIL
 HORIZONTAL
 
 MONITOR
-1616
-115
-1705
-161
-Decision Date
+1613
+139
+1728
+185
+Last Decision Date
 DecisionDate
 0
 1
@@ -13031,7 +13031,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
-      <value value="7"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
       <value value="20"/>
