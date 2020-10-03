@@ -1567,7 +1567,7 @@ to calculateObjfunction
    ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-   if ticks > 1 and numberinfected != 0 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
+   if ticks > 1 a[ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
 
   ;; cases
   ;;if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
