@@ -1567,7 +1567,7 @@ to calculateObjfunction
    ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-   if ticks > 1 [ set objFunction ((numberInfected / 10000 ) + 1 * (1 - ( mean [ contacts ] of simuls ) ))]
+   if ticks > 1 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
 
   ;; cases
   ;;if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
@@ -1689,7 +1689,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1717,7 +1717,7 @@ Span
 Span
 0
 30
-5.0
+30.0
 1
 1
 NIL
@@ -1766,7 +1766,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1846,7 +1846,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1999,7 +1999,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -2069,7 +2069,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-88.0
+24.0
 .5
 1
 NIL
@@ -2084,7 +2084,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-88.0
+24.0
 .5
 1
 NIL
@@ -2453,7 +2453,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2652,7 +2652,7 @@ INPUTBOX
 609
 284
 ppa
-88.0
+23.0
 1
 0
 Number
@@ -2663,7 +2663,7 @@ INPUTBOX
 700
 285
 pta
-88.0
+23.0
 1
 0
 Number
@@ -3080,7 +3080,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-30.200406740432296
+31.506330444898815
 1
 1
 NIL
@@ -3132,7 +3132,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+75.0
 1
 1
 NIL
@@ -3330,7 +3330,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3369,7 +3369,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3384,7 +3384,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3617,7 +3617,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.36745261660217166
+0.31077539523260544
 .01
 1
 NIL
@@ -3737,7 +3737,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+1
 
 PLOT
 2378
