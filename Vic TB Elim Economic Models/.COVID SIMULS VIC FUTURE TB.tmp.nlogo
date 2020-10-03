@@ -55,6 +55,7 @@ globals [
   resetDate ;; days after today that the policy is reviewed
   cashposition
   Objfunction ;; seeks to minimise the damage - totalinfection * stage * currentInfections
+  decisionDate ;; a date (ticks) when policy decsions were made
   prior0
   prior1
   prior2
@@ -1340,22 +1341,22 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
    ;;up
 
-    if stage = 0 and casesinperiod7 >= zerotoone [ set stage 1 set resetdate (ticks + JudgeDay1) ]
-    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) ]
-    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) ] ;; these all jump back up to stage 4
+    if stage = 0 and casesinperiod7 >= zerotoone [ set stage 1 set resetdate (ticks + JudgeDay1) set decisionDate ticks ]
+    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) set decisionDate ticks ]
+    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) set decisionDate ticks ]
+    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
-    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
-    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate [ set stage 0 ]
-    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate [ set stage 1 set resetdate (ticks + JudgeDay1_d ) ]
-    if stage = 3.5 and casesinperiod7 < threetotwo [ set stage 2 set resetdate (ticks + JudgeDay2_d) ]
-    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
-    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) ]
-    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3_d)     ] ; ramps down to 3.9 on September 15th
 
+    if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
+    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ]
+    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + JudgeDay3_d) set decisionDate ticks ]
+    if stage = 3.5 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + JudgeDay2_d) set decisionDate ticks ]
+    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + JudgeDay1_d ) set decisionDate ticks ]
+    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) set decisionDate ticks ]
 
-  ;;Previous
+;;Previous
 
     ;      ;;up
 ;
@@ -1688,7 +1689,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1716,7 +1717,7 @@ Span
 Span
 0
 30
-7.0
+15.0
 1
 1
 NIL
@@ -1765,7 +1766,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1845,7 +1846,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1998,7 +1999,7 @@ Superspreaders
 Superspreaders
 0
 100
-3.0
+10.0
 1
 1
 NIL
@@ -2068,7 +2069,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-80.0
+52.0
 .5
 1
 NIL
@@ -2083,7 +2084,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-80.0
+52.0
 .5
 1
 NIL
@@ -2452,7 +2453,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2651,7 +2652,7 @@ INPUTBOX
 609
 284
 ppa
-80.0
+52.0
 1
 0
 Number
@@ -2662,7 +2663,7 @@ INPUTBOX
 700
 285
 pta
-80.0
+52.0
 1
 0
 Number
@@ -3131,7 +3132,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -3329,7 +3330,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3368,7 +3369,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+52.0
 1
 1
 NIL
@@ -3383,7 +3384,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+52.0
 1
 1
 NIL
@@ -3736,7 +3737,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-7
+8
 
 PLOT
 2378
@@ -4175,6 +4176,17 @@ IncursionRate
 1
 NIL
 HORIZONTAL
+
+MONITOR
+1616
+115
+1705
+161
+Decision Date
+DecisionDate
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
