@@ -1205,7 +1205,7 @@ end
 to turnOnTracking
   if freewheel != true [ ;; ensures that policies are enacted if their master switches are set to true at the time of the policy switch turning on
   if policyTriggerOn = true and ticks >= triggerday and schoolPolicyActive = true [
-      set tracking true set link_switch true set SchoolsPolicy true ]
+      set tracking true set SchoolsPolicy true ]
 
     if policyTriggerOn = true and ticks >= triggerday [
       set tracking true   ] ;; set link_switch true
@@ -1343,11 +1343,11 @@ to COVIDPolicyTriggers ;; used in idynamic model
    ;;up
 
 
-    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
-    if stage < 4 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
+    ;;if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+   ;; if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+   ;; if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+  if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 3 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
 
@@ -1741,7 +1741,7 @@ Span
 Span
 0
 30
-30.0
+5.0
 1
 1
 NIL
@@ -2023,7 +2023,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -2093,7 +2093,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+89.0
 .5
 1
 NIL
@@ -2108,7 +2108,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+89.0
 .5
 1
 NIL
@@ -2477,7 +2477,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+45.0
 1
 1
 NIL
@@ -2676,7 +2676,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+88.0
 1
 0
 Number
@@ -2687,7 +2687,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+88.0
 1
 0
 Number
@@ -3104,7 +3104,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.348197582738386
+34.05570058341947
 1
 1
 NIL
@@ -3156,7 +3156,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+20.0
 1
 1
 NIL
@@ -3354,7 +3354,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3393,7 +3393,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3641,7 +3641,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3809421730714265
+0.1524040617689906
 .01
 1
 NIL
@@ -3761,7 +3761,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-1
+8
 
 PLOT
 2378
@@ -3861,7 +3861,7 @@ MONITOR
 926
 2494
 971
-Cases in period 14
+Cases in period 7
 casesinperiod7
 0
 1

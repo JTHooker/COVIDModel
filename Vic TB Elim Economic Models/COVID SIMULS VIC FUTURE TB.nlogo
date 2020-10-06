@@ -1205,7 +1205,7 @@ end
 to turnOnTracking
   if freewheel != true [ ;; ensures that policies are enacted if their master switches are set to true at the time of the policy switch turning on
   if policyTriggerOn = true and ticks >= triggerday and schoolPolicyActive = true [
-      set tracking true set link_switch true set SchoolsPolicy true ]
+      set tracking true set SchoolsPolicy true ]
 
     if policyTriggerOn = true and ticks >= triggerday [
       set tracking true   ] ;; set link_switch true
@@ -1347,7 +1347,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
-    if stage < 4 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
+    if stage <= 3 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
 
@@ -2477,7 +2477,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+45.0
 1
 1
 NIL
@@ -3104,7 +3104,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.348197582738386
+34.05570058341947
 1
 1
 NIL
@@ -3641,7 +3641,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3809421730714265
+0.1524040617689906
 .01
 1
 NIL
