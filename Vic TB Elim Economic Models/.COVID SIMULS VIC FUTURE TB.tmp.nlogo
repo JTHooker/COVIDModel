@@ -1347,7 +1347,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
-    if stage < 4 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
+    if stage < 4 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
 
@@ -1741,7 +1741,7 @@ Span
 Span
 0
 30
-5.0
+30.0
 1
 1
 NIL
@@ -2023,7 +2023,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -2093,7 +2093,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+24.0
 .5
 1
 NIL
@@ -2108,7 +2108,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+24.0
 .5
 1
 NIL
@@ -2676,7 +2676,7 @@ INPUTBOX
 609
 284
 ppa
-88.0
+23.0
 1
 0
 Number
@@ -2687,7 +2687,7 @@ INPUTBOX
 700
 285
 pta
-88.0
+23.0
 1
 0
 Number
@@ -3156,7 +3156,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+75.0
 1
 1
 NIL
@@ -3354,7 +3354,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3393,7 +3393,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+15.0
 1
 1
 NIL
@@ -3761,7 +3761,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+1
 
 PLOT
 2378
@@ -3862,7 +3862,7 @@ MONITOR
 2494
 971
 Cases in period 14
-casesinperiod14
+casesinperiod7
 0
 1
 11

@@ -3861,8 +3861,8 @@ MONITOR
 926
 2494
 971
-Cases in period 14
-casesinperiod14
+Cases in period 7
+casesinperiod7
 0
 1
 11
