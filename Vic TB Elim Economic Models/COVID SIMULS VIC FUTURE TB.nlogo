@@ -1342,17 +1342,19 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
    ;;up
 
+
     if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage < 4 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
 
     if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + 1) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
-    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 3.5 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage = 1 and casesinperiod28 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
@@ -1412,7 +1414,7 @@ to setupstages
       set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 33 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ]
        if agerange = 5 and returntoschool > 33 [ set studentFlag 0 ]] ask simuls [ if agerange = 15 and returntoschool > 20 [ set studentflag 0 ] set superspreaders 5 ]]
 
-    if stage = 3.5 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+    if stage = 3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
     set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ] ]
 
@@ -2475,7 +2477,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+22.5
 1
 1
 NIL
@@ -3102,7 +3104,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-31.150414256392818
+34.348197582738386
 1
 1
 NIL
@@ -3639,7 +3641,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3959016557533103
+0.3809421730714265
 .01
 1
 NIL
@@ -3787,7 +3789,7 @@ INPUTBOX
 1505
 194
 zerotoone
-0.0
+1120.0
 1
 0
 Number
@@ -3798,7 +3800,7 @@ INPUTBOX
 1503
 257
 onetotwo
-10.0
+1120.0
 1
 0
 Number
@@ -3809,7 +3811,7 @@ INPUTBOX
 1505
 319
 twotothree
-20.0
+2240.0
 1
 0
 Number
@@ -3820,7 +3822,7 @@ INPUTBOX
 1505
 381
 threetofour
-0.0
+4480.0
 1
 0
 Number
@@ -3871,7 +3873,7 @@ INPUTBOX
 1590
 193
 JudgeDay1
-14.0
+7.0
 1
 0
 Number
@@ -3882,7 +3884,7 @@ INPUTBOX
 1591
 259
 JudgeDay2
-7.0
+1.0
 1
 0
 Number
@@ -3893,7 +3895,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-7.0
+1.0
 1
 0
 Number
@@ -3904,7 +3906,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-7.0
+1.0
 1
 0
 Number
@@ -4007,7 +4009,7 @@ INPUTBOX
 1902
 193
 onetozero
-0.0
+560.0
 1
 0
 Number
@@ -4018,7 +4020,7 @@ INPUTBOX
 1903
 254
 twotoone
-1000.0
+560.0
 1
 0
 Number
@@ -4029,7 +4031,7 @@ INPUTBOX
 1901
 316
 threetotwo
-0.0
+560.0
 1
 0
 Number
@@ -4040,7 +4042,7 @@ INPUTBOX
 1903
 377
 fourtothree
-0.0
+560.0
 1
 0
 Number
@@ -4073,7 +4075,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-14.0
+20.0
 1
 0
 Number
@@ -4084,7 +4086,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-7.0
+20.0
 1
 0
 Number
@@ -4095,7 +4097,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-7.0
+20.0
 1
 0
 Number
@@ -4106,7 +4108,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-7.0
+20.0
 1
 0
 Number
@@ -4194,7 +4196,7 @@ IncursionRate
 IncursionRate
 0
 100
-1.0
+0.0
 1
 1
 NIL
