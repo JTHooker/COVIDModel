@@ -50,6 +50,7 @@ globals [
   meanDaysInfected
   lasttransday
   lastPeriod
+  casesinperiod28
   casesinperiod14
   casesinperiod7
   resetDate ;; days after today that the policy is reviewed
@@ -1341,10 +1342,10 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
    ;;up
 
-    if stage = 0 and casesinperiod7 >= zerotoone [ set stage 1 set resetdate (ticks + JudgeDay1) set decisionDate ticks ]
-    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate [ set stage 2 set resetdate (ticks + JudgeDay2) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate [ set stage 3.5 set resetdate (ticks + JudgeDay3) set decisionDate ticks ]
-    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate [ set stage 4 set resetdate (ticks + JudgeDay4) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3.5 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
@@ -1353,7 +1354,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3.5 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 3.5 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage = 1 and casesinperiod14 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if stage = 1 and casesinperiod28 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
@@ -1512,6 +1513,22 @@ end
 to calculateCasesInLastPeriod ;; counts cases in the last 14 days -
   ;; THIS ONLY COUNTS DETECTED CASES,  NOT ALL INFECTIONS - TOADJUST YOU MUST SET ASYMPTOMATIC TO ZERO
 
+
+
+set	prior27	prior26
+set	prior26	prior25
+set	prior25	prior24
+set	prior24	prior23
+set	prior23	prior22
+set	prior22	prior21
+set	prior21	prior20
+set	prior20	prior19
+set	prior19	prior18
+set	prior18	prior17
+set	prior17	prior16
+set	prior16	prior15
+set	prior15	prior14
+set	prior14	prior13
 set prior13	prior12
 set prior12	prior11
 set prior11	prior10
@@ -1531,6 +1548,11 @@ set prior0 dailyCases
     + prior10 + prior11 + prior12 + prior13 )
 
   set casesinperiod7 (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 )
+
+  set casesinperiod28 (prior0 + prior1 + prior2 + prior3 + prior4 + prior5 + prior6 + prior7 + prior8 + prior9
+    + prior10 + prior11 + prior12 + prior13 + prior14 + prior15 + prior16 + prior17 + prior18 + prior19 + prior20 + prior21
+    + prior22 + prior23 + prior24 + prior25 + prior26 + prior27)
+
 
 ;print	prior13
 ;print	prior12
@@ -1564,10 +1586,10 @@ end
 
 to calculateObjfunction
   ;; mobility
-   ;;if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
+   if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-   if ticks > 1 and numberinfected != 0 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
+  ;; if ticks > 1 and numberinfected != 0 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
 
   ;; cases
   ;;if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
@@ -1717,7 +1739,7 @@ Span
 Span
 0
 30
-30.0
+5.0
 1
 1
 NIL
@@ -1999,7 +2021,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+2.0
 1
 1
 NIL
@@ -2069,7 +2091,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+89.0
 .5
 1
 NIL
@@ -2084,7 +2106,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+89.0
 .5
 1
 NIL
@@ -2652,7 +2674,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+88.0
 1
 0
 Number
@@ -2663,7 +2685,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+88.0
 1
 0
 Number
@@ -3080,7 +3102,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-31.506330444898815
+31.150414256392818
 1
 1
 NIL
@@ -3132,7 +3154,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+20.0
 1
 1
 NIL
@@ -3330,7 +3352,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3369,7 +3391,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3384,7 +3406,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+81.0
 1
 1
 NIL
@@ -3617,7 +3639,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.31077539523260544
+0.3959016557533103
 .01
 1
 NIL
@@ -3737,14 +3759,14 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-1
+8
 
 PLOT
 2378
 981
-2578
-1102
-New cases in last 7 or 14 days
+2623
+1103
+New cases in last 7, 14, 28 days
 NIL
 NIL
 0.0
@@ -3757,6 +3779,7 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot casesinperiod14"
 "pen-1" 1.0 0 -7500403 true "" "plot casesinperiod7"
+"pen-2" 1.0 0 -2674135 true "" "plot casesinperiod28"
 
 INPUTBOX
 1425
@@ -3764,7 +3787,7 @@ INPUTBOX
 1505
 194
 zerotoone
-1120.0
+0.0
 1
 0
 Number
@@ -3775,7 +3798,7 @@ INPUTBOX
 1503
 257
 onetotwo
-1120.0
+10.0
 1
 0
 Number
@@ -3786,7 +3809,7 @@ INPUTBOX
 1505
 319
 twotothree
-2240.0
+20.0
 1
 0
 Number
@@ -3797,7 +3820,7 @@ INPUTBOX
 1505
 381
 threetofour
-4480.0
+0.0
 1
 0
 Number
@@ -3848,7 +3871,7 @@ INPUTBOX
 1590
 193
 JudgeDay1
-7.0
+14.0
 1
 0
 Number
@@ -3859,7 +3882,7 @@ INPUTBOX
 1591
 259
 JudgeDay2
-1.0
+7.0
 1
 0
 Number
@@ -3870,7 +3893,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-1.0
+7.0
 1
 0
 Number
@@ -3881,7 +3904,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-1.0
+7.0
 1
 0
 Number
@@ -3984,7 +4007,7 @@ INPUTBOX
 1902
 193
 onetozero
-560.0
+0.0
 1
 0
 Number
@@ -3995,7 +4018,7 @@ INPUTBOX
 1903
 254
 twotoone
-560.0
+1000.0
 1
 0
 Number
@@ -4006,7 +4029,7 @@ INPUTBOX
 1901
 316
 threetotwo
-560.0
+0.0
 1
 0
 Number
@@ -4017,7 +4040,7 @@ INPUTBOX
 1903
 377
 fourtothree
-560.0
+0.0
 1
 0
 Number
@@ -4050,7 +4073,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-20.0
+14.0
 1
 0
 Number
@@ -4061,7 +4084,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-20.0
+7.0
 1
 0
 Number
@@ -4072,7 +4095,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-20.0
+7.0
 1
 0
 Number
@@ -4083,7 +4106,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-20.0
+7.0
 1
 0
 Number
