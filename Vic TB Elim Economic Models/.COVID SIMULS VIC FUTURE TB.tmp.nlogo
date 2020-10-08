@@ -1343,10 +1343,10 @@ to COVIDPolicyTriggers ;; used in idynamic model
    ;;up
 
 
-    ;;if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-   ;; if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-   ;; if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-  if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
     if stage <= 3 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
@@ -1355,8 +1355,8 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 3.9 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 4 and ticks > 14 and casesinperiod7 <= fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 2 and casesinperiod7 <= onetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage = 1 and casesinperiod28 <= zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if stage = 2 and casesinperiod7 = twotoone and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
@@ -1741,7 +1741,7 @@ Span
 Span
 0
 30
-5.0
+30.0
 1
 1
 NIL
@@ -2023,7 +2023,7 @@ Superspreaders
 Superspreaders
 0
 100
-2.0
+10.0
 1
 1
 NIL
@@ -2093,7 +2093,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-89.0
+0.0
 .5
 1
 NIL
@@ -2108,7 +2108,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-89.0
+0.0
 .5
 1
 NIL
@@ -2477,7 +2477,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-45.0
+-22.5
 1
 1
 NIL
@@ -2676,7 +2676,7 @@ INPUTBOX
 609
 284
 ppa
-88.0
+0.0
 1
 0
 Number
@@ -2687,7 +2687,7 @@ INPUTBOX
 700
 285
 pta
-88.0
+0.0
 1
 0
 Number
@@ -2916,7 +2916,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -3104,7 +3104,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.05570058341947
+34.44634301154783
 1
 1
 NIL
@@ -3156,7 +3156,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -3201,7 +3201,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3227,7 +3227,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3354,7 +3354,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3393,7 +3393,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-81.0
+0.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-81.0
+0.0
 1
 1
 NIL
@@ -3641,7 +3641,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.1524040617689906
+0.4351140414552424
 .01
 1
 NIL
@@ -3761,7 +3761,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+0
 
 PLOT
 2378
@@ -3789,7 +3789,7 @@ INPUTBOX
 1505
 194
 zerotoone
-1120.0
+224.0
 1
 0
 Number
@@ -3800,7 +3800,7 @@ INPUTBOX
 1503
 257
 onetotwo
-1120.0
+224.0
 1
 0
 Number
@@ -3811,7 +3811,7 @@ INPUTBOX
 1505
 319
 twotothree
-2240.0
+448.0
 1
 0
 Number
@@ -3822,7 +3822,7 @@ INPUTBOX
 1505
 381
 threetofour
-4480.0
+896.0
 1
 0
 Number
@@ -3884,7 +3884,7 @@ INPUTBOX
 1591
 259
 JudgeDay2
-1.0
+7.0
 1
 0
 Number
@@ -4009,7 +4009,7 @@ INPUTBOX
 1902
 193
 onetozero
-560.0
+112.0
 1
 0
 Number
@@ -4020,7 +4020,7 @@ INPUTBOX
 1903
 254
 twotoone
-560.0
+112.0
 1
 0
 Number
@@ -4031,7 +4031,7 @@ INPUTBOX
 1901
 316
 threetotwo
-560.0
+112.0
 1
 0
 Number
@@ -4042,7 +4042,7 @@ INPUTBOX
 1903
 377
 fourtothree
-560.0
+112.0
 1
 0
 Number
@@ -4196,7 +4196,7 @@ IncursionRate
 IncursionRate
 0
 100
-0.0
+1.0
 1
 1
 NIL
@@ -12430,7 +12430,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetozero">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="OS_Import_Post_Proportion">
       <value value="0.61"/>
@@ -12499,7 +12499,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="schoolsPolicy">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="se_illnesspd">
       <value value="4"/>
@@ -12532,7 +12532,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Superspreaders">
-      <value value="5"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetofour">
       <value value="53"/>
@@ -12562,7 +12562,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotoone">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotothree">
       <value value="11"/>
@@ -13056,7 +13056,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
-      <value value="1"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
       <value value="20"/>
@@ -13393,7 +13393,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="20"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
-      <value value="1"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
       <value value="20"/>
