@@ -1588,10 +1588,10 @@ end
 
 to calculateObjfunction
   ;; mobility
-   if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
+  ;; if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
 
   ;; moderate
-  ;; if ticks > 1 and numberinfected != 0 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
+   if ticks > 1 and numberinfected != 0 [ set objFunction ( log numberInfected 10 ) + 1 * (1 - ( mean [ contacts ] of simuls ) )]
 
   ;; cases
   ;;if ticks > 1 [ set objFunction  ( numberinfected * currentinfections )]
@@ -2093,7 +2093,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2108,7 +2108,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2676,7 +2676,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+23.0
 1
 0
 Number
@@ -2687,7 +2687,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+23.0
 1
 0
 Number
@@ -2916,7 +2916,7 @@ SWITCH
 1066
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -3104,7 +3104,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.44634301154783
+33.51980559936642
 1
 1
 NIL
@@ -3156,7 +3156,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+75.0
 1
 1
 NIL
@@ -3201,7 +3201,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3227,7 +3227,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+90.0
 1
 1
 NIL
@@ -3393,7 +3393,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+15.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+15.0
 1
 1
 NIL
@@ -3641,7 +3641,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.4351140414552424
+0.4330712781950026
 .01
 1
 NIL
@@ -3761,7 +3761,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-0
+1
 
 PLOT
 2378
@@ -3789,7 +3789,7 @@ INPUTBOX
 1505
 194
 zerotoone
-224.0
+1.0
 1
 0
 Number
@@ -3800,7 +3800,7 @@ INPUTBOX
 1503
 257
 onetotwo
-224.0
+1000.0
 1
 0
 Number
@@ -3811,7 +3811,7 @@ INPUTBOX
 1505
 319
 twotothree
-448.0
+20.0
 1
 0
 Number
@@ -3822,7 +3822,7 @@ INPUTBOX
 1505
 381
 threetofour
-896.0
+100.0
 1
 0
 Number
@@ -3873,7 +3873,7 @@ INPUTBOX
 1590
 193
 JudgeDay1
-7.0
+14.0
 1
 0
 Number
@@ -3895,7 +3895,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-1.0
+14.0
 1
 0
 Number
@@ -3906,7 +3906,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-1.0
+14.0
 1
 0
 Number
@@ -4009,7 +4009,7 @@ INPUTBOX
 1902
 193
 onetozero
-112.0
+1.0
 1
 0
 Number
@@ -4020,7 +4020,7 @@ INPUTBOX
 1903
 254
 twotoone
-112.0
+1.0
 1
 0
 Number
@@ -4031,7 +4031,7 @@ INPUTBOX
 1901
 316
 threetotwo
-112.0
+20.0
 1
 0
 Number
@@ -4042,7 +4042,7 @@ INPUTBOX
 1903
 377
 fourtothree
-112.0
+100.0
 1
 0
 Number
@@ -4075,7 +4075,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-20.0
+7.0
 1
 0
 Number
@@ -4086,7 +4086,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-20.0
+14.0
 1
 0
 Number
@@ -4097,7 +4097,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-20.0
+14.0
 1
 0
 Number
@@ -4108,7 +4108,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-20.0
+14.0
 1
 0
 Number
@@ -13684,7 +13684,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="fourtothree">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="freewheel">
       <value value="false"/>
@@ -13727,13 +13727,13 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay1_d">
-      <value value="7"/>
+      <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
       <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
-      <value value="14"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay3">
       <value value="14"/>
@@ -13742,7 +13742,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay4">
-      <value value="7"/>
+      <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday4_d">
       <value value="7"/>
@@ -13775,7 +13775,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetotwo">
-      <value value="10"/>
+      <value value="1000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetozero">
       <value value="0"/>
@@ -13880,7 +13880,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Superspreaders">
-      <value value="3"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetofour">
       <value value="100000"/>
@@ -13910,7 +13910,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotoone">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotothree">
       <value value="20"/>
@@ -14452,7 +14452,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="1000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetozero">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="OS_Import_Post_Proportion">
       <value value="0.61"/>
@@ -14554,7 +14554,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Superspreaders">
-      <value value="3"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetofour">
       <value value="100"/>
@@ -14584,7 +14584,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotoone">
-      <value value="0"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotothree">
       <value value="20"/>
