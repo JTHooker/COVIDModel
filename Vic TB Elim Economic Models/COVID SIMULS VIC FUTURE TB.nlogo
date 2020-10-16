@@ -179,6 +179,8 @@ simuls-own [
   detectable ;; Is the infected person detectable likelihood
   unDetectedFlag;; Indicates whether they are detected or not.
   returntoschool ;; a random number between 0 and 100 that determines whether the person will return to school (assuming they are a student) at time x
+  isolating ;; is the person currently isolating?
+
 
   contacts7 ;; contacts from seven days ago
   contacts6
@@ -497,7 +499,7 @@ to assigndetectablestatus
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage  checkMask updatepersonalvirulence visitDestination  ] ;; calculateIncomeperday earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage checkMask updatepersonalvirulence visitDestination HHContactsIso ] ;; calculateIncomeperday earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -1608,7 +1610,11 @@ end
 ;end
 
 to incursion
-  if ticks > 0 and currentinfections = 0 and IncursionRate > random 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
+  if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
+end
+
+to HHContactsIso
+  ifelse  isolate = true and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set shape "star" set isolating 1 ] [ set shape "dot" set isolating 0 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1713,7 +1719,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1741,7 +1747,7 @@ Span
 Span
 0
 30
-30.0
+7.0
 1
 1
 NIL
@@ -1790,7 +1796,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1870,7 +1876,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2023,7 +2029,7 @@ Superspreaders
 Superspreaders
 0
 100
-10.0
+3.0
 1
 1
 NIL
@@ -2093,7 +2099,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+80.0
 .5
 1
 NIL
@@ -2108,7 +2114,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+80.0
 .5
 1
 NIL
@@ -2477,7 +2483,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2676,7 +2682,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+80.0
 1
 0
 Number
@@ -2687,7 +2693,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+80.0
 1
 0
 Number
@@ -3104,7 +3110,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-33.51980559936642
+32.728881979035215
 1
 1
 NIL
@@ -3156,7 +3162,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+20.0
 1
 1
 NIL
@@ -3250,7 +3256,7 @@ MONITOR
 523
 213
 Household
-mean [ householdUnit ] of simuls
+mean [ householdunit ] of simuls
 1
 1
 11
@@ -3354,7 +3360,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3393,7 +3399,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+80.0
 1
 1
 NIL
@@ -3408,7 +3414,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+80.0
 1
 1
 NIL
@@ -3641,7 +3647,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.4330712781950026
+0.32954279895576816
 .01
 1
 NIL
@@ -3761,7 +3767,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-1
+8
 
 PLOT
 2378
@@ -3822,7 +3828,7 @@ INPUTBOX
 1505
 381
 threetofour
-100.0
+100000.0
 1
 0
 Number
@@ -3834,7 +3840,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -4009,7 +4015,7 @@ INPUTBOX
 1902
 193
 onetozero
-1.0
+0.0
 1
 0
 Number
@@ -4042,7 +4048,7 @@ INPUTBOX
 1903
 377
 fourtothree
-100.0
+1.0
 1
 0
 Number
@@ -4075,7 +4081,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-7.0
+14.0
 1
 0
 Number
@@ -4086,7 +4092,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-14.0
+7.0
 1
 0
 Number
@@ -4108,7 +4114,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-14.0
+7.0
 1
 0
 Number
@@ -4212,6 +4218,17 @@ DecisionDate
 0
 1
 11
+
+SWITCH
+962
+87
+1066
+120
+Isolate
+Isolate
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
