@@ -1719,7 +1719,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1747,7 +1747,7 @@ Span
 Span
 0
 30
-7.0
+30.0
 1
 1
 NIL
@@ -1796,7 +1796,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1876,7 +1876,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2029,7 +2029,7 @@ Superspreaders
 Superspreaders
 0
 100
-3.0
+10.0
 1
 1
 NIL
@@ -2099,7 +2099,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-80.0
+0.0
 .5
 1
 NIL
@@ -2114,7 +2114,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-80.0
+0.0
 .5
 1
 NIL
@@ -2483,7 +2483,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2682,7 +2682,7 @@ INPUTBOX
 609
 284
 ppa
-80.0
+0.0
 1
 0
 Number
@@ -2693,7 +2693,7 @@ INPUTBOX
 700
 285
 pta
-80.0
+0.0
 1
 0
 Number
@@ -2922,7 +2922,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -3110,7 +3110,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-32.728881979035215
+31.369751152144136
 1
 1
 NIL
@@ -3162,7 +3162,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -3207,7 +3207,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3233,7 +3233,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3360,7 +3360,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3399,7 +3399,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -3414,7 +3414,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -3647,7 +3647,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.32954279895576816
+0.306608541685647
 .01
 1
 NIL
@@ -3767,7 +3767,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+0
 
 PLOT
 2378
@@ -3795,7 +3795,7 @@ INPUTBOX
 1505
 194
 zerotoone
-1.0
+224.0
 1
 0
 Number
@@ -3806,7 +3806,7 @@ INPUTBOX
 1503
 257
 onetotwo
-1000.0
+224.0
 1
 0
 Number
@@ -3817,7 +3817,7 @@ INPUTBOX
 1505
 319
 twotothree
-20.0
+448.0
 1
 0
 Number
@@ -3828,7 +3828,7 @@ INPUTBOX
 1505
 381
 threetofour
-100000.0
+896.0
 1
 0
 Number
@@ -3840,7 +3840,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
@@ -3879,7 +3879,7 @@ INPUTBOX
 1590
 193
 JudgeDay1
-14.0
+7.0
 1
 0
 Number
@@ -3901,7 +3901,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-14.0
+1.0
 1
 0
 Number
@@ -3912,7 +3912,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-14.0
+1.0
 1
 0
 Number
@@ -4015,7 +4015,7 @@ INPUTBOX
 1902
 193
 onetozero
-0.0
+112.0
 1
 0
 Number
@@ -4026,7 +4026,7 @@ INPUTBOX
 1903
 254
 twotoone
-1.0
+112.0
 1
 0
 Number
@@ -4037,7 +4037,7 @@ INPUTBOX
 1901
 316
 threetotwo
-20.0
+112.0
 1
 0
 Number
@@ -4048,7 +4048,7 @@ INPUTBOX
 1903
 377
 fourtothree
-1.0
+112.0
 1
 0
 Number
@@ -4081,7 +4081,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-14.0
+20.0
 1
 0
 Number
@@ -4092,7 +4092,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-7.0
+20.0
 1
 0
 Number
@@ -4103,7 +4103,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-14.0
+20.0
 1
 0
 Number
@@ -4114,7 +4114,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-7.0
+20.0
 1
 0
 Number
@@ -4202,7 +4202,7 @@ IncursionRate
 IncursionRate
 0
 100
-1.0
+2.0
 1
 1
 NIL
@@ -12289,6 +12289,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -12380,8 +12383,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0"/>
-      <value value="1"/>
+      <value value="0.5"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -12626,6 +12629,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -12717,8 +12723,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0"/>
-      <value value="1"/>
+      <value value="0.5"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -12963,6 +12969,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -13054,8 +13063,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0"/>
-      <value value="1"/>
+      <value value="0.5"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -13300,6 +13309,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -13391,8 +13403,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0"/>
-      <value value="1"/>
+      <value value="0.5"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -13637,6 +13649,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -13974,6 +13989,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -14311,6 +14329,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
