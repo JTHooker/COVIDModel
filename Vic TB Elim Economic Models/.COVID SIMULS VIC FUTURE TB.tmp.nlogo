@@ -2427,10 +2427,10 @@ DailyCases
 12
 
 PLOT
-323
-949
-625
-1104
+330
+943
+632
+1098
 New Infections Per Day
 NIL
 NIL
@@ -3110,7 +3110,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-31.369751152144136
+33.08621118511722
 1
 1
 NIL
@@ -3647,7 +3647,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.306608541685647
+0.2476517935457524
 .01
 1
 NIL
@@ -3795,7 +3795,7 @@ INPUTBOX
 1505
 194
 zerotoone
-224.0
+1.0
 1
 0
 Number
@@ -3806,7 +3806,7 @@ INPUTBOX
 1503
 257
 onetotwo
-224.0
+2.0
 1
 0
 Number
@@ -3817,7 +3817,7 @@ INPUTBOX
 1505
 319
 twotothree
-448.0
+11.0
 1
 0
 Number
@@ -3828,7 +3828,7 @@ INPUTBOX
 1505
 381
 threetofour
-896.0
+53.0
 1
 0
 Number
@@ -3901,7 +3901,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-1.0
+7.0
 1
 0
 Number
@@ -3912,7 +3912,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-1.0
+7.0
 1
 0
 Number
@@ -4015,7 +4015,7 @@ INPUTBOX
 1902
 193
 onetozero
-112.0
+1.0
 1
 0
 Number
@@ -4026,7 +4026,7 @@ INPUTBOX
 1903
 254
 twotoone
-112.0
+1.0
 1
 0
 Number
@@ -4037,7 +4037,7 @@ INPUTBOX
 1901
 316
 threetotwo
-112.0
+6.0
 1
 0
 Number
@@ -4048,7 +4048,7 @@ INPUTBOX
 1903
 377
 fourtothree
-112.0
+35.0
 1
 0
 Number
@@ -4081,7 +4081,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-20.0
+28.0
 1
 0
 Number
@@ -12289,6 +12289,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -12626,6 +12629,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -12963,6 +12969,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -13300,6 +13309,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>scale</metric>
     <metric>stage</metric>
     <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
