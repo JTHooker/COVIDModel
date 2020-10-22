@@ -298,8 +298,7 @@ to setup
         resetPersonalVirulence
         assignApptoEssential
         assigndetectablestatus ;; identifies people unlikely to be found
-        meanHouseholdSize
-        ;set pta random-float ((Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2))
+       ;set pta random-float ((Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2))
        ;set ppa random-float ((Proportion_People_avoid - (Proportion_People_Avoid * .2)) + random-float (Proportion_People_avoid + (1 - Proportion_People_avoid) * .2))
 
        ]]
@@ -4254,10 +4253,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "histogram [ pplInHousehold ] of simuls "
 
 MONITOR
-1156
-73
-1254
-119
+1143
+293
+1241
+339
 Household Size
 mean [ pplinHousehold ] of simuls
 1
