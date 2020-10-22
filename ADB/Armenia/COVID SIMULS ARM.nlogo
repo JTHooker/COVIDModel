@@ -219,7 +219,7 @@ to setup
    ;; random-seed  100 ;; for use in setting random nuber generator seeds
 
   clear-all
-  ;;import-drawing "Background1.png" ;; imports MSD image
+  import-drawing "ARMap.jpg" ;; imports Armenian map image
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -268,7 +268,7 @@ to setup
  ;; set up people in the environment and allocates characteristics to them
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set householdUnit random 1000 set agerange 95  set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set householdUnit random 1200 set agerange 95  set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income    move-to one-of patches with [ pcolor = black  ]
         set riskofdeath .01 set personalTrust random-normal 75 10  set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 10 set haveApp random 100
         set wearsMask random 100 ;; resethealth resetincome calculateincomeperday calculateexpenditureperday resettrust
@@ -298,7 +298,6 @@ to setup
         resetPersonalVirulence
         assignApptoEssential
         assigndetectablestatus ;; identifies people unlikely to be found
-        meanHouseholdSize
         ;set pta random-float ((Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2))
        ;set ppa random-float ((Proportion_People_avoid - (Proportion_People_Avoid * .2)) + random-float (Proportion_People_avoid + (1 - Proportion_People_avoid) * .2))
 
@@ -338,6 +337,7 @@ to setup
   set ninetyfive int ( Population * .008 )
 
   matchages ;; assigns risk to age ranges (see below)
+  meanHouseholdSize
 
   ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk    ] ;; spend CalculateIncomePerday
 
@@ -351,17 +351,17 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
   set spatial_distance false
   set case_isolation false
-  set stage 4 ;; starts the simulation off at zero policy settings
+  set stage 0 ;; starts the simulation off at zero policy settings
 
   ;; setting households up
 
 
-  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ set householdUnit random 600 ] ] ;; allocates adults to a household unit range
-  ask simuls with [ agerange > 60 and agerange <= 80 ] [ if 95 > random 100 [ set householdUnit random 200 + 600 ] ] ;; allocated older adults to household Units that don't include young children or teenagers
-  ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 300 + 600 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ set householdUnit random 720 ] ] ;; allocates adults to a household unit range
+  ask simuls with [ agerange > 60 and agerange <= 80 ] [ if 95 > random 100 [ set householdUnit random 240 + 620 ] ] ;; allocated older adults to household Units that don't include young children or teenagers
+  ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 360 + 720 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
   ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
     set householdUnit random 600 ] ] ]  ;; allocates up to two adults per household
-  ask simuls with [ agerange = 15 and agerange = 5 and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 600 and agerange > ([ agerange ] of myself + 20) ] ]  ] ;; Identifies students
+  ask simuls with [ agerange = 15 and agerange = 5 and studentFlag != 1 ] [ if 95 > random 100 [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 720 and agerange > ([ agerange ] of myself + 20) ] ]  ] ;; Identifies students
  ;; ask simuls [ if agerange < 20 [ set studentFlag 1 ]  ]
 
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
@@ -1196,16 +1196,16 @@ end
 
 to seedCases ;; set up to take the pre-intervention growth pre ******August 31th ********* and use it to seed new cases in the next week - must be updated each day 1_9_2020 =244.02*EXP(-0.09)^G55
 
-;; Vic @ 90
-    if ticks < seedticks and scalephase = 0 [ ask n-of  80 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 1 [ ask n-of  8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int .8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+;; Armenia @ 1500+
+;    if ticks < seedticks and scalephase = 0 [ ask n-of  80 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+;    if ticks < seedticks and scalephase = 1 [ ask n-of  8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+;    if ticks < seedticks and scalephase = 2 [ ask n-of int .8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
-;    if ticks < seedticks and scalephase = 0 [ ask n-of int ((244 * (.914 ^ (ticks + 15))) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-;    if ticks < seedticks and scalephase = 1 [ ask n-of int ((244 * (.914 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-;    if ticks < seedticks and scalephase = 2 [ ask n-of int ((244 * (.914 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    ;; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
-    ;; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
+    if ticks < seedticks and scalephase = 0 [ ask n-of int ((1500 * (1.1 ^ (ticks + 15))) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 1 [ ask n-of int ((1500 * (1.1 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((1500 * (1.1 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    ; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
+    ; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
 
 end
 
@@ -1581,18 +1581,6 @@ set prior0 dailyCases
 
 end
 
-;to covidpolicytriggers
-;
-;  if ticks > 0 [ set stage 4 ] ;; used to set up initial stages for Victoria runs
-;
-;  ;;if ticks > 0 [ set stage 3 ] ;; used to set up initial stages for Victoria runs
-;end
-
-
-;to calculatecashPosition
-;  set cashPosition ( mean [ reserves] of simuls with [ color != black ] )
-;end
-
 to calculateObjfunction
   ;; mobility
   ;; if ticks > 1 [ set objFunction (mean [ contacts ] of simuls ) ]
@@ -1623,13 +1611,13 @@ to HHContactsIso
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-329
-136
-949
-945
+323
+130
+942
+936
 -1
 -1
-6.554
+6.54
 1
 10
 1
@@ -1724,7 +1712,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1737,7 +1725,7 @@ Span
 Span
 0
 30
-7.0
+10.0
 1
 1
 NIL
@@ -1786,7 +1774,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1866,7 +1854,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1966,24 +1954,6 @@ Track_and_Trace_Efficiency
 NIL
 HORIZONTAL
 
-PLOT
-1155
-343
-1360
-493
-Fear & Action
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 1 -2674135 true "" "plot mean [ anxiety ] of simuls"
-
 SLIDER
 1938
 686
@@ -2019,7 +1989,7 @@ Superspreaders
 Superspreaders
 0
 100
-7.280276283364606
+5.0
 1
 1
 NIL
@@ -2089,7 +2059,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+68.0
 .5
 1
 NIL
@@ -2104,7 +2074,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+68.0
 .5
 1
 NIL
@@ -2672,7 +2642,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+68.0
 1
 0
 Number
@@ -2683,20 +2653,10 @@ INPUTBOX
 700
 285
 pta
-79.0
+68.0
 1
 0
 Number
-
-TEXTBOX
-346
-210
-522
-296
-Manually enter the proportion of people who avoid (PPA) and time avoided (PTA) here when using the policy trigger switch
-12
-0.0
-0
 
 PLOT
 1609
@@ -2832,7 +2792,7 @@ true
 "" ""
 PENS
 "Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired"
-"Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_in_Australia - ICUBedsRequired "
+"Spare" 1.0 0 -5298144 true "" "plot ICU_Beds_Available - ICUBedsRequired "
 
 SLIDER
 1027
@@ -2854,8 +2814,8 @@ SLIDER
 532
 510
 565
-ICU_Beds_in_Australia
-ICU_Beds_in_Australia
+ICU_Beds_Available
+ICU_Beds_Available
 0
 20000
 7000.0
@@ -2912,7 +2872,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -3146,13 +3106,13 @@ mean [ personalvirulence ] of simuls with [ asymptom < AsymptomaticPercentage ]
 SLIDER
 338
 456
-514
-489
+474
+491
 Essential_Workers
 Essential_Workers
 0
 100
-18.225752871294112
+25.0
 1
 1
 NIL
@@ -3176,8 +3136,8 @@ HORIZONTAL
 SLIDER
 336
 492
-511
-525
+494
+527
 Ess_W_Risk_Reduction
 Ess_W_Risk_Reduction
 0
@@ -3191,13 +3151,13 @@ HORIZONTAL
 SLIDER
 339
 420
-515
-453
+441
+455
 App_Uptake
 App_Uptake
 0
 100
-25.81073547919255
+30.0
 1
 1
 NIL
@@ -3215,10 +3175,10 @@ tracking
 -1000
 
 SLIDER
-461
-305
-573
-338
+343
+245
+455
+278
 Mask_Wearing
 Mask_Wearing
 0
@@ -3230,10 +3190,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-342
-383
-464
-416
+508
+623
+630
+656
 schoolsPolicy
 schoolsPolicy
 0
@@ -3344,10 +3304,10 @@ studentInfections / 2500
 11
 
 SWITCH
-469
-383
-621
-416
+512
+552
+664
+585
 SchoolPolicyActive
 SchoolPolicyActive
 1
@@ -3355,10 +3315,10 @@ SchoolPolicyActive
 -1000
 
 SLIDER
-520
-420
-652
-453
+425
+43
+574
+78
 SchoolReturnDate
 SchoolReturnDate
 0
@@ -3370,10 +3330,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-340
-342
-450
-375
+343
+210
+453
+243
 MaskPolicy
 MaskPolicy
 0
@@ -3389,7 +3349,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+68.0
 1
 1
 NIL
@@ -3404,7 +3364,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+68.0
 1
 1
 NIL
@@ -3729,10 +3689,10 @@ ICUBedsRequired
 15
 
 SWITCH
-462
-347
-587
-380
+509
+588
+634
+621
 Complacency
 Complacency
 0
@@ -3757,7 +3717,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-8
+0
 
 PLOT
 2378
@@ -3830,7 +3790,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -3941,10 +3901,10 @@ LowerStudentAge
 Number
 
 PLOT
-512
-493
-692
-643
+2520
+125
+2700
+246
 Objective Function
 NIL
 NIL
@@ -4112,8 +4072,8 @@ Number
 SLIDER
 423
 83
-603
-116
+573
+118
 Undetected_Proportion
 Undetected_Proportion
 0
@@ -4160,17 +4120,6 @@ Household_Attack
 1
 NIL
 HORIZONTAL
-
-MONITOR
-80
-335
-153
-380
-Time = 1 
-count simuls with [ timenow = 2 ]
-0
-1
-11
 
 MONITOR
 1529
@@ -4224,7 +4173,7 @@ SLIDER
 149
 263
 322
-298
+296
 Population
 Population
 0
@@ -4236,11 +4185,11 @@ NIL
 HORIZONTAL
 
 PLOT
-1156
-342
-1362
-495
-Household Distribution
+1155
+343
+1361
+496
+Household Size Distribution
 NIL
 NIL
 0.0
@@ -4251,13 +4200,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "histogram [ pplInHousehold ] of simuls "
+"default" 1.0 1 -16777216 true "" "histogram [ pplInHousehold ] of simuls "
 
 MONITOR
 1156
 73
 1254
-119
+118
 Household Size
 mean [ pplinHousehold ] of simuls
 1
