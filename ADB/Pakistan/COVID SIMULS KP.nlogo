@@ -1374,20 +1374,20 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
  ;;   Armenian Triggers
 
-   ;;up
+      ;;up
 
 
-   ;; if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+   ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
-    if stage = 4 and casesinperiod7 < fourtothree and ticks = resetdate and (ticks - decisionDate) >= judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) >= judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) >= judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-  ;;if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) >= judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if stage = 4 and casesinperiod7 < (fourtothree * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 3 and casesinperiod7 < (threetotwo * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 2 and casesinperiod7 < (twotoone * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+  ;;if stage = 1 and casesinperiod28 < (zerotoone * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
@@ -4252,6 +4252,21 @@ TEXTBOX
 11
 0.0
 1
+
+SLIDER
+1520
+83
+1693
+118
+threshold_Multiplier
+threshold_Multiplier
+1
+25
+25.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
