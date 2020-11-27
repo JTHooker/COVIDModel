@@ -288,7 +288,7 @@ to setup
         let complianceDist rngs:rnd-beta  stream_id 450.3 23.7
         set ownComplianceWithIsolation complianceDist
         let maskWearEfficacy rngs:rnd-beta stream_id 24.3 8.08
-        set ownMaskEfficacy maskWearEfficacy * 33  ;; assigning mask efficacy to individuals around a distribution with median 75% or 75% x 1/3 if 33 as per request based on Burnett Institute #s
+        set ownMaskEfficacy maskWearEfficacy * 1  ;; assigning mask efficacy to individuals around a distribution with median 75% or 75% x 1/3 if 33 as per request based on Burnett Institute #s
 
         set asymptom random 100
         set essentialWorker random 100
@@ -1263,8 +1263,11 @@ to-report nonesspercentage
 end
 
 to traceadjust
-  set track_and_trace_efficiency .25 ;; kept stable here for simplicity
+  ifelse casesinperiod7 > 0 [ set track_and_trace_efficiency (0.63219 - 0.07213 * ln(casesinperiod7))] [ set track_and_trace_efficiency .25 ]
 
+
+
+;  set track_and_trace_efficiency .25 ;; kept stable here for simplicity
 ;  if scalephase = 0 [ set track_and_trace_efficiency .25 ]
 ;  if scalephase = 1 [ set track_and_trace_efficiency .20 ]
 ;  if scalephase = 2 [ set track_and_trace_efficiency .15 ]
@@ -1719,7 +1722,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1747,7 +1750,7 @@ Span
 Span
 0
 30
-7.0
+30.0
 1
 1
 NIL
@@ -1796,7 +1799,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1876,7 +1879,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2029,7 +2032,7 @@ Superspreaders
 Superspreaders
 0
 100
-7.280276283364606
+10.0
 1
 1
 NIL
@@ -2099,7 +2102,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+0.0
 .5
 1
 NIL
@@ -2114,7 +2117,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+0.0
 .5
 1
 NIL
@@ -2682,7 +2685,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+0.0
 1
 0
 Number
@@ -2693,7 +2696,7 @@ INPUTBOX
 700
 285
 pta
-79.0
+0.0
 1
 0
 Number
@@ -2922,7 +2925,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -3110,7 +3113,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-36.5490425448508
+33.62936342516072
 1
 1
 NIL
@@ -3162,7 +3165,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-18.225752871294112
+100.0
 1
 1
 NIL
@@ -3207,7 +3210,7 @@ App_Uptake
 App_Uptake
 0
 100
-25.81073547919255
+20.0
 1
 1
 NIL
@@ -3233,7 +3236,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3360,7 +3363,7 @@ SWITCH
 416
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3399,7 +3402,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -3414,7 +3417,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+0.0
 1
 1
 NIL
@@ -3647,7 +3650,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.4430600754959987
+0.36745257542314214
 .01
 1
 NIL
@@ -3795,7 +3798,7 @@ INPUTBOX
 1505
 194
 zerotoone
-1120.0
+2.0
 1
 0
 Number
@@ -3806,7 +3809,7 @@ INPUTBOX
 1503
 257
 onetotwo
-1120.0
+5.0
 1
 0
 Number
@@ -3817,7 +3820,7 @@ INPUTBOX
 1505
 319
 twotothree
-2240.0
+42.0
 1
 0
 Number
@@ -3828,7 +3831,7 @@ INPUTBOX
 1505
 381
 threetofour
-4480.0
+210.0
 1
 0
 Number
@@ -3901,7 +3904,7 @@ INPUTBOX
 1591
 321
 JudgeDay3
-1.0
+7.0
 1
 0
 Number
@@ -3912,7 +3915,7 @@ INPUTBOX
 1591
 383
 JudgeDay4
-1.0
+7.0
 1
 0
 Number
@@ -4015,7 +4018,7 @@ INPUTBOX
 1902
 193
 onetozero
-560.0
+0.0
 1
 0
 Number
@@ -4026,7 +4029,7 @@ INPUTBOX
 1903
 254
 twotoone
-560.0
+7.0
 1
 0
 Number
@@ -4037,7 +4040,7 @@ INPUTBOX
 1901
 316
 threetotwo
-560.0
+35.0
 1
 0
 Number
@@ -4048,7 +4051,7 @@ INPUTBOX
 1903
 377
 fourtothree
-560.0
+140.0
 1
 0
 Number
@@ -4202,7 +4205,7 @@ IncursionRate
 IncursionRate
 0
 100
-0.5
+1.0
 1
 1
 NIL
@@ -12383,8 +12386,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0.5"/>
-      <value value="2"/>
+      <value value="5"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -12723,8 +12726,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0.5"/>
-      <value value="2"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -13063,8 +13065,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0.5"/>
-      <value value="2"/>
+      <value value="5"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
@@ -13403,8 +13405,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="5.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="IncursionRate">
-      <value value="0.5"/>
-      <value value="2"/>
+      <value value="5"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Initial">
       <value value="1"/>
