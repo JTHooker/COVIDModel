@@ -1301,10 +1301,10 @@ end
 
 to visitDestination
   ;;; sets up destinations where people might gather and set off superspreader events
-  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (5.36) and stage = 0 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
-  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (4.37) and stage = 1 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
-  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (2.53) and stage = 2 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
-  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (1.17) and stage = 3 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
+  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (5.36) and stage = 1 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
+  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (4.37) and stage = 2 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
+  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (2.53) and stage = 3 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
+  if remainder random 7 Visit_Frequency = 0 and any? patches with [ destination = 1 ] in-radius (1.17) and stage = 4 [ move-to one-of patches with [ destination = 1 ] ];; reduces large gatherings by stage
 end
  ;; essential workers do not have the same capacity to reduce contact as non-esssential
 
@@ -1373,14 +1373,14 @@ to COVIDPolicyTriggers ;; used in idynamic model
    ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage <= 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and casesinperiod7 >= (threetofour and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
-    if stage = 4 and casesinperiod7 < fourtothree and ticks = resetdate and (ticks - decisionDate) >= judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) >= judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) >= judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-  ;;if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) >= judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if stage = 4 and casesinperiod7 < (fourtothree * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 3 and casesinperiod7 < (threetotwo * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 2 and casesinperiod7 < (twotoone * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+  ;;if stage = 1 and casesinperiod28 < (zerotoone * threshold_Multiplier) and ticks = resetdate and (ticks - decisionDate) >= judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
@@ -1405,6 +1405,10 @@ to COVIDPolicyTriggers ;; used in idynamic model
 ;    if ticks > 0 and ticks >= resetdate [ set resetdate (ticks + 7) ]
 
 
+  ]
+
+  if selfgovern = false [
+    set stage 1
   ]
 
 end
@@ -1520,6 +1524,12 @@ to setupstages
 
 ;;*************************************************************************************************************************************************************************************************************************
 
+  if selfgovern = false [
+
+   if stage = 1 [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set Essential_Workers 75 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 30 set residualcautionPTA 15
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+  ]
 end
 
 to calculateCasesInLastPeriod ;; counts cases in the last 14 days -
@@ -1606,10 +1616,15 @@ end
 ;end
 
 to incursion
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 [ ask n-of 50 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 1 [ ask n-of 5 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 2 and 50 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 and 50 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 [ ask n-of 50 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 1 [ ask n-of 5 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 2 and 50 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 and 50 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+
+   if ticks > 0 and stage = 0 [ ask n-of 50 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 1 [ ask n-of 5 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 2 and 50 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 0 and 50 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
 
 end
 
@@ -1719,7 +1734,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1732,7 +1747,7 @@ Span
 Span
 0
 30
-7.0
+5.0
 1
 1
 NIL
@@ -1781,7 +1796,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1861,7 +1876,7 @@ SWITCH
 348
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1955,7 +1970,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.1
 .05
 1
 NIL
@@ -1996,7 +2011,7 @@ Superspreaders
 Superspreaders
 0
 100
-3.0
+10.0
 1
 1
 NIL
@@ -2451,7 +2466,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2650,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+78.0
 1
 0
 Number
@@ -2661,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-79.0
+78.0
 1
 0
 Number
@@ -2816,7 +2831,7 @@ ICU_Beds_Available
 ICU_Beds_Available
 0
 20000
-7000.0
+700.0
 50
 1
 NIL
@@ -2831,7 +2846,7 @@ Hospital_Beds_in_Australia
 Hospital_Beds_in_Australia
 0
 200000
-65000.0
+6500.0
 5000
 1
 NIL
@@ -3110,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+10.0
 1
 1
 NIL
@@ -3347,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+64.0
 1
 1
 NIL
@@ -3362,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+64.0
 1
 1
 NIL
@@ -3715,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-0
+3
 
 PLOT
 2378
@@ -3788,7 +3803,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
@@ -4241,7 +4256,7 @@ SLIDER
 1459
 80
 1632
-115
+113
 Threshold_Multiplier
 Threshold_Multiplier
 1
@@ -15034,7 +15049,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="App_Uptake">
-      <value value="30"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="AssignAppEss">
       <value value="false"/>
@@ -15103,13 +15118,13 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="21"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
-      <value value="65000"/>
+      <value value="6500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Household_Attack">
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Beds_Available">
-      <value value="7000"/>
+      <value value="700"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ICU_Required">
       <value value="5"/>
@@ -15274,6 +15289,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0.8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="SelfGovern">
+      <value value="true"/>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Severity_of_illness">
@@ -15292,7 +15308,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Superspreaders">
-      <value value="3"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="this_number">
       <value value="0"/>
@@ -15302,6 +15318,12 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
       <value value="435"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Threshold_Multiplier">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="5"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>

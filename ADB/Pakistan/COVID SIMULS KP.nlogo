@@ -1613,10 +1613,10 @@ end
 ;end
 
 to incursion
-   if ticks > 0 and IncursionRate > random-float 100 and stage = 0 [ ask n-of 40 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 500/day based on 10,000 incoming passengers per day with 5% infection risk
-   if ticks > 0 and IncursionRate > random-float 100 and stage = 1 [ ask n-of 4 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and IncursionRate > random-float 100 and stage = 2 and 40 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and IncursionRate > random-float 100 and stage = 3 and 40 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 1 [ ask n-of 40 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 40/day based on 10,000 incoming passengers per day with 5% infection risk
+   if ticks > 0 and stage = 2 [ ask n-of 4 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 3 and 40 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+   if ticks > 0 and stage = 4 and 40 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
 end
 
 to HHContactsIso
@@ -4257,7 +4257,7 @@ SLIDER
 1520
 83
 1693
-118
+116
 threshold_Multiplier
 threshold_Multiplier
 1

@@ -1610,10 +1610,10 @@ end
 ;end
 
 to incursion
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 [ ask n-of 500 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 500/day based on 10,000 incoming passengers per day with 5% infection risk
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 1 [ ask n-of 50 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 2 [ ask n-of 5 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 and stage = 0 and 50 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+   if ticks and stage = 1 [ ask n-of 500 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 500/day based on 10,000 incoming passengers per day with 5% infection risk
+   if ticks and stage = 2 [ ask n-of 50 simuls with [ color = 85 ] [ set color red ]]
+   if ticks and stage = 3 [ ask n-of 5 simuls with [ color = 85 ] [ set color red ]]
+   if ticks and stage = 4 and 50 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
 end
 
 to HHContactsIso
@@ -1722,7 +1722,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1784,7 +1784,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1864,7 +1864,7 @@ SWITCH
 348
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2069,7 +2069,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+63.0
 .5
 1
 NIL
@@ -2084,7 +2084,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+63.0
 .5
 1
 NIL
@@ -2454,7 +2454,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--67.5
+0.0
 1
 1
 NIL
@@ -3718,7 +3718,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -4254,7 +4254,7 @@ SLIDER
 1489
 83
 1662
-118
+116
 threshold_Multiplier
 threshold_Multiplier
 1
