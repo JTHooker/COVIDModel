@@ -1437,7 +1437,7 @@ to setupstages
     set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 20 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 10 ]] ]
 
   if stage = 4 and ticks = resetdate [ set span 5 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set Essential_Workers 10 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 64
+  set OS_Import_Proportion 0 set Essential_Workers 10 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA
       set residualcautionPPA 64 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] set superspreaders 10 ]
 
 
@@ -1747,7 +1747,7 @@ Span
 Span
 0
 30
-5.0
+30.0
 1
 1
 NIL
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+24.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+24.0
 .5
 1
 NIL
@@ -2665,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-78.0
+23.0
 1
 0
 Number
@@ -2676,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-78.0
+23.0
 1
 0
 Number
@@ -3125,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-10.0
+75.0
 1
 1
 NIL
@@ -3196,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+20.0
 1
 1
 NIL
@@ -3323,7 +3323,7 @@ SWITCH
 585
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3362,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-64.0
+15.0
 1
 1
 NIL
@@ -3377,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-64.0
+15.0
 1
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-3
+0
 
 PLOT
 2378
@@ -3803,7 +3803,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -4261,7 +4261,7 @@ Threshold_Multiplier
 Threshold_Multiplier
 1
 25
-1.0
+10.0
 1
 1
 NIL
@@ -4667,7 +4667,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.1.2-beta2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
