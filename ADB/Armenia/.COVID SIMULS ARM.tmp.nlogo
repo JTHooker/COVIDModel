@@ -1372,8 +1372,8 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
    ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage <= 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 2 and stage_2 = true and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and stage_2 = true and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
@@ -1430,15 +1430,15 @@ to setupstages
 
   if stage = 2 and ticks = resetdate [ set span 15 set pta 65 set ppa 65 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 50 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 30 set residualcautionPTA 52
-      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ] set superspreaders 10 ]]
+      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool <= 85 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
   set OS_Import_Proportion 0 set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
     set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 20 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 10 ]] ]
 
   if stage = 4 and ticks = resetdate [ set span 5 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set Essential_Workers 10 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA
-      set residualcautionPPA 64 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] set superspreaders 10 ]
+  set OS_Import_Proportion 0 set Essential_Workers 10 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 72
+      set residualcautionPPA 72 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] set superspreaders 10 ]
 
 
 
@@ -1747,7 +1747,7 @@ Span
 Span
 0
 30
-30.0
+15.0
 1
 1
 NIL
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+64.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+64.0
 .5
 1
 NIL
@@ -2665,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+63.0
 1
 0
 Number
@@ -2676,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+63.0
 1
 0
 Number
@@ -3125,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+50.0
 1
 1
 NIL
@@ -3196,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -3362,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3377,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-0
+1
 
 PLOT
 2378
@@ -3803,7 +3803,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
@@ -4266,6 +4266,17 @@ Threshold_Multiplier
 1
 NIL
 HORIZONTAL
+
+SWITCH
+1646
+80
+1751
+115
+Stage_2
+Stage_2
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15023,7 +15034,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="1120"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Armenia" repetitions="250" runMetricsEveryStep="true">
+  <experiment name="Armenia" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="150"/>
@@ -15321,9 +15332,6 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Threshold_Multiplier">
       <value value="1"/>
-      <value value="2"/>
-      <value value="5"/>
-      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>
@@ -15369,6 +15377,10 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="zerotoone">
       <value value="1120"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_2">
+      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
