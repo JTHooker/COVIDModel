@@ -213,7 +213,7 @@ resources-own [
 
 
 to setup
-  random-seed 50
+  ;;random-seed 50
 
   profiler:start
 
@@ -14650,9 +14650,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="1"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Loose Suppression Variation Test" repetitions="5" runMetricsEveryStep="true">
+  <experiment name="Loose Suppression Variation Test" repetitions="100" runMetricsEveryStep="true">
     <setup>setup
-random-seed 50 
 ;;set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
 ;;set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
 ;;set Essential_Workers Essential_Workers + random-normal 0 2
