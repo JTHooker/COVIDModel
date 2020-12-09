@@ -1623,10 +1623,10 @@ to HHContactsIso
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-328
-124
-946
-943
+316
+123
+934
+942
 -1
 -1
 10.0
@@ -1724,7 +1724,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1801,7 +1801,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1881,7 +1881,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2488,7 +2488,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -3772,7 +3772,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-0
+8
 
 PLOT
 2378

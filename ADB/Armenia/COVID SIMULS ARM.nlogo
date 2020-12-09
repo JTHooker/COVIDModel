@@ -1421,15 +1421,15 @@ to setupstages
 
   if stage = 2 and ticks = resetdate [ set span 15 set pta 65 set ppa 65 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 50 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 30 set residualcautionPTA 52
-      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool <= 85 [ set studentflag 1 ] set superspreaders 10 ]]
+      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool <= 85 [ set studentflag 1 ] set superspreaders 5 ]]
 
   if stage = 3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 20 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 10 ]]
+    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 20 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 [ set studentflag 0 ] set superspreaders 7 ]]
 
   if stage = 4 and ticks = resetdate [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 10 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 72
-      set residualcautionPPA 72 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] set superspreaders 10 ]
+      set residualcautionPPA 72 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ]  ]
 
 
   ]
@@ -1885,7 +1885,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.2
+0.1
 .05
 1
 NIL
@@ -2381,7 +2381,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+22.5
 1
 1
 NIL
@@ -3634,7 +3634,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-0
+1
 
 PLOT
 2378
@@ -3707,7 +3707,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 

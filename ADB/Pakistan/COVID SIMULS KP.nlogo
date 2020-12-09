@@ -380,7 +380,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls in-radius 6 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
+    if any? other simuls in-radius 2 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
 
@@ -566,7 +566,7 @@ to go ;; these funtions get called each time-step
   calculateObjfunction
   updateoutside
   ;;updatestudentStatus
-  incursion
+  ;;incursion
   ask patches [ checkutilisation ]
  tick
 
@@ -1230,11 +1230,11 @@ to seedCases ;; set up to take the pre-intervention growth pre ******August 31th
 ;    if ticks < seedticks and scalephase = 1 [ ask n-of  8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 ;    if ticks < seedticks and scalephase = 2 [ ask n-of int .8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
-    if ticks < seedticks and scalephase = 0 [ ask n-of int ((242 * (1.05 ^ (ticks + 15))) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 1 [ ask n-of int ((242 * (1.05 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ (ticks + 15))) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ (ticks + 15))) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ (ticks + 15))) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of int ((242 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 1 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
   ; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
     ; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
@@ -1378,9 +1378,9 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
 
    ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage <= 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 1 and Stage_1 = true and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and Stage_1 = true and Stage_2 = true and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and Stage_1 = true and Stage_2 = true and Stage_3 = true and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
@@ -1428,22 +1428,20 @@ to setupstages
 ;      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 30 set residualcautionPTA 15
-      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 0 set residualcautionPTA 20
+      set residualcautionPPA 20 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 2 and ticks = resetdate [ set span 15 set pta 65 set ppa 65 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion 0 set Essential_Workers 75 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 30 set residualcautionPTA 52
-      set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 50 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 50 [ set studentflag 1 ] set superspreaders 10 ]]
+  set OS_Import_Proportion 0 set Essential_Workers 75 set maskPolicy true set mask_wearing 50 set tracking true set App_Uptake 0 set residualcautionPTA 40
+      set residualcautionPPA 40 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 50 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 50 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 3 and ticks = resetdate [ set span 10 set pta 75 set ppa 75 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
-    set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 25 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 25 [ set studentflag 1 ] set superspreaders 7 ]] ]
+  set OS_Import_Proportion 0 set Essential_Workers 25 set maskPolicy true set mask_wearing 75 set tracking true set App_Uptake 0 set residualcautionPTA 60 ;;
+    set residualcautionPPA 60 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ if agerange = 5 and returntoschool <= 25 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 25 [ set studentflag 1 ] set superspreaders 7 ]] ]
 
-  if stage = 4 and ticks = resetdate [ set span 5 set pta 80 set ppa 80 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 64
-      set residualcautionPPA 64 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] set superspreaders 5 ]
-
-
+  if stage = 4 and ticks = resetdate [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
+  set OS_Import_Proportion 0 set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 0 set residualcautionPTA 72
+      set residualcautionPPA 72 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ]  ]
 
 
  ;;; *******************************************************************************************************************************************************************************************************
@@ -1526,6 +1524,15 @@ to setupstages
 ;    set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency false set upperStudentAge 18 set LowerStudentAge 3 ] ;; check student age update
 
 ;;*************************************************************************************************************************************************************************************************************************
+
+  if selfGovern = false [
+    set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 15
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]
+  ]
+
+
+
 
 end
 
@@ -1612,12 +1619,12 @@ end
 ;  ask simuls with [ agerange = 15 ] [ set studentFlag 1 ]
 ;end
 
-to incursion
-   if ticks > 0 and stage = 1 [ ask n-of 40 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 40/day based on 10,000 incoming passengers per day with 5% infection risk
-   if ticks > 0 and stage = 2 [ ask n-of 4 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and stage = 3 and 40 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
-   if ticks > 0 and stage = 4 and 40 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
-end
+;to incursion
+;   if ticks > 0 and stage = 1 [ ask n-of 40 simuls with [ color = 85 ] [ set color red ]] ;; incursion rates of 40/day based on 10,000 incoming passengers per day with 5% infection risk
+;   if ticks > 0 and stage = 2 [ ask n-of 4 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and stage = 3 and 40 > random 100 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+;   if ticks > 0 and stage = 4 and 40 > random 1000 [ ask n-of 1 simuls with [ color = 85 ] [ set color red ]]
+;end
 
 to HHContactsIso
   ifelse  isolate = true and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set shape "star" set isolating 1 ] [ set shape "dot" set isolating 0 ]
@@ -1738,7 +1745,7 @@ Span
 Span
 0
 30
-7.0
+30.0
 1
 1
 NIL
@@ -1961,7 +1968,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.05
 .05
 1
 NIL
@@ -2002,7 +2009,7 @@ Superspreaders
 Superspreaders
 0
 100
-3.0
+10.0
 1
 1
 NIL
@@ -2072,7 +2079,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+24.0
 .5
 1
 NIL
@@ -2087,7 +2094,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+24.0
 .5
 1
 NIL
@@ -2250,7 +2257,7 @@ INPUTBOX
 314
 569
 total_population
-3553000.0
+3.553E7
 1
 0
 Number
@@ -2457,7 +2464,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--90.0
+0.0
 1
 1
 NIL
@@ -2656,7 +2663,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+23.0
 1
 0
 Number
@@ -2667,7 +2674,7 @@ INPUTBOX
 700
 285
 pta
-79.0
+23.0
 1
 0
 Number
@@ -3116,7 +3123,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -3161,7 +3168,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -3187,7 +3194,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+20.0
 1
 1
 NIL
@@ -3314,7 +3321,7 @@ SWITCH
 585
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3353,7 +3360,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+20.0
 1
 1
 NIL
@@ -3368,7 +3375,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+20.0
 1
 1
 NIL
@@ -3711,7 +3718,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4 5
-4
+3
 
 CHOOSER
 506
@@ -3794,7 +3801,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
@@ -4261,12 +4268,45 @@ SLIDER
 threshold_Multiplier
 threshold_Multiplier
 1
-25
-25.0
+186
+186.0
 1
 1
 NIL
 HORIZONTAL
+
+SWITCH
+1735
+80
+1840
+113
+Stage_1
+Stage_1
+1
+1
+-1000
+
+SWITCH
+1852
+80
+1957
+113
+Stage_2
+Stage_2
+1
+1
+-1000
+
+SWITCH
+1968
+79
+2073
+112
+Stage_3
+Stage_3
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15365,8 +15405,13 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="1120"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="KP Self Govern and unmitigated" repetitions="250" runMetricsEveryStep="true">
-    <setup>setup</setup>
+  <experiment name="KP Self Govern and unmitigated" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup
+set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
+set Essential_Workers Essential_Workers + random-normal 0 2
+set Superspreaders Superspreaders + random-normal 0 2
+set App_uptake App_Uptake + random-normal 0 4</setup>
     <go>go</go>
     <timeLimit steps="150"/>
     <metric>count turtles</metric>
@@ -15487,7 +15532,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InitialScale">
-      <value value="4"/>
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Isolate">
       <value value="false"/>
@@ -15646,6 +15691,18 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <enumeratedValueSet variable="Stage">
       <value value="1"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_1">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_2">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_3">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
     </enumeratedValueSet>
@@ -15661,11 +15718,16 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <enumeratedValueSet variable="threetotwo">
       <value value="2200"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold_Multiplier">
+      <value value="1"/>
+      <value value="4"/>
+      <value value="186"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="total_population">
-      <value value="3553000"/>
+      <value value="35530000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Track_and_Trace_Efficiency">
       <value value="0.2"/>
