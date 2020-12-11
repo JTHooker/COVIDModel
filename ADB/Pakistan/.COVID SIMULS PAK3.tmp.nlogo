@@ -1379,10 +1379,10 @@ to COVIDPolicyTriggers ;; used in idynamic model
       ;;up
 
 
-   ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage <= 1 and Stage_123 = 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and Stage_123 = 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and Stage_123 = 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage = 0 and Stage_123 = 1 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and Stage_123 = 2 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and Stage_123 = 3 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and Stage_123 = 4 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
@@ -1425,9 +1425,9 @@ to setupstages
 
  ;;   This section for 31_8_2020
 
-;  if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking false set App_Uptake 20 set residualcautionPTA 0
-;      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+  if stage = 0 and ticks = resetdate [  set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 15
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 0 set residualcautionPTA 20
@@ -1635,8 +1635,8 @@ end
 GRAPHICS-WINDOW
 326
 120
-765
-1021
+763
+1020
 -1
 -1
 11.0
@@ -1734,7 +1734,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1796,7 +1796,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1876,7 +1876,7 @@ SWITCH
 348
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-23.0
+24.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-23.0
+24.0
 .5
 1
 NIL
@@ -3073,7 +3073,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-24.948697823667715
+27.73871814172729
 1
 1
 NIL
@@ -3610,7 +3610,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.40233327371391714
+0.25289232791143357
 .01
 1
 NIL
@@ -3729,8 +3729,8 @@ CHOOSER
 821
 Stage
 Stage
-1 2 3 4
-0
+0 1 2 3 4
+1
 
 PLOT
 2378
@@ -4284,7 +4284,7 @@ CHOOSER
 113
 Stage_123
 Stage_123
-0 1 2 3
+0 1 2 3 4
 0
 
 @#$#@#$#@
@@ -4687,7 +4687,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.2-beta2
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -15951,7 +15951,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Population">
-      <value value="3553"/>
+      <value value="2200"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ppa">
       <value value="79"/>
@@ -16023,13 +16023,14 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage">
-      <value value="1"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage_123">
       <value value="0"/>
       <value value="1"/>
       <value value="2"/>
       <value value="3"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
