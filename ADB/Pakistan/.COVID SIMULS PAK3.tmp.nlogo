@@ -217,7 +217,7 @@ to setup
    ;; random-seed  100 ;; for use in setting random nuber generator seeds
 
   clear-all
-  import-drawing "KP.png" ;; imports Map of Pakistan
+  import-drawing "PAKmap.jpg" ;; imports Map of Pakistan
 
   ;; illness period estimation using ln transform
   set Illness_Periodvariance se_Illnesspd
@@ -274,7 +274,7 @@ to setup
  ;; set up people in the environment and allocates characteristics to them
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
-      [ set size 2 set shape "dot" set color 85 set householdUnit random 580 set agerange 95 set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
+      [ set size 2 set shape "dot" set color 85 set householdUnit random 340 set agerange 95 set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
         set income random-exponential mean_Individual_Income move-to one-of patches with [ pcolor = black  ]
         set riskofdeath .01 set personalTrust random-normal 75 10  set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 10 set haveApp random 100
         set wearsMask random 100 ;; resethealth resetincome calculateincomeperday calculateexpenditureperday resettrust
@@ -368,7 +368,7 @@ to setup
 ;;  ask simuls with [ agerange > 80 ] [ if 95 > random 100 [ set householdUnit random 360 + 720 ] ] ;; allocated older adults 80+  to household Units that don't include young children or teenagers
  ;; ask simuls with [ agerange > 18 and agerange <= 60 ] [ if 95 > random 100 [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 [
   ;;  set householdUnit random 600 ] ] ]  ;; allocates up to two adults per household
-  ask simuls with [ agerange = 15 and agerange = 5 and studentFlag != 1 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 580 and agerange > ([ agerange ] of myself + 15 ) ] ]  ;; Identifies students
+  ask simuls with [ agerange = 15 and agerange = 5 and studentFlag != 1 ] [ set householdUnit [ householdUnit ] of one-of simuls with [ householdUnit <= 340 and agerange > ([ agerange ] of myself + 15 ) ] ]  ;; Identifies students
  ;; ask simuls [ if agerange < 20 [ set studentFlag 1 ]  ]
 
   ;; allocates children and teenagers to a household where there are adults at least 20 years older than them and there are not more than 2 adults in the house
@@ -438,7 +438,7 @@ end
 to resethouseholdUnit ;; allocates children to households
   if schoolsPolicy = true [
     ask simuls with [ agerange > 18 and agerange <= 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 95 > random 100 [
-    set householdUnit random 580 ] ] ;; allows for upo 5% of houses to be sharehouses / care facilities, etc.
+    set householdUnit random 340 ] ] ;; allows for upo 5% of houses to be sharehouses / care facilities, etc.
   ;;ask simuls with [ agerange > 60 ] [ if count simuls with [ householdUnit = [ householdUnit ] of myself ] > 2 and 93 < random 100 [
   ;;  set householdUnit [ householdUnit ] of one-of simuls with [ count other simuls with [ householdUnit = [ householdUnit ] of myself ] = 0  ]]];; allows for older people in group homes to make up to 7% of housing units
   ]
@@ -871,7 +871,8 @@ to death ;; calculates death for individuals and adds them to a total for the po
   if Scalephase = 1 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10 ]
   if Scalephase = 2 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100 ]
   if Scalephase = 3 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 1000 ]
-
+  if Scalephase = 4 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 10000 ]
+  if Scalephase = 5 and color = red and timenow = int ownIllnessPeriod - 1 and RiskofDeath > random-float 1  [ set color black set pace 0 set RequireICU 0 set deathcount deathcount + 100000 ]
 
 end
 
@@ -925,7 +926,7 @@ end
 
 to scaleup ;; this function scales up the simulation over 5 phases at base 10 to enable a small and large-scale understanding of dynamics. It enables the fine-grained analysis in early stages
   ;; that more closely resembles diffusion across a population similar to assumptions in SEIR models but as it scales up, recognises taht there are geographic constraints of movement of populations
-  ifelse scale = true and ( count simuls with [ color = red ] )  >= 220 and scalePhase >= 0 and scalePhase < 4 and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
+  ifelse scale = true and ( count simuls with [ color = red ] )  >= 220 and scalePhase >= 0 and scalePhase < 5 and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 set detectable random 100  ;;;; identifies whether the person is detectable or not ;;resethealth calculateincomeperday calculateexpenditureperday
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set imported 0 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc )   ;; log transform of compliance with isolation
@@ -1025,7 +1026,7 @@ to countDailyCases ;; sets the day for reporting new cases at 6 (adjustable) day
   if Scalephase = 2 [ set DailyCases casestoday * 100 ]
   if Scalephase = 3 [ set DailyCases casestoday * 1000 ]
   if Scalephase = 4 [ set DailyCases casestoday * 10000 ]
-;;  if Scalephase = 5 [ set DailyCases casestoday * 100000 ]
+  if Scalephase = 5 [ set DailyCases casestoday * 100000 ]
 
 
 ;; If X represents the variable that has a log-normal distribution, and µ and σ are
@@ -1051,7 +1052,7 @@ to calculatePopulationScale ;; population scaling function
   if scalephase = 2 [ set Scaled_Population ( count simuls ) * 100 ]
   if scalephase = 3 [ set Scaled_Population ( count simuls ) * 1000 ]
   if scalephase = 4 [ set Scaled_Population ( count simuls ) * 10000 ]
-;;  if scalephase = 5 [ set Scaled_Population ( count simuls ) * 100000 ]
+  if scalephase = 5 [ set Scaled_Population ( count simuls ) * 100000 ]
 end
 
 to checkICU
@@ -1067,7 +1068,7 @@ to CalculateICUBedsRequired ;; calculates the number of ICU beds required at any
   if scalephase = 2 [ set ICUBedsRequired needsICU * 100]
   if scalephase = 3 [ set ICUBedsRequired needsICU * 1000 ]
   if scalephase = 4 [ set ICUBedsRequired needsICU * 10000 ]
-;;  if scalephase = 5 [ set ICUBedsRequired needsICU * 100000 ]
+  if scalephase = 5 [ set ICUBedsRequired needsICU * 100000 ]
 
 end
 
@@ -1083,7 +1084,7 @@ to calculateCurrentInfections ;; calculates the number of infected people in the
    if Scalephase = 2 [ set currentInfections infectedsimuls * 100 ]
    if Scalephase = 3 [ set currentInfections infectedsimuls * 1000 ]
    if Scalephase = 4 [ set currentInfections infectedsimuls * 10000 ]
-;;   if Scalephase = 5 [ set currentInfections infectedsimuls * 100000 ]
+   if Scalephase = 5 [ set currentInfections infectedsimuls * 100000 ]
 
 end
 
@@ -1138,7 +1139,7 @@ to traceadjust
   if scalephase = 2 [ set track_and_trace_efficiency .15 ]
   if scalephase = 3 [ set track_and_trace_efficiency .10 ]
   if scalephase = 4 [ set track_and_trace_efficiency .05 ]
-;;  if scalephase = 5 [ set track_and_trace_efficiency .01 ]
+  if scalephase = 5 [ set track_and_trace_efficiency .01 ]
 end
 
 
@@ -1162,7 +1163,7 @@ to calculatePotentialContacts ;; counts the number of people tracked from infect
    if Scalephase = 2 [ set PotentialContacts ( count links ) * 100 ]
    if Scalephase = 3 [ set PotentialContacts ( count links ) * 1000 ]
    if Scalephase = 4 [ set PotentialContacts ( count links ) * 10000 ]
-;;   if Scalephase = 5 [ set PotentialContacts ( count links ) * 100000 ]
+   if Scalephase = 5 [ set PotentialContacts ( count links ) * 100000 ]
 end
 
 to countred ;; as per code
@@ -1230,11 +1231,12 @@ to seedCases ;; set up to take the pre-intervention growth pre ******August 31th
 ;    if ticks < seedticks and scalephase = 1 [ ask n-of  8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 ;    if ticks < seedticks and scalephase = 2 [ ask n-of int .8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
-    if ticks < seedticks and scalephase = 0 [ ask n-of int ((242 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 1 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of int ((204600 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 1 [ ask n-of int ((204600 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((204600 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 3 [ ask n-of int ((204600 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 4 [ ask n-of int ((204600 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 5 [ ask n-of int ((204600 * (1.05 ^ ticks )) / 100000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
   ; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
     ; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
@@ -1258,7 +1260,7 @@ to countEWInfections ;; counts infections among Essential workers
   if Scalephase = 2 [ set EWInfections EWInfects  * 100 ]
   if Scalephase = 3 [ set EWInfections EWInfects  * 1000 ]
   if Scalephase = 4 [ set EWInfections EWInfects  * 10000 ]
-;;  if Scalephase = 5 [ set EWInfections EWInfects  * 100000 ]
+  if Scalephase = 5 [ set EWInfections EWInfects  * 100000 ]
 end
 
 
@@ -1269,7 +1271,7 @@ to countSchoolInfections ;; counts infections among school students
    if Scalephase = 2 [ set studentInfections studentInfects * 100 ]
    if Scalephase = 3 [ set studentInfections studentInfects * 1000 ]
    if Scalephase = 4 [ set studentInfections studentInfects * 10000 ]
-;;   if Scalephase = 5 [ set studentInfections studentInfects * 100000 ]
+   if Scalephase = 5 [ set studentInfections studentInfects * 100000 ]
 end
 
 to checkMask ;; identifies people who waear a mask
@@ -1633,8 +1635,8 @@ end
 GRAPHICS-WINDOW
 326
 120
-1005
-1020
+765
+1021
 -1
 -1
 11.0
@@ -1647,8 +1649,8 @@ GRAPHICS-WINDOW
 1
 1
 1
--30
-30
+-19
+19
 -40
 40
 0
@@ -1732,7 +1734,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1745,7 +1747,7 @@ Span
 Span
 0
 30
-15.0
+30.0
 1
 1
 NIL
@@ -1794,7 +1796,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1874,7 +1876,7 @@ SWITCH
 348
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -1968,7 +1970,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.15
+0.01
 .05
 1
 NIL
@@ -2079,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+23.0
 .5
 1
 NIL
@@ -2094,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+23.0
 .5
 1
 NIL
@@ -2246,7 +2248,7 @@ INPUTBOX
 314
 504
 current_cases
-44.0
+34.0
 1
 0
 Number
@@ -2257,7 +2259,7 @@ INPUTBOX
 314
 569
 total_population
-3.553E7
+2.2E8
 1
 0
 Number
@@ -2464,7 +2466,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2652,7 +2654,7 @@ TEXTBOX
 744
 1379
 837
-0 - 2,500 Population\n1 - 25,000 \n2 - 250,000\n3 - 2,500,000\n4 - 25,000,000
+0 - 2,500 Population (for example)\n1 - 25,000 \n2 - 250,000\n3 - 2,500,000\n4 - 25,000,000\n5 - 250,000,000
 12
 0.0
 1
@@ -2663,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+23.0
 1
 0
 Number
@@ -2674,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+23.0
 1
 0
 Number
@@ -3123,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+100.0
 1
 1
 NIL
@@ -3194,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3360,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-40.0
+20.0
 1
 1
 NIL
@@ -3375,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-40.0
+20.0
 1
 1
 NIL
@@ -3718,7 +3720,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4 5
-3
+5
 
 CHOOSER
 506
@@ -3728,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -4189,7 +4191,7 @@ Population
 Population
 0
 4000
-3553.0
+2200.0
 100
 1
 NIL
@@ -4225,10 +4227,10 @@ mean [ pplinHousehold ] of simuls
 11
 
 SLIDER
-1270
-80
-1444
-113
+1269
+75
+1443
+108
 this_number
 this_number
 0
@@ -4255,16 +4257,16 @@ TEXTBOX
 476
 158
 502
-2426 * 180
+18470 * 186
 11
 0.0
 1
 
 SLIDER
-1520
-83
-1693
-116
+1463
+75
+1636
+108
 threshold_Multiplier
 threshold_Multiplier
 1
@@ -4276,13 +4278,13 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1758
-96
-1897
-142
+1729
+68
+1868
+113
 Stage_123
 Stage_123
-1 2 3
+0 1 2 3
 0
 
 @#$#@#$#@
@@ -4685,7 +4687,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.1.2-beta2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -15667,17 +15669,11 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <enumeratedValueSet variable="Stage">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_1">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_2">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_3">
-      <value value="true"/>
-      <value value="false"/>
+    <enumeratedValueSet variable="Stage_123">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
@@ -15703,6 +15699,362 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="total_population">
       <value value="35530000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Track_and_Trace_Efficiency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="tracking">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Treatment_Benefit">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Triggerday">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TTIncrease">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="twotoone">
+      <value value="1100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="twotothree">
+      <value value="5500"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Undetected_Proportion">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="UpperStudentAge">
+      <value value="18"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Visit_Frequency">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Visit_Radius">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="WFH_Capacity">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="zerotoone">
+      <value value="1120"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Pak Self Govern and unmitigated" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup
+set asymptomaticPercentage asymptomaticPercentage + random-normal 0 3
+set Asymptomatic_Trans Asymptomatic_Trans + random-normal 0 .06 
+set Essential_Workers Essential_Workers + random-normal 0 2
+set Superspreaders Superspreaders + random-normal 0 2
+set App_uptake App_Uptake + random-normal 0 4</setup>
+    <go>go</go>
+    <timeLimit steps="150"/>
+    <metric>count turtles</metric>
+    <metric>ticks</metric>
+    <metric>numberInfected</metric>
+    <metric>deathcount</metric>
+    <metric>casefatalityrate</metric>
+    <metric>ICUBedsRequired</metric>
+    <metric>DailyCases</metric>
+    <metric>CurrentInfections</metric>
+    <metric>EliminationDate</metric>
+    <metric>MeanR</metric>
+    <metric>Essential_Workers</metric>
+    <metric>scale</metric>
+    <metric>stage</metric>
+    <metric>averagecontacts</metric>
+    <metric>CasesinPeriod7</metric>
+    <metric>CasesinPeriod14</metric>
+    <metric>CasesinPeriod28</metric>
+    <metric>reportedCases</metric>
+    <enumeratedValueSet variable="Age_Isolation">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="App_Uptake">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="AssignAppEss">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Asymptomatic_Trans">
+      <value value="0.33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="AsymptomaticPercentage">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Available_Resources">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Bed_Capacity">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="care_attitude">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="case_isolation">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Case_Reporting_Delay">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Complacency">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Compliance_with_Isolation">
+      <value value="95"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Contact_Radius">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cruise">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="current_cases">
+      <value value="34"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="days_of_cash_reserves">
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Diffusion_Adjustment">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Ess_W_Risk_Reduction">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Essential_Workers">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="eWAppUptake">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="FearTrigger">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fourtothree">
+      <value value="4400"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="freewheel">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Global_Transmissability">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Hospital_Beds_in_Australia">
+      <value value="65000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Household_Attack">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Beds_Available">
+      <value value="7000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ICU_Required">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Illness_period">
+      <value value="20.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Incubation_Period">
+      <value value="5.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="IncursionRate">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Initial">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initialassociationstrength">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="InitialScale">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Isolate">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="JudgeDay1">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="JudgeDay1_d">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="JudgeDay2">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Judgeday2_d">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="JudgeDay3">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Judgeday3_d">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="JudgeDay4">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Judgeday4_d">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_switch">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="lockdown_off">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="LowerStudentAge">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mask_Wearing">
+      <value value="90"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="MaskPolicy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maxv">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Mean_Individual_Income">
+      <value value="55000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Media_Exposure">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="minv">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="onetotwo">
+      <value value="2200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="onetozero">
+      <value value="560"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Post_Proportion">
+      <value value="0.61"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Proportion">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="OS_Import_Switch">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Outside">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outsideRisk">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="phwarnings">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="policytriggeron">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Population">
+      <value value="3553"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ppa">
+      <value value="79"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ProductionRate">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_People_Avoid">
+      <value value="79"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Proportion_Time_Avoid">
+      <value value="79"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pta">
+      <value value="79"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="quarantine">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ReInfectionRate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPPA">
+      <value value="80"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ResidualCautionPTA">
+      <value value="80"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="RestrictedMovement">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="saliency_of_experience">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scale">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SchoolPolicyActive">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SchoolReturnDate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="schoolsPolicy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_illnesspd">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="se_incubation">
+      <value value="2.25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SeedTicks">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="self_capacity">
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SelfGovern">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity_of_illness">
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Span">
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="spatial_distance">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_123">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="stimulus">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Superspreaders">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="this_number">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threetofour">
+      <value value="6600"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threetotwo">
+      <value value="2200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="threshold_Multiplier">
+      <value value="1"/>
+      <value value="186"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="TimeLockDownOff">
+      <value value="28"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="total_population">
+      <value value="220000000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Track_and_Trace_Efficiency">
       <value value="0.2"/>
