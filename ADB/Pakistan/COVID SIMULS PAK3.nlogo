@@ -1734,7 +1734,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1747,7 +1747,7 @@ Span
 Span
 0
 30
-30.0
+15.0
 1
 1
 NIL
@@ -1796,7 +1796,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1876,7 +1876,7 @@ SWITCH
 348
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1970,7 +1970,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.01
+0.05
 .05
 1
 NIL
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+64.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+64.0
 .5
 1
 NIL
@@ -2466,7 +2466,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2665,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+63.0
 1
 0
 Number
@@ -2676,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+63.0
 1
 0
 Number
@@ -3073,7 +3073,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-25.06496395158131
+21.3126856672219
 1
 1
 NIL
@@ -3099,7 +3099,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-9.0
+12.0
 1
 1
 NIL
@@ -3125,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+75.0
 1
 1
 NIL
@@ -3196,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+50.0
 1
 1
 NIL
@@ -3362,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+40.0
 1
 1
 NIL
@@ -3377,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+40.0
 1
 1
 NIL
@@ -3610,7 +3610,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3451938804585852
+0.3203338911623836
 .01
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+2
 
 PLOT
 2378
@@ -4271,7 +4271,7 @@ threshold_Multiplier
 threshold_Multiplier
 1
 186
-1.0
+186.0
 1
 1
 NIL
@@ -4285,7 +4285,7 @@ CHOOSER
 Stage_123
 Stage_123
 0 1 2 3 4
-0
+4
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15837,7 +15837,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="9"/>
+      <value value="12"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>

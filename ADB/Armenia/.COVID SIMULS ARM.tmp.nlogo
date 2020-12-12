@@ -356,7 +356,7 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
   set spatial_distance false
   set case_isolation false
-  set stage 1 ;; starts the simulation off at zero policy settings
+  set stage 0 ;; starts the simulation off at zero policy settings
 
   ;; setting households up
 
@@ -376,7 +376,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls in-radius  with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
+    if any? other simuls in-radius 3 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
 
@@ -1411,6 +1411,10 @@ to setupstages
 
  if selfgovern = true   [
 
+  if stage = 0 [   set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy false set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 0 set quarantine false
+      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+
 
   if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 75 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 30 set residualcautionPTA 15
@@ -1646,7 +1650,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -2160,7 +2164,7 @@ INPUTBOX
 314
 504
 current_cases
-31.0
+32.0
 1
 0
 Number
@@ -2378,7 +2382,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2985,7 +2989,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-20.77064732966501
+19.500249899726107
 1
 1
 NIL
@@ -3522,7 +3526,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.38469092550808226
+0.1954768383376078
 .01
 1
 NIL
@@ -3630,8 +3634,8 @@ CHOOSER
 821
 Stage
 Stage
-1 2 3 4
-0
+0 1 2 3 4
+1
 
 PLOT
 2378
@@ -3704,7 +3708,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -4169,10 +4173,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1679
-82
-1818
-128
+1646
+68
+1785
+113
 Stage_123
 Stage_123
 0 1 2 3 4
@@ -4578,7 +4582,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.2-beta2
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -15419,7 +15423,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="InitialScale">
-      <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Isolate">
       <value value="false"/>
