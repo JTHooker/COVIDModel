@@ -358,7 +358,7 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
   set spatial_distance false
   set case_isolation false
-  set stage 1 ;; starts the simulation off at zero policy settings
+  set stage 0 ;; starts the simulation off at zero policy settings
 
   ;; setting households up
 
@@ -1425,7 +1425,7 @@ to setupstages
 
  ;;   This section for 31_8_2020
 
-  if stage = 0 and ticks = resetdate [  set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  if stage = 0 and ticks = resetdate [  set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 15
       set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
@@ -3073,7 +3073,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-25.0
+25.06496395158131
 1
 1
 NIL
@@ -3099,7 +3099,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-7.0
+9.0
 1
 1
 NIL
@@ -3610,7 +3610,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.33
+0.3451938804585852
 .01
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -15837,7 +15837,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="7"/>
+      <value value="9"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>
@@ -16023,13 +16023,14 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage">
-      <value value="1"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage_123">
       <value value="0"/>
       <value value="1"/>
       <value value="2"/>
       <value value="3"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
