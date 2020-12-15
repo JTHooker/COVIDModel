@@ -380,7 +380,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls in-radius 2 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
+    if any? other simuls in-radius 3 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
 
@@ -1747,7 +1747,7 @@ Span
 Span
 0
 30
-15.0
+30.0
 1
 1
 NIL
@@ -1970,7 +1970,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.05
+0.2
 .05
 1
 NIL
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+24.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+24.0
 .5
 1
 NIL
@@ -2466,7 +2466,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+-90.0
 1
 1
 NIL
@@ -2665,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+23.0
 1
 0
 Number
@@ -2676,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+23.0
 1
 0
 Number
@@ -3073,7 +3073,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-21.3126856672219
+25.368143369888287
 1
 1
 NIL
@@ -3125,7 +3125,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+100.0
 1
 1
 NIL
@@ -3196,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -3362,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-40.0
+20.0
 1
 1
 NIL
@@ -3377,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-40.0
+20.0
 1
 1
 NIL
@@ -3610,7 +3610,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3203338911623836
+0.28743816736105793
 .01
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+1
 
 PLOT
 2378
@@ -4271,7 +4271,7 @@ threshold_Multiplier
 threshold_Multiplier
 1
 186
-186.0
+1.0
 1
 1
 NIL
@@ -4687,7 +4687,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.1.2-beta2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -16049,7 +16049,6 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threshold_Multiplier">
       <value value="1"/>
-      <value value="186"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>

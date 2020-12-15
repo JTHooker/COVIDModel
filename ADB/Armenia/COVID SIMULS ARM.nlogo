@@ -2382,7 +2382,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2989,7 +2989,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-19.500249899726107
+20.158596845254024
 1
 1
 NIL
@@ -3526,7 +3526,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.1954768383376078
+0.35922150389727076
 .01
 1
 NIL
@@ -3625,7 +3625,7 @@ CHOOSER
 InitialScale
 InitialScale
 0 1 2 3 4
-2
+3
 
 CHOOSER
 506
@@ -3635,7 +3635,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -4166,7 +4166,7 @@ Threshold_Multiplier
 Threshold_Multiplier
 1
 25
-1.0
+4.0
 1
 1
 NIL
@@ -4180,7 +4180,7 @@ CHOOSER
 Stage_123
 Stage_123
 0 1 2 3 4
-0
+4
 
 @#$#@#$#@
 ## WHAT IS IT?

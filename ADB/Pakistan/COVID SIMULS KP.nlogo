@@ -358,7 +358,7 @@ to setup
   set Proportion_Time_Avoid PTA ;; used to set the proportion of time that people who are socially distancing are socially distancing (e.g., 85% of people 85% of the time)
   set spatial_distance false
   set case_isolation false
-  set stage 1 ;; starts the simulation off at zero policy settings
+  set stage 0 ;; starts the simulation off at zero policy settings
 
   ;; setting households up
 
@@ -380,7 +380,7 @@ to setup
 
 
   ask simuls [
-    if any? other simuls in-radius 2 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
+    if any? other simuls in-radius 4 with [ color = red ] and Household_Attack > random 100 [ set color yellow ]
   ] ;; this ensures that half the people in households with existing infections have also had an infection and prevents a big spike early-on
 
 
@@ -1377,10 +1377,10 @@ to COVIDPolicyTriggers ;; used in idynamic model
       ;;up
 
 
-   ;; if stage = 0 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    if stage <= 1 and Stage_123 = 1 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 2 and Stage_123 = 2 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage <= 3 and Stage_123 = 3 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage = 0 and Stage_123 = 1 and casesinperiod7 >= (zerotoone * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and Stage_123 = 2 and casesinperiod7 >= ( onetotwo * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 2 and Stage_123 = 3 and casesinperiod7 >= ( twotothree * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage <= 3 and Stage_123 = 4 and casesinperiod7 >= ( threetofour * threshold_Multiplier) and ticks = resetdate and ( ticks - decisionDate) >= Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
 
   ;; down
 
@@ -1423,9 +1423,9 @@ to setupstages
 
  ;;   This section for 31_8_2020
 
-;  if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-;  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking false set App_Uptake 20 set residualcautionPTA 0
-;      set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
+  if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
+  set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 0 set tracking true set App_Uptake 0 set residualcautionPTA 15
+      set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
   set OS_Import_Proportion 0 set Essential_Workers 100 set maskPolicy true set mask_wearing 20 set tracking true set App_Uptake 0 set residualcautionPTA 20
@@ -1745,7 +1745,7 @@ Span
 Span
 0
 30
-15.0
+7.0
 1
 1
 NIL
@@ -1968,7 +1968,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.15
+0.05
 .05
 1
 NIL
@@ -2079,7 +2079,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+79.0
 .5
 1
 NIL
@@ -2094,7 +2094,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+79.0
 .5
 1
 NIL
@@ -2464,7 +2464,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -2663,7 +2663,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+79.0
 1
 0
 Number
@@ -2674,7 +2674,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+79.0
 1
 0
 Number
@@ -3071,7 +3071,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-24.948697823667715
+25.0
 1
 1
 NIL
@@ -3123,7 +3123,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+20.0
 1
 1
 NIL
@@ -3168,7 +3168,7 @@ App_Uptake
 App_Uptake
 0
 100
-0.0
+30.0
 1
 1
 NIL
@@ -3194,7 +3194,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+90.0
 1
 1
 NIL
@@ -3321,7 +3321,7 @@ SWITCH
 585
 SchoolPolicyActive
 SchoolPolicyActive
-0
+1
 1
 -1000
 
@@ -3360,7 +3360,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-40.0
+80.0
 1
 1
 NIL
@@ -3375,7 +3375,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-40.0
+80.0
 1
 1
 NIL
@@ -3608,7 +3608,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.40233327371391714
+0.33
 .01
 1
 NIL
@@ -3727,8 +3727,8 @@ CHOOSER
 821
 Stage
 Stage
-1 2 3 4
-1
+0 1 2 3 4
+0
 
 PLOT
 2378
@@ -4269,21 +4269,21 @@ threshold_Multiplier
 threshold_Multiplier
 1
 186
-1.0
+46.5
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1758
-96
-1897
-142
+1726
+75
+1865
+120
 Stage_123
 Stage_123
-1 2 3
-0
+0 1 2 3 4
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15665,19 +15665,14 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stage_123">
+      <value value="0"/>
       <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_1">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_2">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stage_3">
-      <value value="true"/>
-      <value value="false"/>
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
@@ -15695,8 +15690,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2200"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threshold_Multiplier">
-      <value value="1"/>
-      <value value="186"/>
+      <value value="46.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>
