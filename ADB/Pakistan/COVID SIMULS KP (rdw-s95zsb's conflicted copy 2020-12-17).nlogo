@@ -1230,11 +1230,11 @@ to seedCases ;; set up to take the pre-intervention growth pre ******August 31th
 ;    if ticks < seedticks and scalephase = 1 [ ask n-of  8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 ;    if ticks < seedticks and scalephase = 2 [ ask n-of int .8 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
-    if ticks < seedticks and scalephase = 0 [ ask n-of int ((242 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 1 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of int ((33000 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 1 [ ask n-of int ((33000 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int ((33000 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 3 [ ask n-of int ((33000 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 4 [ ask n-of int ((33000 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
   ; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
     ; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
@@ -1745,7 +1745,7 @@ Span
 Span
 0
 30
-15.0
+30.0
 1
 1
 NIL
@@ -1968,7 +1968,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.05
+0.1
 .05
 1
 NIL
@@ -2079,7 +2079,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+0.0
 .5
 1
 NIL
@@ -2094,7 +2094,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+0.0
 .5
 1
 NIL
@@ -2464,7 +2464,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-22.5
+0.0
 1
 1
 NIL
@@ -2663,7 +2663,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+0.0
 1
 0
 Number
@@ -2674,7 +2674,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+0.0
 1
 0
 Number
@@ -3071,7 +3071,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-32.023129374452814
+25.053558158415306
 1
 1
 NIL
@@ -3123,7 +3123,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+100.0
 1
 1
 NIL
@@ -3194,7 +3194,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+0.0
 1
 1
 NIL
@@ -3360,7 +3360,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-40.0
+15.0
 1
 1
 NIL
@@ -3375,7 +3375,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-40.0
+15.0
 1
 1
 NIL
@@ -3608,7 +3608,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.36672465621172057
+0.26541513081049317
 .01
 1
 NIL
@@ -3728,7 +3728,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-2
+0
 
 PLOT
 2378
@@ -3767,7 +3767,7 @@ INPUTBOX
 1503
 257
 onetotwo
-2200.0
+355.0
 1
 0
 Number
@@ -3778,7 +3778,7 @@ INPUTBOX
 1505
 319
 twotothree
-5500.0
+888.0
 1
 0
 Number
@@ -3789,7 +3789,7 @@ INPUTBOX
 1505
 381
 threetofour
-6600.0
+1065.0
 1
 0
 Number
@@ -3987,7 +3987,7 @@ INPUTBOX
 1903
 254
 twotoone
-1100.0
+178.0
 1
 0
 Number
@@ -3998,7 +3998,7 @@ INPUTBOX
 1901
 316
 threetotwo
-2200.0
+355.0
 1
 0
 Number
@@ -4009,7 +4009,7 @@ INPUTBOX
 1903
 377
 fourtothree
-4400.0
+710.0
 1
 0
 Number
@@ -4269,7 +4269,7 @@ threshold_Multiplier
 threshold_Multiplier
 1
 186
-46.5
+1.0
 1
 1
 NIL
@@ -4283,7 +4283,7 @@ CHOOSER
 Stage_123
 Stage_123
 0 1 2 3 4
-4
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15473,7 +15473,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="fourtothree">
-      <value value="4400"/>
+      <value value="710"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="freewheel">
       <value value="false"/>
@@ -15566,7 +15566,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetotwo">
-      <value value="2200"/>
+      <value value="355"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="onetozero">
       <value value="560"/>
@@ -15684,13 +15684,15 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetofour">
-      <value value="6600"/>
+      <value value="1065"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threetotwo">
-      <value value="2200"/>
+      <value value="355"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threshold_Multiplier">
       <value value="1"/>
+      <value value="46.5"/>
+      <value value="186"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>
@@ -15714,10 +15716,10 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotoone">
-      <value value="1100"/>
+      <value value="178"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="twotothree">
-      <value value="5500"/>
+      <value value="888"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Undetected_Proportion">
       <value value="0"/>

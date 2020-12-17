@@ -1970,7 +1970,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.2
+0.01
 .05
 1
 NIL
@@ -2081,7 +2081,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+0.0
 .5
 1
 NIL
@@ -2096,7 +2096,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+0.0
 .5
 1
 NIL
@@ -2466,7 +2466,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--90.0
+0.0
 1
 1
 NIL
@@ -2665,7 +2665,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+0.0
 1
 0
 Number
@@ -2676,7 +2676,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+0.0
 1
 0
 Number
@@ -3196,7 +3196,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-20.0
+0.0
 1
 1
 NIL
@@ -3362,7 +3362,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-20.0
+15.0
 1
 1
 NIL
@@ -3377,7 +3377,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-20.0
+15.0
 1
 1
 NIL
@@ -3730,7 +3730,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378
@@ -3803,7 +3803,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-0
+1
 1
 -1000
 
@@ -4687,7 +4687,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.2-beta2
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

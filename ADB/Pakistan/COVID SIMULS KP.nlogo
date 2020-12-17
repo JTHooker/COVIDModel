@@ -2,6 +2,7 @@ extensions [ rngs profiler ]
 
 globals [
 
+  recoveredcases
   anxietyFactor
   NumberInfected
   InfectionChange
@@ -306,7 +307,6 @@ to setup
         assigndetectablestatus ;; identifies people unlikely to be found
         ;set pta random-float ((Proportion_time_avoid - (Proportion_Time_Avoid * .2)) + random-float (Proportion_time_avoid + (1 - Proportion_time_avoid) * .2))
        ;set ppa random-float ((Proportion_People_avoid - (Proportion_People_Avoid * .2)) + random-float (Proportion_People_avoid + (1 - Proportion_People_avoid) * .2))
-
        ]]
 
   ;; set up initial infected people
@@ -456,6 +456,8 @@ to meanHouseholdSize
   ask simuls [ set pplInHousehold ( count simuls with [ householdUnit = [ householdUnit ] of myself ]  )  ]
 end
 
+
+
 ;to resetincome
 ;  if agerange >= 18 and agerange < 70 and income < 10000 [ ;;assigns income to working age-people
 ;    set income random-exponential Mean_Individual_Income ]
@@ -509,6 +511,7 @@ end
 to assigndetectablestatus
   if asymptomaticFlag = 1 and detectable < Undetected_Proportion [ set unDetectedFlag 1 ]
 end
+
 
 to go ;; these funtions get called each time-step
   ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage checkMask updatepersonalvirulence visitDestination HHContactsIso ] ;; calculateIncomeperday earn financialstress
@@ -565,12 +568,21 @@ to go ;; these funtions get called each time-step
   ;;calculateCashPosition
   calculateObjfunction
   updateoutside
+  countrecoveredcases ;; counts existing cases (yellow)
   ;;updatestudentStatus
   ;;incursion
   ask patches [ checkutilisation ]
  tick
 
 end
+
+
+to countrecoveredcases
+  if ticks = 1 [
+    set recoveredcases ( Total_Population * Recovered_proportion )
+  ]
+end
+
 
 
 to move ;; describes the circumstances under which people can move and infect one another
@@ -928,7 +940,7 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
   ifelse scale = true and ( count simuls with [ color = red ] )  >= 220 and scalePhase >= 0 and scalePhase < 4 and days > 0  [ ;;;+ ( count simuls with [ color = yellow ] )
     set scalephase scalephase + 1 ask n-of ( count simuls with [ color = red ] * .9 ) simuls with [ color = red ] [ set size 2 set shape "dot" set color 85 set detectable random 100  ;;;; identifies whether the person is detectable or not ;;resethealth calculateincomeperday calculateexpenditureperday
     set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set imported 0 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
-        set ownIncubationPeriod ( exp random-normal Minc Sinc )   ;; log transform of compliance with isolation
+      set ownIncubationPeriod ( exp random-normal Minc Sinc )   ;; log transform of compliance with isolation
       set income ([ income ] of one-of other simuls )  move-to one-of patches with [ pcolor = black  ]
       resetlandingSimul set riskofdeath .01 set WFHCap random 100 set ageRange ([ageRange ] of one-of simuls) set requireICU random 100
 
@@ -946,6 +958,7 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
 
      ask n-of ( count simuls with [ color = yellow ] * .9 ) simuls with [ color = yellow ] [ set size 2 set shape "dot" set color 85 set WFHCap random 100
       set ageRange ([ageRange ] of one-of simuls)  set imported 0 ;; resethealth
+
      set timenow 0 set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0 set ownIllnessPeriod ( exp random-normal M S ) ;; log transform of illness period
         set ownIncubationPeriod ( exp random-normal Minc Sinc )
        ;; log transform of compliance with isolation
@@ -962,6 +975,8 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
         let maskWearEfficacy rngs:rnd-beta stream_id 20 11
         set ownMaskEfficacy maskWearEfficacy * 100
     ]
+
+ ask n-of (count simuls * recovered_proportion ) simuls with [ color = 85 ] [ set color yellow ] ;; this should maintain existing pre-condition recovered plus add the new ones
 
 
  set contact_Radius Contact_Radius + (90 / 4)
@@ -1233,8 +1248,8 @@ to seedCases ;; set up to take the pre-intervention growth pre ******August 31th
     if ticks < seedticks and scalephase = 0 [ ask n-of int ((242 * (1.05 ^ ticks )) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
     if ticks < seedticks and scalephase = 1 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
     if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 100 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 3 [ ask n-of int ((242 * (1.05 ^ ticks )) / 1000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 4 [ ask n-of int ((242 * (1.05 ^ ticks )) / 10000 ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
   ; creates a steady stream of cases into the model in early stages for seeding - these need to be estimated are are unlikely to be exact due to errors and lags in real-world reporting
     ; count simuls with [ color = red and unDetectedFlag = 0 and int timenow = int Case_reporting_delay ]
@@ -1531,9 +1546,6 @@ to setupstages
       set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]
   ]
 
-
-
-
 end
 
 to calculateCasesInLastPeriod ;; counts cases in the last 14 days -
@@ -1634,7 +1646,7 @@ GRAPHICS-WINDOW
 326
 120
 1005
-1020
+1021
 -1
 -1
 11.0
@@ -1745,7 +1757,7 @@ Span
 Span
 0
 30
-7.0
+15.0
 1
 1
 NIL
@@ -1954,7 +1966,7 @@ MONITOR
 493
 742
 Total # Infected
-numberInfected
+numberInfected + recoveredcases
 0
 1
 14
@@ -2036,7 +2048,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / Total_Population * 100
+( numberInfected + recoveredcases ) / Total_Population * 100
 2
 1
 14
@@ -2079,7 +2091,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-79.0
+64.0
 .5
 1
 NIL
@@ -2094,7 +2106,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-79.0
+64.0
 .5
 1
 NIL
@@ -2393,7 +2405,6 @@ false
 PENS
 "Current Cases" 1.0 1 -7858858 true "" "plot currentInfections "
 "Total Infected" 1.0 0 -13345367 true "" "plot NumberInfected "
-"ICU Beds Required" 1.0 0 -16777216 true "" "plot ICUBedsRequired "
 
 MONITOR
 335
@@ -2464,7 +2475,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+22.5
 1
 1
 NIL
@@ -2663,7 +2674,7 @@ INPUTBOX
 609
 284
 ppa
-79.0
+63.0
 1
 0
 Number
@@ -2674,7 +2685,7 @@ INPUTBOX
 700
 285
 pta
-79.0
+63.0
 1
 0
 Number
@@ -3071,7 +3082,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-25.0
+22.75143986945578
 1
 1
 NIL
@@ -3097,7 +3108,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-7.0
+6.0
 1
 1
 NIL
@@ -3123,7 +3134,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-20.0
+75.0
 1
 1
 NIL
@@ -3168,7 +3179,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+0.0
 1
 1
 NIL
@@ -3194,7 +3205,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3321,7 +3332,7 @@ SWITCH
 585
 SchoolPolicyActive
 SchoolPolicyActive
-1
+0
 1
 -1000
 
@@ -3360,7 +3371,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-80.0
+40.0
 1
 1
 NIL
@@ -3375,7 +3386,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-80.0
+40.0
 1
 1
 NIL
@@ -3608,7 +3619,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.33
+0.34888431362956596
 .01
 1
 NIL
@@ -3728,7 +3739,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+2
 
 PLOT
 2378
@@ -4283,7 +4294,33 @@ CHOOSER
 Stage_123
 Stage_123
 0 1 2 3 4
+4
+
+MONITOR
+56
+765
+166
+810
+Recovered Cases
+recoveredcases
+0
 1
+11
+
+SLIDER
+149
+76
+329
+109
+Recovered_proportion
+Recovered_proportion
+0
+1
+0.2
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15479,7 +15516,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="7"/>
+      <value value="6"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>
@@ -15612,6 +15649,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="quarantine">
       <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Recovered_Proportion">
+      <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="ReInfectionRate">
       <value value="0"/>
