@@ -2,6 +2,7 @@ extensions [ rngs profiler ]
 
 globals [
 
+  recoveredcases
   anxietyFactor
   NumberInfected
   InfectionChange
@@ -565,11 +566,18 @@ to go ;; these funtions get called each time-step
   ;;calculateCashPosition
   calculateObjfunction
   updateoutside
+  countrecoveredcases ;; counts existing cases (yellow)
   ;;updatestudentStatus
   ;;incursion
   ask patches [ checkutilisation ]
  tick
 
+end
+
+to countrecoveredcases
+  if ticks = 1 [
+    set recoveredcases ( Total_Population * Recovered_proportion )
+  ]
 end
 
 
@@ -964,6 +972,7 @@ to scaleup ;; this function scales up the simulation over 5 phases at base 10 to
         set ownMaskEfficacy maskWearEfficacy * 100
     ]
 
+ ask n-of (count simuls * recovered_proportion ) simuls with [ color = 85 ] [ set color yellow ] ;; this should maintain existing pre-condition recovered plus add the new ones
 
  set contact_Radius Contact_Radius + (90 / 4)
     Set days 0
@@ -1956,7 +1965,7 @@ MONITOR
 493
 742
 Total # Infected
-numberInfected
+numberInfected + recoveredcases
 0
 1
 14
@@ -1970,7 +1979,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.01
+0.05
 .05
 1
 NIL
@@ -2038,7 +2047,7 @@ MONITOR
 491
 872
 % Total Infections
-numberInfected / Total_Population * 100
+( numberInfected + recoveredcases ) / Total_Population * 100
 2
 1
 14
@@ -2081,7 +2090,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2096,7 +2105,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2422,7 +2431,7 @@ NIL
 10.0
 true
 false
-"" "if Scalephase = 1 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10000 ]"
+"" "if Scalephase = 1 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10 ] \nif ScalePhase = 2 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 100 ] \nif ScalePhase = 3 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 1000 ]\nif ScalePhase = 4 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 10000 ]\nif ScalePhase = 5 [ plot count simuls with [ color = red and int timenow = Case_Reporting_Delay ] * 100000 ]"
 PENS
 "New Cases" 1.0 1 -5298144 true "" "if scalephase = 0 [ plot count simuls with [ color = red and timenow = Case_Reporting_Delay ] ]"
 "Reported Cases" 1.0 0 -16777216 true "" "plot reportedCases"
@@ -2466,7 +2475,7 @@ Contact_Radius
 Contact_Radius
 0
 180
-0.0
+-22.5
 1
 1
 NIL
@@ -2665,7 +2674,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+23.0
 1
 0
 Number
@@ -2676,7 +2685,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+23.0
 1
 0
 Number
@@ -3073,7 +3082,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-25.368143369888287
+25.475248883217393
 1
 1
 NIL
@@ -3099,7 +3108,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-12.0
+7.0
 1
 1
 NIL
@@ -3196,7 +3205,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -3362,7 +3371,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+20.0
 1
 1
 NIL
@@ -3377,7 +3386,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+20.0
 1
 1
 NIL
@@ -3610,7 +3619,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.28743816736105793
+0.33203878928930236
 .01
 1
 NIL
@@ -3730,7 +3739,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-0
+1
 
 PLOT
 2378
@@ -3803,7 +3812,7 @@ SWITCH
 691
 SelfGovern
 SelfGovern
-1
+0
 1
 -1000
 
@@ -4271,7 +4280,7 @@ threshold_Multiplier
 threshold_Multiplier
 1
 186
-1.0
+186.0
 1
 1
 NIL
@@ -4286,6 +4295,21 @@ Stage_123
 Stage_123
 0 1 2 3 4
 4
+
+SLIDER
+142
+80
+322
+113
+Recovered_proportion
+Recovered_proportion
+0
+1
+0.2
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15837,7 +15861,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
-      <value value="12"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>
@@ -15971,6 +15995,9 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <enumeratedValueSet variable="quarantine">
       <value value="true"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="Recovered_proportion">
+      <value value="0.2"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="ReInfectionRate">
       <value value="0"/>
     </enumeratedValueSet>
@@ -16049,6 +16076,8 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="threshold_Multiplier">
       <value value="1"/>
+      <value value="46.5"/>
+      <value value="186"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="TimeLockDownOff">
       <value value="28"/>
