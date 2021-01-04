@@ -1743,7 +1743,7 @@ SWITCH
 166
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1805,7 +1805,7 @@ SWITCH
 203
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1885,7 +1885,7 @@ SWITCH
 348
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2090,7 +2090,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+23.0
 .5
 1
 NIL
@@ -2105,7 +2105,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+23.0
 .5
 1
 NIL
@@ -2475,7 +2475,7 @@ Contact_Radius
 Contact_Radius
 0
 180
--22.5
+0.0
 1
 1
 NIL
@@ -3739,7 +3739,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 4
-1
+0
 
 PLOT
 2378

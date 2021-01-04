@@ -1194,9 +1194,9 @@ end
 to seedCases ;; set up to take the pre-intervention growth pre ******August 31th ********* and use it to seed new cases in the next week - must be updated each day 1_9_2020 =244.02*EXP(-0.09)^G55
 
 ;; Vic @ 90
-    if ticks < seedticks and scalephase = 0 [ ask n-of  30 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 1 [ ask n-of  3 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
-    if ticks < seedticks and scalephase = 2 [ ask n-of int .3 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 0 [ ask n-of  10 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 1 [ ask n-of  1 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
+    if ticks < seedticks and scalephase = 2 [ ask n-of int .1 simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
 
 ;    if ticks < seedticks and scalephase = 0 [ ask n-of int ((244 * (.914 ^ (ticks + 15))) )  simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100 set unDetectedFlag  0 ]]
 ;    if ticks < seedticks and scalephase = 1 [ ask n-of int ((244 * (.914 ^ (ticks + 15))) / 10  ) simuls with [ color = 85 ] [ set color red set timenow int Case_reporting_delay - 1 set Essentialworker random 100  set unDetectedFlag  0 ]]
