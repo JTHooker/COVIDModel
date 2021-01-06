@@ -1623,7 +1623,7 @@ end
 
 to HHContactsIso
   ifelse  isolate = true and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set shape "star" set isolating 1 ] [ set shape "dot" set isolating 0 ]
-  if isolating = 1 and color = red [ set tracked 1 ] ;; this identifies people in the system earlier because they get a test straight away having been a close contact of someone in their house
+  if isolating = 1 and color = red [ set tracked 1 ] ;
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
