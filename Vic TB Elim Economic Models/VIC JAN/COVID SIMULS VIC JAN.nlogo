@@ -180,6 +180,8 @@ simuls-own [
   unDetectedFlag;; Indicates whether they are detected or not.
   returntoschool ;; a random number between 0 and 100 that determines whether the person will return to school (assuming they are a student) at time x
   isolating ;; is the person currently isolating?
+  vaccinated ;; is the person vaccinated?
+  vacc_Effective ;; is this effective in this person?
 
 
   contacts7 ;; contacts from seven days ago
@@ -501,7 +503,7 @@ to assigndetectablestatus
 end
 
 to go ;; these funtions get called each time-step
-  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage checkMask updatepersonalvirulence visitDestination HHContactsIso ] ;; calculateIncomeperday earn financialstress
+  ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage checkMask updatepersonalvirulence visitDestination HHContactsIso vaccinate_me ] ;; calculateIncomeperday earn financialstress
   ; *current excluded functions for reducing processing resources**
   ask medresources [ allocatebed ]
   ask resources [ deplete replenish resize spin ]
@@ -1625,6 +1627,10 @@ to HHContactsIso
   ifelse  isolate = true and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set shape "star" set isolating 1 ] [ set shape "dot" set isolating 0 ]
   if isolating = 1 and color = red [ set tracked 1 ] ;; this identifies people in the system earlier because they get a test straight away having been a close contact of someone in their house
 end
+
+to vaccinate_me
+  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 316
@@ -1728,7 +1734,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1805,7 +1811,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1885,7 +1891,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2108,7 +2114,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+63.0
 .5
 1
 NIL
@@ -2123,7 +2129,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+63.0
 .5
 1
 NIL
@@ -4243,13 +4249,54 @@ SLIDER
 1155
 88
 1343
-123
+121
 Mask_Efficacy_Discount
 Mask_Efficacy_Discount
 0
 1
 0.33
 .01
+1
+NIL
+HORIZONTAL
+
+SWITCH
+1398
+80
+1524
+115
+Vaccine_Avail
+Vaccine_Avail
+1
+1
+-1000
+
+SLIDER
+1532
+82
+1705
+117
+Vaccine_Rate
+Vaccine_Rate
+0
+1000
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1710
+82
+1883
+117
+VEffectiveness
+VEffectiveness
+0
+100
+60.0
+1
 1
 NIL
 HORIZONTAL
@@ -4654,7 +4701,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -15793,6 +15840,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Global_Transmissability">
       <value value="25"/>
+      <value value="40"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Hospital_Beds_in_Australia">
       <value value="65000"/>
@@ -15831,25 +15879,25 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay1_d">
-      <value value="20"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
-      <value value="20"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay3">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday3_d">
-      <value value="20"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay4">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday4_d">
-      <value value="20"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="link_switch">
       <value value="true"/>
@@ -15979,10 +16027,6 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage">
       <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
@@ -16030,6 +16074,15 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="UpperStudentAge">
       <value value="18"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Vaccine_Avail">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="VEffectiveness">
+      <value value="70"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Vaccine_Rate">
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Visit_Frequency">
       <value value="3"/>
