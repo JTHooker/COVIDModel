@@ -1367,7 +1367,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
    ;; if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
-   ;; if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
+    if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
 
@@ -1756,7 +1756,7 @@ Span
 Span
 0
 30
-30.0
+15.0
 1
 1
 NIL
@@ -1979,7 +1979,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.4368583389944976
 .05
 1
 NIL
@@ -2108,7 +2108,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+64.0
 .5
 1
 NIL
@@ -2123,7 +2123,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+64.0
 .5
 1
 NIL
@@ -2691,7 +2691,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+63.0
 1
 0
 Number
@@ -2702,7 +2702,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+63.0
 1
 0
 Number
@@ -2931,7 +2931,7 @@ SWITCH
 1066
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -3171,7 +3171,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+50.0
 1
 1
 NIL
@@ -3216,7 +3216,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3242,7 +3242,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+90.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+52.0
 1
 1
 NIL
@@ -3423,7 +3423,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+52.0
 1
 1
 NIL
@@ -3776,7 +3776,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-0
+2
 
 PLOT
 2378
@@ -15703,7 +15703,7 @@ set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4</setup>
     <go>go</go>
-    <timeLimit steps="180"/>
+    <timeLimit steps="365"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>

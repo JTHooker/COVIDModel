@@ -1348,7 +1348,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
 
  ;;************************************************************************************************************************************
 
- ;;
+ ;;   VIC Jan Section
 
    ;;up
 
@@ -1367,7 +1367,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage = 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
    ;; if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
-   ;; if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
+    if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
 
@@ -2108,7 +2108,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2123,7 +2123,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-0.0
+24.0
 .5
 1
 NIL
@@ -2691,7 +2691,7 @@ INPUTBOX
 609
 284
 ppa
-0.0
+23.0
 1
 0
 Number
@@ -2702,7 +2702,7 @@ INPUTBOX
 700
 285
 pta
-0.0
+23.0
 1
 0
 Number
@@ -2931,7 +2931,7 @@ SWITCH
 1066
 link_switch
 link_switch
-1
+0
 1
 -1000
 
@@ -3119,7 +3119,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.82020586177844
+37.809526488350684
 1
 1
 NIL
@@ -3171,7 +3171,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-100.0
+75.0
 1
 1
 NIL
@@ -3216,7 +3216,7 @@ App_Uptake
 App_Uptake
 0
 100
-20.0
+30.0
 1
 1
 NIL
@@ -3242,7 +3242,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-50.0
+90.0
 1
 1
 NIL
@@ -3408,7 +3408,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-0.0
+15.0
 1
 1
 NIL
@@ -3423,7 +3423,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-0.0
+15.0
 1
 1
 NIL
@@ -3656,7 +3656,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3772138963752026
+0.3414323829286508
 .01
 1
 NIL
@@ -3776,7 +3776,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-0
+1
 
 PLOT
 2378
@@ -15703,7 +15703,7 @@ set Essential_Workers Essential_Workers + random-normal 0 2
 set Superspreaders Superspreaders + random-normal 0 2
 set App_uptake App_Uptake + random-normal 0 4</setup>
     <go>go</go>
-    <timeLimit steps="180"/>
+    <timeLimit steps="365"/>
     <metric>count turtles</metric>
     <metric>ticks</metric>
     <metric>numberInfected</metric>
@@ -15831,25 +15831,25 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay1_d">
-      <value value="20"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay2">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday2_d">
-      <value value="20"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay3">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday3_d">
-      <value value="20"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="JudgeDay4">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Judgeday4_d">
-      <value value="20"/>
+      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="link_switch">
       <value value="true"/>
@@ -15978,11 +15978,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
       <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Stage">
-      <value value="0"/>
       <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="stimulus">
       <value value="false"/>
