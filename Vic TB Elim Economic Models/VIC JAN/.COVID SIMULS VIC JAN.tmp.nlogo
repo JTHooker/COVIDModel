@@ -1355,20 +1355,18 @@ to COVIDPolicyTriggers ;; used in idynamic model
    ;;up
 
 
-    ;;if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-    ;;if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
     if stage <= 2 and casesinperiod7 >= twotothree and ticks = resetdate and ( ticks - decisionDate) > Judgeday3 [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    ;;if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
+    if stage <= 3 and casesinperiod7 >= threetofour and ticks = resetdate and ( ticks - decisionDate) > Judgeday4 [ set stage 4 set resetdate (ticks + 1) set decisionDate ticks ] ;; these all jump back up to stage 4
   ;;  if stage <= 3 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage stage + 1 set resetdate (ticks + 1) set decisionDate ticks ] ;; this tightens one stage if the other triggers are not met
 
   ;; down
 
-    ;;if stage = 4 and ticks = 14 [ set stage 3.9 set resetdate (ticks + 1) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
-   ;; if stage = 3.9 and ticks > 14 and casesinperiod7 < fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-   ;; if stage = 4 and ticks > 14 and casesinperiod7 < fourtothree and ticks = resetdate and (ticks - decisionDate) > judgeday4_d [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
-    if stage = 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
-   ;; if stage = 1 and casesinperiod28 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
+    if stage = 4 and BaseStage < 4 and casesinPeriod7 < fourtothree [ set stage 3 set resetdate (ticks + 1) set decisionDate ticks ] ; ramps down to 3.9 on September 15th
+    if stage = 3 and BaseStage < 3 and casesinperiod7 < threetotwo and ticks = resetdate and (ticks - decisionDate) > judgeday3_d [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
+    if stage = 2 and BaseStage < 2 and casesinperiod7 < twotoone and ticks = resetdate and (ticks - decisionDate) > judgeday2_d [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
+    if stage = 1 and BaseStage < 1 and casesinperiod7 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
 ;;Previous
@@ -1734,7 +1732,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1811,7 +1809,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1891,7 +1889,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -1985,7 +1983,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.4368583389944976
+0.5529470956183693
 .05
 1
 NIL
@@ -2114,7 +2112,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-63.0
+64.0
 .5
 1
 NIL
@@ -2129,7 +2127,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-63.0
+64.0
 .5
 1
 NIL
@@ -3151,7 +3149,7 @@ Global_Transmissability
 Global_Transmissability
 0
 100
-25.0
+40.0
 1
 1
 NIL
@@ -4300,6 +4298,16 @@ VEffectiveness
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+1958
+76
+2097
+122
+BaseStage
+BaseStage
+0 1 2 3 4
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15786,6 +15794,13 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Available_Resources">
       <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="BaseStage">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Bed_Capacity">
       <value value="4"/>
