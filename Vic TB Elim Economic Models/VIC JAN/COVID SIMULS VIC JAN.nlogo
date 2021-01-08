@@ -1353,7 +1353,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
  ;;   VIC Jan Section
 
    ;;up
-
+ if ticks > 7 [
 
     if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
@@ -1369,6 +1369,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 1 and BaseStage < 1 and casesinperiod7 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
+    ]
 ;;Previous
 
     ;      ;;up
@@ -1983,7 +1984,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.5529470956183693
+0.5161012433761284
 .05
 1
 NIL
