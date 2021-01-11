@@ -94,6 +94,8 @@ globals [
   PrimaryUpper
   SecondaryLower
 
+  meanIDTime
+
 
   ;; log transform illness period variables
   Illness_PeriodVariance
@@ -182,6 +184,7 @@ simuls-own [
   isolating ;; is the person currently isolating?
   vaccinated ;; is the person vaccinated?
   vacc_Effective ;; is this effective in this person?
+  IDTime ;; days into infection the person is identified as a case
 
 
   contacts7 ;; contacts from seven days ago
@@ -560,6 +563,7 @@ to go ;; these funtions get called each time-step
   updateoutside
   ;;updatestudentStatus
   incursion
+  CalculateMeanIDTime
   ask patches [ checkutilisation ]
  tick
 
@@ -1073,7 +1077,7 @@ end
 
 
 to traceme
-  if tracked != 1 and tracking = true [ if color = red and track_and_trace_efficiency > random-float 1 and unDetectedFlag = 0 [ set tracked 1 ] ] ;; this represents the standard tracking and tracing regime - undetected people are not tracked
+  if tracked != 1 and tracking = true [ if color = red and track_and_trace_efficiency > random-float 1 and unDetectedFlag = 0 [ set tracked 1 set IDTime timenow ] ] ;; this represents the standard tracking and tracing regime - undetected people are not tracked
    if color != red and count my-in-links = 0 [ set hunted 0 set tracked 0 ] ;; this ensures that hunted people are tracked but that tracked people are not necessarily hunted
 end
 
@@ -1353,7 +1357,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
  ;;   VIC Jan Section
 
    ;;up
-
+ if ticks > 7 [
 
     if stage = 0 and casesinperiod7 >= zerotoone and ticks = resetdate and ( ticks - decisionDate) > Judgeday1 [ set stage 1 set resetdate (ticks + 1 ) set decisionDate ticks ]
     if stage <= 1 and casesinperiod7 >= onetotwo and ticks = resetdate and ( ticks - decisionDate) > Judgeday2 [ set stage 2 set resetdate (ticks + 1) set decisionDate ticks ]
@@ -1369,6 +1373,7 @@ to COVIDPolicyTriggers ;; used in idynamic model
     if stage = 1 and BaseStage < 1 and casesinperiod7 < zerotoone and ticks = resetdate and (ticks - decisionDate) > judgeday1_d [ set stage 0 set decisionDate ticks ]
     if ticks > 0 and ticks = resetdate [ set resetdate (ticks + 1 ) ]
 
+    ]
 ;;Previous
 
     ;      ;;up
@@ -1629,6 +1634,10 @@ end
 to vaccinate_me
   if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
 end
+
+to CalculateMeanIDTime
+    set meanIDTime mean [ IDTime ] of simuls with [ color != 85 ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 316
@@ -1760,7 +1769,7 @@ Span
 Span
 0
 30
-15.0
+30.0
 1
 1
 NIL
@@ -1983,7 +1992,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.5529470956183693
+0.3576154346128669
 .05
 1
 NIL
@@ -2112,7 +2121,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-64.0
+0.0
 .5
 1
 NIL
@@ -2127,7 +2136,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-64.0
+0.0
 .5
 1
 NIL
@@ -2695,7 +2704,7 @@ INPUTBOX
 609
 284
 ppa
-63.0
+0.0
 1
 0
 Number
@@ -2706,7 +2715,7 @@ INPUTBOX
 700
 285
 pta
-63.0
+0.0
 1
 0
 Number
@@ -2935,7 +2944,7 @@ SWITCH
 1066
 link_switch
 link_switch
-0
+1
 1
 -1000
 
@@ -3123,7 +3132,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-34.82020586177844
+37.652294726613725
 1
 1
 NIL
@@ -3175,7 +3184,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -3220,7 +3229,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+20.0
 1
 1
 NIL
@@ -3246,7 +3255,7 @@ Mask_Wearing
 Mask_Wearing
 0
 100
-90.0
+50.0
 1
 1
 NIL
@@ -3412,7 +3421,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-52.0
+0.0
 1
 1
 NIL
@@ -3427,7 +3436,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-52.0
+0.0
 1
 1
 NIL
@@ -3660,7 +3669,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.3772138963752026
+0.4454126684490638
 .01
 1
 NIL
@@ -3780,7 +3789,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-2
+0
 
 PLOT
 2378
@@ -4094,7 +4103,7 @@ INPUTBOX
 1824
 194
 JudgeDay1_d
-20.0
+1.0
 1
 0
 Number
@@ -4105,7 +4114,7 @@ INPUTBOX
 1828
 255
 Judgeday2_d
-20.0
+1.0
 1
 0
 Number
@@ -4116,7 +4125,7 @@ INPUTBOX
 1831
 317
 Judgeday3_d
-20.0
+1.0
 1
 0
 Number
@@ -4127,7 +4136,7 @@ INPUTBOX
 1829
 380
 Judgeday4_d
-20.0
+1.0
 1
 0
 Number
@@ -4262,7 +4271,7 @@ SWITCH
 1398
 80
 1524
-115
+113
 Vaccine_Avail
 Vaccine_Avail
 1
@@ -4273,12 +4282,12 @@ SLIDER
 1532
 82
 1705
-117
+115
 Vaccine_Rate
 Vaccine_Rate
 0
-1000
-10.0
+700
+1.0
 1
 1
 NIL
@@ -4288,12 +4297,12 @@ SLIDER
 1710
 82
 1883
-117
+115
 VEffectiveness
 VEffectiveness
 0
 100
-60.0
+90.0
 1
 1
 NIL
@@ -4303,11 +4312,22 @@ CHOOSER
 1958
 76
 2097
-122
+121
 BaseStage
 BaseStage
 0 1 2 3 4
 0
+
+MONITOR
+58
+776
+147
+821
+Mean ID Time
+meanIDTime
+1
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -15777,6 +15797,7 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     <metric>CasesinPeriod14</metric>
     <metric>CasesinPeriod28</metric>
     <metric>objFunction</metric>
+    <metric>meanIDTime</metric>
     <enumeratedValueSet variable="Age_Isolation">
       <value value="0"/>
     </enumeratedValueSet>
@@ -16092,12 +16113,13 @@ set App_uptake App_Uptake + random-normal 0 4</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Vaccine_Avail">
       <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="VEffectiveness">
-      <value value="70"/>
+      <value value="90"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Vaccine_Rate">
-      <value value="10"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Visit_Frequency">
       <value value="3"/>
