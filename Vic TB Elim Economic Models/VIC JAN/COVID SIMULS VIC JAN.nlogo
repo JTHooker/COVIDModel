@@ -1632,7 +1632,10 @@ to HHContactsIso
 end
 
 to vaccinate_me
-  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
+;;  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
+
+if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85 [ set color yellow ]
+
 end
 
 to CalculateMeanIDTime
@@ -4322,7 +4325,7 @@ MONITOR
 58
 776
 147
-822
+821
 Mean ID Time
 meanIDTime
 1
@@ -4729,7 +4732,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
