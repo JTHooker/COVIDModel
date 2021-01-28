@@ -1099,7 +1099,7 @@ to assesslinks ;; this represents the COVID-Safe or other tracing app function
     [ if any? other simuls-here and GoldStandard > random 100 [ create-links-with other simuls-here with [ haveapp <= App_Uptake ] ] ] ;; other person must also have the app installed
     ;; asks tracked simuls who have the app to make links to other simuls who also have the app they are in contact with
   ask simuls with [ haveApp <= App_Uptake and agerange > 10 ] [ ask my-out-links [ set color blue ] ] ;; Covid-safe app out-links  are set to blue
-  ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red ] ] ;; in-links red but if there is an out and in-link it will be grey
+  ask simuls with [ haveApp > App_Uptake ] [ ask my-in-links [ set color red  ] ] ;; in-links red but if there is an out and in-link it will be grey
 
   ask simuls with [ color != red ] [ ask my-out-links [ die ] ] ;; asks all links coming from the infected agent to die
   ask simuls with [ color = yellow ] [ ask my-in-links [ die ] ] ;; asks all links going to the recovered agent to die
@@ -1108,7 +1108,8 @@ end
 
 to hunt ;; this specifically uses the app to trace people
   if link_switch = true [
-    if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+   ;; if Track_and_Trace_Efficiency * TTIncrease > random-float 1 and count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]  ;; I need to only activate this if the index case is tracked
+    if count my-links > 0 and haveApp <= App_Uptake [ set hunted 1 ]
   if hunted = 1 [ set tracked 1 ]
   ]  ;;
 end
@@ -1276,7 +1277,7 @@ to-report nonesspercentage
 end
 
 to traceadjust
-  ifelse casesinperiod7 > 0 [ set track_and_trace_efficiency (0.63219 - 0.07213 * ln(casesinperiod7))] [ set track_and_trace_efficiency .25 ]
+  ifelse casesinperiod7 > 0 [ set track_and_trace_efficiency (0.63219 - (0.07213 * ln(casesinperiod7)))] [ set track_and_trace_efficiency .25 ] ;; fix this so it doesn't go negative
 
 ;  set track_and_trace_efficiency .25 ;; kept stable here for simplicity
 ;  if scalephase = 0 [ set track_and_trace_efficiency .25 ]
@@ -1408,37 +1409,37 @@ to setupstages
  ;;   This section for 31_8_2020
 
     if stage = 0 and ticks = resetdate [ set span 30 set pta 0 set ppa 0 set spatial_distance false set age_isolation 0 set case_isolation false set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 20 set residualcautionPTA 0
+  set OS_Import_Proportion 0 set link_switch false set Essential_Workers 100 set maskPolicy true set mask_wearing 50 set tracking false set App_Uptake 100 set residualcautionPTA 0
       set residualcautionPPA 0 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 1 and ticks = resetdate [ set span 30 set pta 25 set ppa 25 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 15
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 75 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 15
       set residualcautionPPA 15 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 100 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 100 [ set studentflag 1 ] set superspreaders 10 ]]
 
   if stage = 2 and ticks = resetdate [ set span 15 set pta 65 set ppa 65 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive true
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 52
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 50 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 52
       set residualcautionPPA 52 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 40 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ] set superspreaders 10 ]]
 
     if stage = 3.3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends older children back
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 68 ;; this sends older children back
       set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true  ask simuls [ if agerange = 5 and returntoschool <= 33 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ]
        if agerange = 5 and returntoschool > 50 [ set studentFlag 0 ]] ask simuls [ if agerange = 15 and returntoschool > 33 [ set studentflag 0 ]  set superspreaders 5 ]]
 
     if stage = 3.4 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 68 ;; this sends younger students back to school up to age 10
       set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true ask simuls [ if agerange = 5 and returntoschool <= 33 [ set studentFlag 1 ]] ask simuls [ if agerange = 15 and returntoschool < 15 [ set studentflag 1 ]
        if agerange = 5 and returntoschool > 33 [ set studentFlag 0 ]] ask simuls [ if agerange = 15 and returntoschool > 20 [ set studentflag 0 ] set superspreaders 5 ]]
 
     if stage = 3 and ticks = resetdate [ set span 10 set pta 85 set ppa 85 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 25 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 68 ;; 25% essentialworkers represents increase of ~150,000 FTE from 3.9
     set residualcautionPPA 68 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 5 ask simuls [ set studentFlag 0 ] ]
 
    if stage = 3.9 and ticks = resetdate [ set span 7 set pta 89 set ppa 89 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 80
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 80
     set residualcautionPPA 80 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 3 ask simuls [ set studentFlag 0 ] ] ;; check st
 
   if stage = 4 and ticks = resetdate [ set span 5 set pta 90 set ppa 90 set spatial_distance true set age_isolation 0 set case_isolation true set schoolsPolicy true set quarantine true set schoolPolicyActive false
-  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 30 set residualcautionPTA 81
+  set OS_Import_Proportion 0 set link_switch true set Essential_Workers 20 set maskPolicy true set mask_wearing 90 set tracking true set App_Uptake 100 set residualcautionPTA 81
       set residualcautionPPA 81 set proportion_people_avoid ppa set proportion_time_avoid pta set complacency true set superspreaders 2 ask simuls [ set studentFlag 0 ] ]
 
 
@@ -1627,14 +1628,15 @@ to incursion
 end
 
 to HHContactsIso
-  ifelse  isolate = true and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set shape "star" set isolating 1 ] [ set shape "dot" set isolating 0 ]
+  ifelse isolate = true and color = 85 and any? other simuls with [ householdunit = [ householdunit] of myself and tracked = 1 ] [ move-to homelocation set pace 0 set isolating 1 ] [ set isolating 0 ]
   if isolating = 1 and color = red [ set tracked 1 ] ;; this identifies people in the system earlier because they get a test straight away having been a close contact of someone in their house
 end
 
 to vaccinate_me
 ;;  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
 
-if vaccine_Avail = true and vaccine_rate > random-float 1000 and vacc_Effective < VEffectiveness and color = 85 [ set color yellow set vaccinated 1  ]
+if vaccine_Avail = true and vaccine_rate > random-float 1000 and vacc_Effective < VEffectiveness and color = 85 [ set shape "person" set vaccinated 1 set ownincubationperiod ( ownincubationperiod / 5 ) set ownillnessperiod (ownillnessperiod / 5 ) ]
+  ;; identifies vaccinated people, compresses the incubation and illness period
 
 end
 
@@ -1744,7 +1746,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1772,7 +1774,7 @@ Span
 Span
 0
 30
-30.0
+15.0
 1
 1
 NIL
@@ -1821,7 +1823,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1901,7 +1903,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2124,7 +2126,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-23.0
+62.0
 .5
 1
 NIL
@@ -2139,7 +2141,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-23.0
+62.0
 .5
 1
 NIL
@@ -2268,8 +2270,8 @@ Compliance_with_Isolation
 Compliance_with_Isolation
 0
 100
-95.0
-5
+99.0
+1
 1
 NIL
 HORIZONTAL
@@ -2707,7 +2709,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+62.0
 1
 0
 Number
@@ -2718,7 +2720,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+62.0
 1
 0
 Number
@@ -3187,7 +3189,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-75.0
+50.0
 1
 1
 NIL
@@ -3232,7 +3234,7 @@ App_Uptake
 App_Uptake
 0
 100
-30.0
+100.0
 1
 1
 NIL
@@ -3424,7 +3426,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3439,7 +3441,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-15.0
+52.0
 1
 1
 NIL
@@ -3792,7 +3794,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-1
+2
 
 PLOT
 2378
@@ -4079,10 +4081,10 @@ fourtothree
 Number
 
 MONITOR
-243
-898
-325
-943
+229
+888
+311
+933
 Yellow (raw)
 count simuls with [ color = yellow ]
 0
@@ -4251,7 +4253,7 @@ SWITCH
 120
 Isolate
 Isolate
-0
+1
 1
 -1000
 
@@ -4277,7 +4279,7 @@ SWITCH
 113
 Vaccine_Avail
 Vaccine_Avail
-1
+0
 1
 -1000
 
@@ -4341,7 +4343,7 @@ GoldStandard
 GoldStandard
 0
 100
-95.0
+100.0
 1
 1
 NIL
