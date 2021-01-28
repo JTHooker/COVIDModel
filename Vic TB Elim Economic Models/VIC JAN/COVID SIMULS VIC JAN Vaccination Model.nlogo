@@ -564,6 +564,7 @@ to go ;; these funtions get called each time-step
   ;;updatestudentStatus
   incursion
   CalculateMeanIDTime
+  VaccineBrand
   ask patches [ checkutilisation ]
  tick
 
@@ -1635,13 +1636,19 @@ end
 to vaccinate_me
 ;;  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
 
-if vaccine_Avail = true and vaccine_rate > random-float 1000 and vacc_Effective < VEffectiveness and color = 85 [ set shape "person" set vaccinated 1 set ownincubationperiod ( ownincubationperiod / 5 ) set ownillnessperiod (ownillnessperiod / 5 ) ]
+if vaccine_Avail = true and vaccine_rate > random-float 1000 and vacc_Effective < Vaccine_Efficacy and color = 85 [ set shape "person" set vaccinated 1 set ownincubationperiod ( ownincubationperiod / 5 ) set ownillnessperiod (ownillnessperiod / 5 ) ]
   ;; identifies vaccinated people, compresses the incubation and illness period
 
 end
 
 to CalculateMeanIDTime
     set meanIDTime mean [ IDTime ] of simuls with [ color != 85 ]
+end
+
+to VaccineBrand
+  if Vaccine_Type = "AstraZeneca" [ set Vaccine_Efficacy 70 ]
+  if Vaccine_Type = "Pfizer/BioNTech" [ set Vaccine_Efficacy 95 ]
+  if Vaccine_Type = "Moderna" [ set Vaccine_Efficacy 94 ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1774,7 +1781,7 @@ Span
 Span
 0
 30
-15.0
+30.0
 1
 1
 NIL
@@ -1997,7 +2004,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.5529470956183693
 .05
 1
 NIL
@@ -2126,7 +2133,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-62.0
+24.0
 .5
 1
 NIL
@@ -2141,7 +2148,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-62.0
+24.0
 .5
 1
 NIL
@@ -2709,7 +2716,7 @@ INPUTBOX
 609
 284
 ppa
-62.0
+23.0
 1
 0
 Number
@@ -2720,7 +2727,7 @@ INPUTBOX
 700
 285
 pta
-62.0
+23.0
 1
 0
 Number
@@ -3086,7 +3093,7 @@ PLOT
 543
 2646
 665
-Dist_Incubation
+Dist_Incubation_Pd
 NIL
 NIL
 0.0
@@ -3189,7 +3196,7 @@ Essential_Workers
 Essential_Workers
 0
 100
-50.0
+75.0
 1
 1
 NIL
@@ -3426,7 +3433,7 @@ ResidualCautionPPA
 ResidualCautionPPA
 0
 100
-52.0
+15.0
 1
 1
 NIL
@@ -3441,7 +3448,7 @@ ResidualCautionPTA
 ResidualCautionPTA
 0
 100
-52.0
+15.0
 1
 1
 NIL
@@ -3794,7 +3801,7 @@ CHOOSER
 Stage
 Stage
 0 1 2 3 3.3 3.4 3.5 3.9 4
-2
+1
 
 PLOT
 2378
@@ -4253,7 +4260,7 @@ SWITCH
 120
 Isolate
 Isolate
-1
+0
 1
 -1000
 
@@ -4303,11 +4310,11 @@ SLIDER
 82
 1883
 115
-VEffectiveness
-VEffectiveness
+Vaccine_Efficacy
+Vaccine_Efficacy
 0
 100
-63.0
+95.0
 1
 1
 NIL
@@ -4358,6 +4365,27 @@ MaxStage
 MaxStage
 0 1 2 3 4
 4
+
+MONITOR
+1533
+33
+1623
+79
+Vaccinated %
+( count simuls with [ shape = \"person\" ] / 2500 )* 100
+2
+1
+11
+
+CHOOSER
+2363
+72
+2502
+118
+Vaccine_Type
+Vaccine_Type
+"AstraZeneca" "Moderna" "Pfizer/BioNTech" "Other"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
