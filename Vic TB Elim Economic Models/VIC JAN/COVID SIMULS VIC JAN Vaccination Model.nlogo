@@ -185,6 +185,8 @@ simuls-own [
   vaccinated ;; is the person vaccinated?
   vacc_Effective ;; is this effective in this person?
   IDTime ;; days into infection the person is identified as a case
+  VaccPhase ;; phase at which this person would receive vaccine
+  comorbidityState ;; does the person have a comorbidity
 
 
   contacts7 ;; contacts from seven days ago
@@ -276,8 +278,8 @@ to setup
   ask n-of Population patches with [ pcolor = black ]
     [ sprout-simuls 1
       [ set size 2 set shape "dot" set color 85 set householdUnit random 1000 set agerange 95  set timenow 0 set IncubationPd int ownIncubationPeriod set InICU 0 set anxiety 0 set sensitivity random-float 1 set R 0
-        set income random-exponential mean_Individual_Income    move-to one-of patches with [ pcolor = black  ]
-        set riskofdeath .01 set personalTrust random-normal 75 10  set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 10 set haveApp random 100
+        set income random-exponential mean_Individual_Income move-to one-of patches with [ pcolor = black  ]
+        set riskofdeath .01 set personalTrust random-normal 75 10  set WFHCap random 100 set requireICU random 100 set personalVirulence random-normal Global_Transmissability 2.5 set haveApp random 100
         set wearsMask random 100 ;; resethealth resetincome calculateincomeperday calculateexpenditureperday resettrust
 
         set detectable random 100 ;; identifies whether the person is detectable or not
@@ -287,6 +289,8 @@ to setup
         set ownIncubationPeriod ( exp random-normal Minc Sinc ) ;;; log transform of incubation period
         ;;set ownComplianceWithIsolation ( exp random-normal Mcomp SComp )  ;; log transform of compliance with isolation
 
+        set VaccPhase 4
+        set comorbidityState random 100
 
         rngs:init ;; replacing previous log transform with beta distribution
         let stream_id random-float 999
@@ -345,6 +349,8 @@ to setup
 
   matchages ;; assigns risk to age ranges (see below)
 
+  ask simuls [ setphases ] ;;; setting up the phase that everyone is in for vaccination
+
   ask simuls [ set health ( 100 - Agerange + random-normal 0 2 ) calculateDailyrisk setdeathrisk    ] ;; spend CalculateIncomePerday
 
   ;;assigns health based on age plus error, perfoms all other functions listed in the brackets - see details of each, below
@@ -386,8 +392,6 @@ to setup
   ask simuls [
     if agerange = 5 and 60 > random 100 [ set AsymptomaticFlag 1 ]
   ]
-
-
 
   ;;set tracking false ;; ensures this is set to false each time the model starts
   ;;set link_switch false ;; ensures this is set to false each timme the model starts
@@ -504,6 +508,14 @@ end
 to assigndetectablestatus
   if asymptomaticFlag = 1 and detectable < Undetected_Proportion [ set unDetectedFlag 1 ]
 end
+
+to setphases ;; who is in which vaccination phase
+  if agerange >= 65 or EssentialWorker = 1 or comorbidityState < PropWithComorbidity [ set VaccPhase 1 ]
+  if agerange >= 45 and agerange < 65 [ set VaccPhase 2 ] ;; plus whatever other characteristics you are interested in and the number of phases you want
+  if agerange >= 20 and agerange < 45 [ set VaccPhase 3 ]
+  if agerange < 20 [ set Vaccphase 4 ]
+end
+
 
 to go ;; these funtions get called each time-step
   ask simuls [ move recover settime death isolation reinfect createanxiety gatherreseources treat Countcontacts respeed checkICU traceme EssentialWorkerID hunt AccessPackage checkMask updatepersonalvirulence visitDestination HHContactsIso vaccinate_me ] ;; calculateIncomeperday earn financialstress
@@ -1624,8 +1636,10 @@ end
 ;  ask simuls with [ agerange = 15 ] [ set studentFlag 1 ]
 ;end
 
-to incursion
+to incursion ;; randomly asks someone to become infected
   if ticks > 0 and currentinfections = 0 and IncursionRate > random-float 100 [ ask one-of simuls with [ color = 85 ] [ set color red ]]
+
+  ;; if ticks = 100 [ ask n-of 10 simuls with color = 85 [ set color red ] ] ;; or something
 end
 
 to HHContactsIso
@@ -1633,23 +1647,33 @@ to HHContactsIso
   if isolating = 1 and color = red [ set tracked 1 ] ;; this identifies people in the system earlier because they get a test straight away having been a close contact of someone in their house
 end
 
-to vaccinate_me
-;;  if vaccine_Avail = true and vaccine_rate > random 1000 and vacc_Effective < VEffectiveness and color = 85  and ageRange > 60 and Essentialworkerflag = 1 [ set color yellow ]
-
-if vaccine_Avail = true and vaccine_rate > random-float 1000 and vacc_Effective < Vaccine_Efficacy and color = 85 [ set shape "person" set vaccinated 1 set ownincubationperiod ( ownincubationperiod / 5 ) set ownillnessperiod (ownillnessperiod / 5 ) ]
-  ;; identifies vaccinated people, compresses the incubation and illness period
-
-end
-
 to CalculateMeanIDTime
     set meanIDTime mean [ IDTime ] of simuls with [ color != 85 ]
 end
 
-to VaccineBrand
+to vaccinate_me
+
+if vaccine_Avail = true
+  [
+    if count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 1 [ set shape "person" set vaccinated 1
+      if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
+    if count simuls with [ VaccPhase < 2 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 2 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 2 [ set shape "person" set vaccinated 1
+      if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
+    if count simuls with [ VaccPhase < 3 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 3 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 3 [ set shape "person" set vaccinated 1
+      if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
+    if count simuls with [ VaccPhase < 4 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 4 [ set shape "person" set vaccinated 1
+      if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
+  ]
+  ;; identifies vaccinated people, compresses the incubation and illness period
+end
+
+
+to VaccineBrand ;; For selection of vaccines
   if Vaccine_Type = "AstraZeneca" [ set Vaccine_Efficacy 70 ]
   if Vaccine_Type = "Pfizer/BioNTech" [ set Vaccine_Efficacy 95 ]
   if Vaccine_Type = "Moderna" [ set Vaccine_Efficacy 94 ]
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 316
@@ -1753,7 +1777,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-0
+1
 1
 -1000
 
@@ -1830,7 +1854,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-0
+1
 1
 -1000
 
@@ -1910,7 +1934,7 @@ SWITCH
 349
 quarantine
 quarantine
-0
+1
 1
 -1000
 
@@ -2004,7 +2028,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.5529470956183693
+0.25
 .05
 1
 NIL
@@ -2133,7 +2157,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-24.0
+19.0
 .5
 1
 NIL
@@ -2148,7 +2172,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-24.0
+19.0
 .5
 1
 NIL
@@ -2277,7 +2301,7 @@ Compliance_with_Isolation
 Compliance_with_Isolation
 0
 100
-99.0
+100.0
 1
 1
 NIL
@@ -2325,7 +2349,7 @@ Triggerday
 Triggerday
 0
 1000
-1.0
+0.0
 1
 1
 NIL
@@ -2716,7 +2740,7 @@ INPUTBOX
 609
 284
 ppa
-23.0
+19.0
 1
 0
 Number
@@ -2727,7 +2751,7 @@ INPUTBOX
 700
 285
 pta
-23.0
+19.0
 1
 0
 Number
@@ -3144,7 +3168,7 @@ AsymptomaticPercentage
 AsymptomaticPercentage
 0
 100
-30.329707267192337
+33.167161004740585
 1
 1
 NIL
@@ -3681,7 +3705,7 @@ Asymptomatic_Trans
 Asymptomatic_Trans
 0
 1
-0.2901105670124259
+0.4090163171826743
 .01
 1
 NIL
@@ -4236,7 +4260,7 @@ IncursionRate
 IncursionRate
 0
 100
-0.0
+100.0
 1
 1
 NIL
@@ -4260,7 +4284,7 @@ SWITCH
 120
 Isolate
 Isolate
-0
+1
 1
 -1000
 
@@ -4281,9 +4305,9 @@ HORIZONTAL
 
 SWITCH
 1398
-80
+85
 1524
-113
+118
 Vaccine_Avail
 Vaccine_Avail
 0
@@ -4299,7 +4323,7 @@ Vaccine_Rate
 Vaccine_Rate
 0
 700
-2.73
+98.0
 1
 1
 NIL
@@ -4314,7 +4338,7 @@ Vaccine_Efficacy
 Vaccine_Efficacy
 0
 100
-95.0
+94.0
 1
 1
 NIL
@@ -4350,7 +4374,7 @@ GoldStandard
 GoldStandard
 0
 100
-100.0
+95.0
 1
 1
 NIL
@@ -4385,7 +4409,37 @@ CHOOSER
 Vaccine_Type
 Vaccine_Type
 "AstraZeneca" "Moderna" "Pfizer/BioNTech" "Other"
+1
+
+SLIDER
+1710
+40
+1888
+75
+Inf_Curve_Truncation
+Inf_Curve_Truncation
 0
+1
+0.29
+.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1158
+49
+1344
+84
+PropWithComorbidity
+PropWithComorbidity
+0
+100
+20.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -16533,11 +16587,11 @@ set stage BaseStage</setup>
     <enumeratedValueSet variable="Vaccine_Avail">
       <value value="false"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="VEffectiveness">
-      <value value="63"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="Vaccine_Rate">
       <value value="2.73"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Vaccine_Type">
+      <value value="&quot;Moderna&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Visit_Frequency">
       <value value="3"/>
