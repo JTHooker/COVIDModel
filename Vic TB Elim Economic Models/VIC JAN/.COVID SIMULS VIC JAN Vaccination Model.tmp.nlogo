@@ -185,8 +185,9 @@ simuls-own [
   vaccinated ;; is the person vaccinated?
   vacc_Effective ;; is this effective in this person?
   IDTime ;; days into infection the person is identified as a case
-  VaccPhase ;; phase at which this person would receive vaccine
+  vaccPhase ;; phase at which this person would receive vaccine
   comorbidityState ;; does the person have a comorbidity
+  vaccRefuse ;; Is teh person a Vaccine refuser?
 
 
   contacts7 ;; contacts from seven days ago
@@ -291,6 +292,7 @@ to setup
 
         set VaccPhase 4
         set comorbidityState random 100
+        set vaccRefuse random 100
 
         rngs:init ;; replacing previous log transform with beta distribution
         let stream_id random-float 999
@@ -509,7 +511,7 @@ to assigndetectablestatus
   if asymptomaticFlag = 1 and detectable < Undetected_Proportion [ set unDetectedFlag 1 ]
 end
 
-to setphases ;
+to setphases ;; who is in which vaccination phase
   if agerange >= 65 or EssentialWorker = 1 or comorbidityState < PropWithComorbidity [ set VaccPhase 1 ]
   if agerange >= 45 and agerange < 65 [ set VaccPhase 2 ] ;; plus whatever other characteristics you are interested in and the number of phases you want
   if agerange >= 20 and agerange < 45 [ set VaccPhase 3 ]
@@ -1655,13 +1657,13 @@ to vaccinate_me
 
 if vaccine_Avail = true
   [
-    if count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 1 [ set shape "person" set vaccinated 1
+    if count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 1 and vaccRefuse <= VaccRefuseRate [ set shape "person" set vaccinated 1
       if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
-    if count simuls with [ VaccPhase < 2 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 2 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 2 [ set shape "person" set vaccinated 1
+    if count simuls with [ VaccPhase < 2 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 2 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 2 and vaccRefuse <= VaccRefuseRate [ set shape "person" set vaccinated 1
       if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
-    if count simuls with [ VaccPhase < 3 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 3 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 3 [ set shape "person" set vaccinated 1
+    if count simuls with [ VaccPhase < 3 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 3 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 3 and vaccRefuse <= VaccRefuseRate [ set shape "person" set vaccinated 1
       if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
-    if count simuls with [ VaccPhase < 4 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 4 [ set shape "person" set vaccinated 1
+    if count simuls with [ VaccPhase < 4 and vaccinated = 0 ] < 10 and count simuls with [ VaccPhase = 1 and vaccinated = 0 ] > 0 and vaccine_rate > random-float 1000 and color = 85 and VaccPhase = 4 and vaccRefuse <= VaccRefuseRate [ set shape "person" set vaccinated 1
       if vacc_Effective < Vaccine_Efficacy [ set ownincubationperiod ( ownincubationperiod / Inf_Curve_Truncation ) set ownillnessperiod (ownillnessperiod * Inf_Curve_Truncation )] ]
   ]
   ;; identifies vaccinated people, compresses the incubation and illness period
@@ -1673,7 +1675,6 @@ to VaccineBrand ;; For selection of vaccines
   if Vaccine_Type = "Pfizer/BioNTech" [ set Vaccine_Efficacy 95 ]
   if Vaccine_Type = "Moderna" [ set Vaccine_Efficacy 94 ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 316
@@ -1777,7 +1778,7 @@ SWITCH
 168
 spatial_distance
 spatial_distance
-1
+0
 1
 -1000
 
@@ -1854,7 +1855,7 @@ SWITCH
 205
 case_isolation
 case_isolation
-1
+0
 1
 -1000
 
@@ -1934,7 +1935,7 @@ SWITCH
 349
 quarantine
 quarantine
-1
+0
 1
 -1000
 
@@ -2028,7 +2029,7 @@ Track_and_Trace_Efficiency
 Track_and_Trace_Efficiency
 0
 1
-0.25
+0.5321965877324223
 .05
 1
 NIL
@@ -2157,7 +2158,7 @@ Proportion_People_Avoid
 Proportion_People_Avoid
 0
 100
-19.0
+24.0
 .5
 1
 NIL
@@ -2172,7 +2173,7 @@ Proportion_Time_Avoid
 Proportion_Time_Avoid
 0
 100
-19.0
+24.0
 .5
 1
 NIL
@@ -2740,7 +2741,7 @@ INPUTBOX
 609
 284
 ppa
-19.0
+23.0
 1
 0
 Number
@@ -2751,7 +2752,7 @@ INPUTBOX
 700
 285
 pta
-19.0
+23.0
 1
 0
 Number
@@ -4394,7 +4395,7 @@ MONITOR
 1533
 33
 1623
-79
+78
 Vaccinated %
 ( count simuls with [ shape = \"person\" ] / 2500 )* 100
 2
@@ -4405,7 +4406,7 @@ CHOOSER
 2363
 72
 2502
-118
+117
 Vaccine_Type
 Vaccine_Type
 "AstraZeneca" "Moderna" "Pfizer/BioNTech" "Other"
@@ -4415,7 +4416,7 @@ SLIDER
 1710
 40
 1888
-75
+73
 Inf_Curve_Truncation
 Inf_Curve_Truncation
 0
@@ -4430,12 +4431,27 @@ SLIDER
 1158
 49
 1344
-84
+82
 PropWithComorbidity
 PropWithComorbidity
 0
 100
 20.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+987
+46
+1159
+79
+VaccRefuseRate
+VaccRefuseRate
+0
+100
+50.0
 1
 1
 NIL
@@ -4841,7 +4857,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.1.2-beta2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
